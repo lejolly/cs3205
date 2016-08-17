@@ -17,5 +17,9 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cs3205_main" target="1.5" />
+      <module name="cs3205_test" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>

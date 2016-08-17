@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="modificationStamps">
-      <map>
-        <entry key="$USER_HOME$/hubturbo/HubTurbo" value="2863156887000" />
-        <entry key="$PROJECT_DIR$/../HubTurbo-tests" value="2867358032000" />
-      </map>
-    </option>
-    <option name="externalProjectsViewState">
-      <projects_view />
-    </option>
-  </component>
   <component name="ProjectDictionaryState">
     <dictionary name="jolly" />
   </component>
