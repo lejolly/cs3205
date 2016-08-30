@@ -8,6 +8,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Base64;
 
+/*
+* HTTP POST code adapted from:
+* https://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+* */
 public class SMSTest {
 
     private static final String USER_AGENT = "CS3205";
@@ -19,6 +23,7 @@ public class SMSTest {
     private static final String SEND_SMS_URL = "https://apiserver.sent.ly/api/outboundmessage";
 
     public static void main(String[] args) {
+        // getting number and message from user
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String to = "";
         int toNumber = 0;
@@ -41,9 +46,12 @@ public class SMSTest {
             }
         }
 
+        // getting bearer token
         Gson gson = new Gson();
         String bearerToken = "";
         try {
+            // rename "sms-api-keys.json.sample" to "sms-api-keys.json" in the resources folder
+            // and fill in the relevant api key details
             APIKeys apiKeys = gson.fromJson(new FileReader(
                     SMSTest.class.getClassLoader().getResource("sms-api-keys.json").getFile()), APIKeys.class);
             // http://docs.sentlyweb.apiary.io/#introduction/issuing-authenticated-requests/step-1:-encode-consumer-key-and-secret
@@ -54,20 +62,18 @@ public class SMSTest {
             e.printStackTrace();
         }
 
+        // getting access token
         String response = "";
         try {
             response = getAccessToken(bearerToken);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         AccessToken accessToken = gson.fromJson(response, AccessToken.class);
 
-        System.out.println(accessToken.getAccessToken());
-        System.out.println(accessToken.getTokenType());
-
+        // sending sms
         try {
-            response = sendSMS(accessToken.getAccessToken(), "CS3205", "+65" + String.valueOf(toNumber), message);
+            response = sendSMS(accessToken.getAccessToken(), USER_AGENT, "+65" + String.valueOf(toNumber), message);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -89,9 +95,7 @@ public class SMSTest {
         DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
         Gson gson = new Gson();
         SMS sms = new SMS(from, to, text);
-        String jsonSMS = gson.toJson(sms);
-        System.out.println(jsonSMS);
-        dos.writeBytes(jsonSMS);
+        dos.writeBytes(gson.toJson(sms));
         dos.flush();
         dos.close();
 
@@ -109,12 +113,10 @@ public class SMSTest {
         in.close();
 
         //print result
-        System.out.println(response.toString());
+        System.out.println("Response: " + response.toString());
         return response.toString();
     }
 
-    // adapted from
-    // https://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
     private static String getAccessToken(String bearerToken) throws IOException {
         URL urlObject = new URL(TOKEN_API_URL);
         HttpsURLConnection connection = (HttpsURLConnection) urlObject.openConnection();
@@ -147,9 +149,11 @@ public class SMSTest {
         in.close();
 
         //print result
-        System.out.println(response.toString());
+        System.out.println("Response: " + response.toString());
         return response.toString();
     }
+
+    // private classes for JSON de/serialisation
 
     private class AccessToken {
 
