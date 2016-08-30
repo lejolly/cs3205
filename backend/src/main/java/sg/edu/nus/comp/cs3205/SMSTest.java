@@ -160,11 +160,11 @@ public class SMSTest {
         private String access_token;
         private String token_type;
 
-        public String getAccessToken() {
+        String getAccessToken() {
             return access_token;
         }
 
-        public String getTokenType() {
+        String getTokenType() {
             return token_type;
         }
 
@@ -189,11 +189,11 @@ public class SMSTest {
         private String apiKey;
         private String apiSecret;
 
-        public String getApiKey() {
+        String getApiKey() {
             return apiKey;
         }
 
-        public String getApiSecret() {
+        String getApiSecret() {
             return apiSecret;
         }
 
