@@ -28,3 +28,9 @@ task runSMSTest(type: JavaExec) {
     main = "sg.edu.nus.comp.cs3205.SMSTest"
     standardInput = System.in
 }
+
+task runDatabaseTest(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "sg.edu.nus.comp.cs3205.DatabaseTest"
+    standardInput = System.in
+}
