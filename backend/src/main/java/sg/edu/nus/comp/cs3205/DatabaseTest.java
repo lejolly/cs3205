@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs3205;
 
 import com.google.gson.Gson;
-import com.sun.tools.javac.jvm.ClassFile;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class DatabaseTest {
             statement = connection.createStatement();
             resultSet = statement.executeQuery("SELECT VERSION()");
             if (resultSet.next()) {
-                Logger lgr = Logger.getLogger(ClassFile.Version.class.getName());
+                Logger lgr = Logger.getLogger(DatabaseTest.class.getName());
                 lgr.log(Level.INFO, "PostgreSQL version: " + resultSet.getString(1));
             }
 
@@ -53,7 +52,7 @@ public class DatabaseTest {
             get("/", (request, response) -> listActors(innerConnection));
             get("/actor/:actor", (request, response) -> getActor(innerConnection, request.params(":actor")));
         } catch (SQLException ex) {
-            Logger lgr = Logger.getLogger(ClassFile.Version.class.getName());
+            Logger lgr = Logger.getLogger(DatabaseTest.class.getName());
             lgr.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             try {
@@ -67,7 +66,7 @@ public class DatabaseTest {
                     connection.close();
                 }
             } catch (SQLException ex) {
-                Logger lgr = Logger.getLogger(ClassFile.Version.class.getName());
+                Logger lgr = Logger.getLogger(DatabaseTest.class.getName());
                 lgr.log(Level.WARNING, ex.getMessage(), ex);
             }
         }
@@ -76,7 +75,7 @@ public class DatabaseTest {
     private static String listActors(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM actor");
-        Logger lgr = Logger.getLogger(ClassFile.Version.class.getName());
+        Logger lgr = Logger.getLogger(DatabaseTest.class.getName());
         lgr.log(Level.INFO, "Listing actors");
         Gson gson = new Gson();
         ArrayList<Actor> actors = new ArrayList<>();
@@ -96,7 +95,7 @@ public class DatabaseTest {
         }
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM actor WHERE actor_id = " + id);
-        Logger lgr = Logger.getLogger(ClassFile.Version.class.getName());
+        Logger lgr = Logger.getLogger(DatabaseTest.class.getName());
         lgr.log(Level.INFO, "Listing actor " + id);
         Gson gson = new Gson();
         if (resultSet.next()) {
