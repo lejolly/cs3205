@@ -15,8 +15,6 @@ import static spark.Spark.port;
 
 public class DatabaseTest {
 
-    private static final String DB_NAME = "cs3205";
-
     // adapted from: http://zetcode.com/db/postgresqljavatutorial/
     // for use with the sample pagila database:
     // http://pgfoundry.org/frs/?group_id=1000150&release_id=998#pagila-pagila-title-content
@@ -26,7 +24,7 @@ public class DatabaseTest {
         Statement statement = null;
         ResultSet resultSet = null;
 
-        String url = "jdbc:postgresql://localhost/" + DB_NAME;
+        String url = "";
         String user = "";
         String password = "";
 
@@ -34,6 +32,7 @@ public class DatabaseTest {
         try {
             DBCredentials dbCredentials = gson.fromJson(new FileReader(DatabaseTest.class.getClassLoader()
                     .getResource("db-credentials.json").getFile()), DBCredentials.class);
+            url = "jdbc:postgresql://" + dbCredentials.getHost() + "/" + dbCredentials.getDbname();
             user = dbCredentials.getUsername();
             password = dbCredentials.getPassword();
         } catch (IOException e ) {
@@ -108,8 +107,18 @@ public class DatabaseTest {
 
     private class DBCredentials {
 
+        private String host;
+        private String dbname;
         private String username;
         private String password;
+
+        String getHost() {
+            return host;
+        }
+
+        String getDbname() {
+            return dbname;
+        }
 
         String getUsername() {
             return username;
