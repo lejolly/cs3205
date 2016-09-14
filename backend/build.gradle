@@ -34,3 +34,9 @@ task runDatabaseTest(type: JavaExec) {
     main = "sg.edu.nus.comp.cs3205.DatabaseTest"
     standardInput = System.in
 }
+
+task runEndtoEndTest(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "sg.edu.nus.comp.cs3205.EndtoEndTest"
+    standardInput = System.in
+}
