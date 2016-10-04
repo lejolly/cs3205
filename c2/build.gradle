@@ -1,0 +1,27 @@
+group 'c2.cs3205.comp.nus.edu.sg'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "sg.edu.nus.comp.cs3205.c2.StartC2"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // core dependencies
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.5.Final'
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
+
+    // test dependencies
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task runC2(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = mainClassName
+    standardInput = System.in
+}
