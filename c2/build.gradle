@@ -20,6 +20,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+test {
+	testLogging.showStandardStreams = true
+	outputs.upToDateWhen {false}
+}
+
 task runC2(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = mainClassName
