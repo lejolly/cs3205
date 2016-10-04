@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class DatabaseManager {
 
-    private Logger logger = LoggerFactory.getLogger(DatabaseManager.class.getClass().getName());
+    private static Logger logger = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
     private static Connection dbConnection = null;
 
     public DatabaseManager() {
@@ -36,13 +36,13 @@ public class DatabaseManager {
                 String username = credentials.get().getUsername();
                 String password = credentials.get().getPassword();
                 dbConnection = DriverManager.getConnection(url, username, password);
-                logger.info("Getting PostgreSQL version.");
+                logger.info("Getting database version.");
                 Statement statement = dbConnection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT VERSION()");
                 if (resultSet.next()) {
-                    logger.info("PostgreSQL version: " + resultSet.getString(1));
+                    logger.info(resultSet.getString(1));
                 } else {
-                    logger.warn("Unable to get PostgreSQL version.");
+                    logger.warn("Unable to get database version.");
                 }
             } catch (SQLException e) {
                 logger.error("SQLException: ", e);
