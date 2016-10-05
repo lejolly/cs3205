@@ -82,6 +82,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
+        keys.remove(ctx.channel());
         ctx.close();
     }
 
