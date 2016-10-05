@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public class SMSManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(SMSManager.class.getSimpleName());
+
     private static final String USER_AGENT = "CS3205";
     private static final String TOKEN_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=UTF-8";
     private static final String SMS_CONTENT_TYPE = "application/json";
@@ -22,7 +24,6 @@ public class SMSManager {
     private static final String TOKEN_API_URL = "https://apiserver.sent.ly/oauth/token";
     private static final String SEND_SMS_URL = "https://apiserver.sent.ly/api/outboundmessage";
 
-    private static Logger logger = LoggerFactory.getLogger(SMSManager.class.getSimpleName());
     private static SMSAccessToken accessToken = null;
 
     public SMSManager() {

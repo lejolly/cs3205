@@ -1,44 +1,76 @@
 package sg.edu.nus.comp.cs3205.c3.network;
 
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import io.netty.channel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
-import java.util.Date;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.HashMap;
 
 @ChannelHandler.Sharable
 public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
+    private static final Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class.getSimpleName());
+
+    private HashMap<String, Key> keys;
+
+    ServerChannelHandler(HashMap<String, Key> keys) {
+        this.keys = keys;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        // Send greeting for a new connection.
-        ctx.write("Welcome to " + InetAddress.getLocalHost().getHostName() + "!\r\n");
-        ctx.write("It is " + new Date() + " now.\r\n");
+        logger.info("New connection: " + ctx.name());
+        Key key = MacProvider.generateKey();
+        keys.put(ctx.name(), key);
+        ctx.write("key: " + Arrays.toString(key.getEncoded()) + "\r\n");
         ctx.flush();
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
+        logger.info(ctx.name() + " received: \"" + request + "\"");
         // Generate and write a response.
-        String response;
+        String response = "error\r\n";
         boolean close = false;
-        if (request.isEmpty()) {
-            response = "Please type something.\r\n";
-        } else if ("bye".equals(request.toLowerCase())) {
-            response = "Have a good day!\r\n";
-            close = true;
-        } else {
-            response = "Did you say '" + request + "'?\r\n";
+        if (!request.equals("key")) {
+            if (request.isEmpty()) {
+                response = "Please type something.\r\n";
+            } else if ("bye".equals(request.toLowerCase())) {
+                response = "Have a good day!\r\n";
+                close = true;
+            } else {
+                try {
+                    Jwt jwt = Jwts.parser().setSigningKey(keys.get(ctx.name())).parseClaimsJws(request);
+                    String body = jwt.getBody().toString();
+                    response = "Got signed value: \"" + body.substring(5, body.length() - 1) + "\"\r\n";
+                } catch (ExpiredJwtException e) {
+                    logger.error("ExpiredJwtException: ", e);
+                } catch (MalformedJwtException e) {
+                    logger.error("MalformedJwtException: ", e);
+                } catch (SignatureException e) {
+                    logger.error("SignatureException: ", e);
+                } catch (IllegalArgumentException e) {
+                    logger.error("IllegalArgumentException: ", e);
+                }
+            }
+
+            // We do not need to write a ChannelBuffer here.
+            // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
+            ChannelFuture future = ctx.write(response);
+
+            // Close the connection after sending 'Have a good day!'
+            // if the client has sent 'bye'.
+            if (close) {
+                logger.info("Closing connection " + ctx.name());
+                keys.remove(ctx.name());
+                future.addListener(ChannelFutureListener.CLOSE);
+            }
         }
 
-        // We do not need to write a ChannelBuffer here.
-        // We know the encoder inserted at TelnetPipelineFactory will do the conversion.
-        ChannelFuture future = ctx.write(response);
-
-        // Close the connection after sending 'Have a good day!'
-        // if the client has sent 'bye'.
-        if (close) {
-            future.addListener(ChannelFutureListener.CLOSE);
-        }
     }
 
     @Override
@@ -48,7 +80,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        logger.error("Exception: ", cause);
         ctx.close();
     }
 

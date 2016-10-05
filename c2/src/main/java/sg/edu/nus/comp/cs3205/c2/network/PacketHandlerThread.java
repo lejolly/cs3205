@@ -1,50 +1,45 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
-import java.net.DatagramPacket;
-import java.util.Arrays;
-
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
+import java.net.DatagramPacket;
+import java.util.Arrays;
 
 public class PacketHandlerThread extends Thread {
-	final private static Logger logger = LoggerFactory.getLogger(PacketHandlerThread.class);
 
-	final private DatagramPacket packet;
+    final private static Logger logger = LoggerFactory.getLogger(PacketHandlerThread.class.getSimpleName());
 
-	private Claims body;
-	private Header header;
+    final private DatagramPacket packet;
 
-	public PacketHandlerThread(DatagramPacket packet) {
-		this.packet = packet;
-	}
+    private Claims body;
+    private Header header;
 
-	@Override
-	public void run() {
-		byte[] data = Arrays.copyOfRange(packet.getData(), packet.getOffset(), packet.getLength());
-		String jwt = new String(data);
-		Jws<Claims> token = null;
-		try {
-			token = Jwts.parser().parseClaimsJws(jwt);
-		} catch (ExpiredJwtException e) {
+    public PacketHandlerThread(DatagramPacket packet) {
+        this.packet = packet;
+    }
 
-		} catch (MalformedJwtException e) {
+    @Override
+    public void run() {
+        byte[] data = Arrays.copyOfRange(packet.getData(), packet.getOffset(), packet.getLength());
+        String jwt = new String(data);
+        Jws<Claims> token = null;
+        try {
+            token = Jwts.parser().parseClaimsJws(jwt);
+        } catch (ExpiredJwtException e) {
+            logger.error("ExpiredJwtException: ", e);
+        } catch (MalformedJwtException e) {
+            logger.error("MalformedJwtException: ", e);
+        } catch (SignatureException e) {
+            logger.error("SignatureException: ", e);
+        } catch (IllegalArgumentException e) {
+            logger.error("IllegalArgumentException: ", e);
+        }
+        if (token != null) {
+            body = token.getBody();
+            header = token.getHeader();
+        }
+    }
 
-		} catch (SignatureException e) {
-
-		} catch (IllegalArgumentException e) {
-
-		}
-		if (token != null) {
-			body = token.getBody();
-			header = token.getHeader();
-		}
-	}
 }

@@ -9,12 +9,22 @@ import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.Key;
+import java.util.HashMap;
+
 public class NetworkManager {
 
-    private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(NetworkManager.class.getSimpleName());
+
+    private static final int PORT = 8080;
+
+    static HashMap<String, Key> keys;
 
     public NetworkManager() {
         logger.info("Initializing network manager.");
+
+        keys = new HashMap<>();
+
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -22,8 +32,8 @@ public class NetworkManager {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ServerChannelInitializer());
-            b.bind(8080).sync().channel().closeFuture().sync();
+                    .childHandler(new ServerChannelInitializer(keys));
+            b.bind(PORT).sync().channel().closeFuture().sync();
         } catch (InterruptedException e) {
             logger.error("InterruptedException: ", e);
         } finally {

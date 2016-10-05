@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class DatabaseManager {
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
     private static Connection dbConnection = null;
 
     public DatabaseManager() {
