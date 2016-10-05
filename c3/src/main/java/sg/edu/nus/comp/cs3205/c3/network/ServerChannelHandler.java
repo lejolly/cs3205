@@ -15,24 +15,24 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class.getSimpleName());
 
-    private HashMap<String, Key> keys;
+    private HashMap<Channel, Key> keys;
 
-    ServerChannelHandler(HashMap<String, Key> keys) {
+    ServerChannelHandler(HashMap<Channel, Key> keys) {
         this.keys = keys;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("New connection: " + ctx.name());
+        logger.info("New connection: " + ctx.channel());
         Key key = MacProvider.generateKey();
-        keys.put(ctx.name(), key);
+        keys.put(ctx.channel(), key);
         ctx.write("key: " + Arrays.toString(key.getEncoded()) + "\r\n");
         ctx.flush();
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
-        logger.info(ctx.name() + " received: \"" + request + "\"");
+        logger.info(ctx.channel() + " received: \"" + request + "\"");
         // Generate and write a response.
         String response = "error\r\n";
         boolean close = false;
@@ -44,7 +44,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
                 close = true;
             } else {
                 try {
-                    Jwt jwt = Jwts.parser().setSigningKey(keys.get(ctx.name())).parseClaimsJws(request);
+                    Jwt jwt = Jwts.parser().setSigningKey(keys.get(ctx.channel())).parseClaimsJws(request);
                     String body = jwt.getBody().toString();
                     response = "Got signed value: \"" + body.substring(5, body.length() - 1) + "\"\r\n";
                 } catch (ExpiredJwtException e) {
@@ -65,8 +65,8 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
             // Close the connection after sending 'Have a good day!'
             // if the client has sent 'bye'.
             if (close) {
-                logger.info("Closing connection " + ctx.name());
-                keys.remove(ctx.name());
+                logger.info("Closing connection " + ctx.channel());
+                keys.remove(ctx.channel());
                 future.addListener(ChannelFutureListener.CLOSE);
             }
         }
@@ -81,6 +81,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
+        logger.info("Closing connection " + ctx.channel());
         ctx.close();
     }
 

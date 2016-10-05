@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs3205.c3.network;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -18,7 +19,7 @@ public class NetworkManager {
 
     private static final int PORT = 8080;
 
-    static HashMap<String, Key> keys;
+    static HashMap<Channel, Key> keys;
 
     public NetworkManager() {
         logger.info("Initializing network manager.");
