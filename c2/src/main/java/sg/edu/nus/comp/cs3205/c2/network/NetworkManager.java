@@ -22,13 +22,20 @@ public class NetworkManager {
 
     private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getSimpleName());
 
-    private static final int PORT = 8080;
+    private static final int SERVER_PORT = 8081;
+    private static final int CLIENT_PORT = 8080;
     private static final String HOST = "localhost";
 
     public Key key = null;
+    private EventLoopGroup group;
 
     public NetworkManager() {
-        EventLoopGroup group = new NioEventLoopGroup();
+        logger.info("Initializing network manager.");
+        group = new NioEventLoopGroup();
+        startNetworkClient();
+    }
+
+    public void startNetworkClient() {
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
@@ -36,7 +43,8 @@ public class NetworkManager {
                     .handler(new ClientChannelInitializer(this));
 
             // Start the connection attempt.
-            Channel ch = b.connect(HOST, PORT).sync().channel();
+            Channel ch = b.connect(HOST, CLIENT_PORT).sync().channel();
+            // request for key
             ch.writeAndFlush("key\r\n");
 
             // Read commands from the stdin.
@@ -55,14 +63,20 @@ public class NetworkManager {
                     ch.closeFuture().sync();
                     break;
                 } else {
+                    // Sends the received line to the server.
                     if (key != null && !line.isEmpty()) {
-                        // Sends the received line to the server.
                         JwtClaims jwtClaims = new JwtClaims();
-                        jwtClaims.setClaim("line", line);
                         JsonWebSignature jws = new JsonWebSignature();
-                        jws.setPayload(jwtClaims.toJson());
                         jws.setKey(key);
                         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                        try {
+                            int actor_id = Integer.parseInt(line);
+                            jwtClaims.setClaim("actor_id", actor_id);
+                        } catch (NumberFormatException e) {
+                            logger.info("Not a number, NumberFormatException.");
+                            jwtClaims.setClaim("line", line);
+                        }
+                        jws.setPayload(jwtClaims.toJson());
                         lastWriteFuture = ch.writeAndFlush(jws.getCompactSerialization() + "\r\n");
                     } else {
                         lastWriteFuture = ch.writeAndFlush(line + "\r\n");
@@ -80,9 +94,11 @@ public class NetworkManager {
             logger.error("IOException: ", e);
         } catch (JoseException e) {
             logger.error("JoseException: ", e);
-        } finally {
-            group.shutdownGracefully();
         }
+    }
+
+    public void stop() {
+        group.shutdownGracefully();
     }
 
 }

@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class DatabaseManager {
@@ -62,6 +64,49 @@ public class DatabaseManager {
             logger.error("IOException: ", e);
             return Optional.empty();
         }
+    }
+
+    public static int getActorCount() {
+        try {
+            logger.info("Getting number of actors");
+            Statement statement = dbConnection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM actor");
+            if (resultSet.next()) {
+                logger.info("Number of actors: " + resultSet.getInt(1));
+                return resultSet.getInt(1);
+            } else {
+                logger.warn("Unable to get number of actors.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return 0;
+    }
+
+    public static String getActorInfo(int id) {
+        try {
+            logger.info("Getting info of actor id: " + id);
+            PreparedStatement preparedStatement =
+                    dbConnection.prepareStatement("SELECT *  FROM actor WHERE actor_id=?");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                logger.info("Info of actor id " + id + ": " + resultSet.getString(2) + ", " + resultSet.getString(3)
+                        + ", " + resultSet.getString(4));
+                Map<String, String> map = new LinkedHashMap<>();
+                map.put("id", resultSet.getString(1));
+                map.put("first_name", resultSet.getString(2));
+                map.put("last_name", resultSet.getString(3));
+                map.put("last_update", resultSet.getString(4));
+                Gson gson = new Gson();
+                return gson.toJson(map);
+            } else {
+                logger.warn("Unable to get number of actors.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return "";
     }
 
 }

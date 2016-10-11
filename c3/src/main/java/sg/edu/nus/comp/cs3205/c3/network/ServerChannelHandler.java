@@ -7,6 +7,7 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.database.DatabaseManager;
 
 import javax.crypto.KeyGenerator;
 import java.security.Key;
@@ -22,6 +23,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     ServerChannelHandler(HashMap<Channel, Key> keys) {
         this.keys = keys;
+        System.out.println(DatabaseManager.getActorCount());
     }
 
     @Override
@@ -30,6 +32,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
         Key key = KeyGenerator.getInstance("HmacSHA256").generateKey();
         keys.put(ctx.channel(), key);
         ctx.write("key: " + Arrays.toString(key.getEncoded()) + "\r\n");
+        ctx.write("Number of actors: " + DatabaseManager.getActorCount() + "\r\n");
         ctx.flush();
     }
 
@@ -51,9 +54,16 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
                             .setVerificationKey(keys.get(ctx.channel()))
                             .build();
                     JwtClaims jwtClaims = jwtConsumer.processToClaims(request);
-                    response = "Got signed value: \"" + jwtClaims.getClaimsMap().get("line") + "\"\r\n";
+                    if (jwtClaims.getClaimsMap().containsKey("actor_id")) {
+                        int actor_id = Integer.parseInt(String.valueOf(jwtClaims.getClaimsMap().get("actor_id")));
+                        response = DatabaseManager.getActorInfo(actor_id) + "\r\n";
+                    } else {
+                        response = "Got signed value: \"" + jwtClaims.getClaimsMap().get("line") + "\"\r\n";
+                    }
                 } catch (InvalidJwtException e) {
                     logger.error("InvalidJwtException: ", e);
+                } catch (NumberFormatException e) {
+                    logger.error("NumberFormatException: ", e);
                 } catch (IllegalArgumentException e) {
                     logger.error("IllegalArgumentException: ", e);
                 }

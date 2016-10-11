@@ -9,6 +9,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.database.DatabaseManager;
 
 import java.security.Key;
 import java.util.HashMap;
@@ -21,9 +22,8 @@ public class NetworkManager {
 
     static HashMap<Channel, Key> keys;
 
-    public NetworkManager() {
+    public NetworkManager(DatabaseManager databaseManager) {
         logger.info("Initializing network manager.");
-
         keys = new HashMap<>();
 
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
