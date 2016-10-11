@@ -1,30 +1,27 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
 import io.netty.channel.*;
-import org.jose4j.jwt.JwtClaims;
-import org.jose4j.jwt.consumer.InvalidJwtException;
-import org.jose4j.jwt.consumer.JwtConsumer;
-import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.security.Key;
-import java.util.HashMap;
 
 @ChannelHandler.Sharable
 public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class.getSimpleName());
 
-    private HashMap<Channel, Key> keys;
+    private NetworkManager networkManager;
+    private NetworkClient networkClient;
+    private ChannelHandlerContext channelHandlerContext;
 
-    ServerChannelHandler(HashMap<Channel, Key> keys) {
-        this.keys = keys;
+    ServerChannelHandler(NetworkManager networkManager) {
+        this.networkManager = networkManager;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("New connection: " + ctx.channel());
+        networkClient = networkManager.getNetworkClient(this);
+        channelHandlerContext = ctx;
         ctx.write("Welcome!\r\n");
         ctx.flush();
     }
@@ -42,13 +39,8 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
             close = true;
         } else {
             try {
-                JwtConsumer jwtConsumer = new JwtConsumerBuilder()
-                        .setVerificationKey(keys.get(ctx.channel()))
-                        .build();
-                JwtClaims jwtClaims = jwtConsumer.processToClaims(request);
-                response = "Got signed value: \"" + jwtClaims.getClaimsMap().get("line") + "\"\r\n";
-            } catch (InvalidJwtException e) {
-                logger.error("InvalidJwtException: ", e);
+                response = "Got input: \"" + request + "\"\r\n";
+                networkClient.sendInput(request);
             } catch (IllegalArgumentException e) {
                 logger.error("IllegalArgumentException: ", e);
             }
@@ -62,9 +54,14 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
         // if the client has sent 'bye'.
         if (close) {
             logger.info("Closing connection " + ctx.channel());
-            keys.remove(ctx.channel());
+            networkClient.stopClient();
             future.addListener(ChannelFutureListener.CLOSE);
         }
+    }
+
+    public void forwardReply(String reply) {
+        channelHandlerContext.write(reply + "\r\n");
+        channelHandlerContext.flush();
     }
 
     @Override
@@ -76,7 +73,6 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
-        keys.remove(ctx.channel());
         ctx.close();
     }
 

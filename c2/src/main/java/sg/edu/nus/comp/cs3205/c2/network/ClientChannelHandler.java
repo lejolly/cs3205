@@ -13,10 +13,10 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class.getSimpleName());
 
-    private NetworkManager networkManager;
+    private NetworkClient networkClient;
 
-    ClientChannelHandler(NetworkManager networkManager) {
-        this.networkManager = networkManager;
+    ClientChannelHandler(NetworkClient networkClient) {
+        this.networkClient = networkClient;
     }
 
     @Override
@@ -24,10 +24,11 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
         if (msg.startsWith("key: ")) {
             String stringArray = msg.substring(5);
             byte[] bytes = fromString(stringArray);
-            networkManager.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
+            networkClient.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
             logger.info("Got key from server");
         } else {
             logger.info("Message: \"" + msg + "\"");
+            networkClient.receiveReply(msg);
         }
     }
 
