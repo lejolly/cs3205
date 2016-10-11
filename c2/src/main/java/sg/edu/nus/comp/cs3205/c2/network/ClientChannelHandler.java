@@ -24,7 +24,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
         if (msg.startsWith("key: ")) {
             String stringArray = msg.substring(5);
             byte[] bytes = fromString(stringArray);
-            networkManager.key = new SecretKeySpec(bytes, 0, bytes.length, "HS512");
+            networkManager.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
             logger.info("Got key from server");
         } else {
             logger.info("Message: \"" + msg + "\"");

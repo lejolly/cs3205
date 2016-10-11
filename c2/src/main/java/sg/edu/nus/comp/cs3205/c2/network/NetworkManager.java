@@ -1,13 +1,15 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +57,13 @@ public class NetworkManager {
                 } else {
                     if (key != null && !line.isEmpty()) {
                         // Sends the received line to the server.
-                        lastWriteFuture = ch.writeAndFlush(Jwts.builder()
-                                .setSubject(line)
-                                .signWith(SignatureAlgorithm.HS512, key)
-                                .compact() + "\r\n");
+                        JwtClaims jwtClaims = new JwtClaims();
+                        jwtClaims.setClaim("line", line);
+                        JsonWebSignature jws = new JsonWebSignature();
+                        jws.setPayload(jwtClaims.toJson());
+                        jws.setKey(key);
+                        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
+                        lastWriteFuture = ch.writeAndFlush(jws.getCompactSerialization() + "\r\n");
                     } else {
                         lastWriteFuture = ch.writeAndFlush(line + "\r\n");
                     }
@@ -73,6 +78,8 @@ public class NetworkManager {
             logger.error("InterruptedException: ", e);
         } catch (IOException e) {
             logger.error("IOException: ", e);
+        } catch (JoseException e) {
+            logger.error("JoseException: ", e);
         } finally {
             group.shutdownGracefully();
         }

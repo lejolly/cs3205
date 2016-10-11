@@ -1,11 +1,14 @@
 package sg.edu.nus.comp.cs3205.c3.network;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.crypto.MacProvider;
 import io.netty.channel.*;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.KeyGenerator;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,7 +27,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("New connection: " + ctx.channel());
-        Key key = MacProvider.generateKey();
+        Key key = KeyGenerator.getInstance("HmacSHA256").generateKey();
         keys.put(ctx.channel(), key);
         ctx.write("key: " + Arrays.toString(key.getEncoded()) + "\r\n");
         ctx.flush();
@@ -44,15 +47,13 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
                 close = true;
             } else {
                 try {
-                    Jwt jwt = Jwts.parser().setSigningKey(keys.get(ctx.channel())).parseClaimsJws(request);
-                    String body = jwt.getBody().toString();
-                    response = "Got signed value: \"" + body.substring(5, body.length() - 1) + "\"\r\n";
-                } catch (ExpiredJwtException e) {
-                    logger.error("ExpiredJwtException: ", e);
-                } catch (MalformedJwtException e) {
-                    logger.error("MalformedJwtException: ", e);
-                } catch (SignatureException e) {
-                    logger.error("SignatureException: ", e);
+                    JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+                            .setVerificationKey(keys.get(ctx.channel()))
+                            .build();
+                    JwtClaims jwtClaims = jwtConsumer.processToClaims(request);
+                    response = "Got signed value: \"" + jwtClaims.getClaimsMap().get("line") + "\"\r\n";
+                } catch (InvalidJwtException e) {
+                    logger.error("InvalidJwtException: ", e);
                 } catch (IllegalArgumentException e) {
                     logger.error("IllegalArgumentException: ", e);
                 }
