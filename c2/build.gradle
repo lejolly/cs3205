@@ -21,6 +21,16 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+jar {
+    manifest {
+        attributes(
+            "Main-Class": mainClassName,
+            "Class-Path": configurations.compile.collect {it.getName()}.join(' ')
+        )
+    }
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
+
 test {
 	testLogging.showStandardStreams = true
 	outputs.upToDateWhen {false}
@@ -30,4 +40,10 @@ task runC2(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = mainClassName
     standardInput = System.in
+}
+
+run {
+    if(project.hasProperty('args')) {
+        args project.args.split('\\s')
+    }
 }
