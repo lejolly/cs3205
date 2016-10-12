@@ -5,7 +5,7 @@ import org.jose4j.jwt.JwtClaims;
 /**
  * Universal Packet Format
  *
- * action — Determines the nature of the packet, can be in the form *_request or *_response
+ * action - Determines the nature of the packet, can be in the form _request or _response
  *
  * data - Data associated with the request / response
  *
