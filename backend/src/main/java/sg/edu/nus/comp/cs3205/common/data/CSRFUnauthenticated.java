@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs3205.c2.data;
+package sg.edu.nus.comp.cs3205.common.data;
 
 /**
  * Request for CSRF token (unauthenticated)

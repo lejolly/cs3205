@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs3205.c2.data;
+package sg.edu.nus.comp.cs3205.common.data;
 
 import org.jose4j.jwt.JwtClaims;
 

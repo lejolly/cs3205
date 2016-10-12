@@ -17,8 +17,6 @@ public class StartC3 {
     public static void main(String[] args) {
         logger.info("Starting C3");
         databaseManager = new DatabaseManager();
-//        databaseManager.getActorCount();
-//        System.out.println(databaseManager.getActorInfo(1));
 //        smsManager = new SMSManager();
         networkManager = new NetworkManager(databaseManager);
     }
