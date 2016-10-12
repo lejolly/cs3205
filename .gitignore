@@ -68,5 +68,16 @@ com_crashlytics_export_strings.xml
 build/
 # Ignore Gradle GUI config
 gradle-app.setting
+
+###################################################
+## Eclipse buildship.gitignore
+###################################################
+.project
+.classpath
+.settings
+
+###################################################
+## Project files
+###################################################
 sms-api-keys.json
 db-credentials.json
