@@ -18,7 +18,7 @@ public class NetworkManager {
 
     private static final Logger logger = LoggerFactory.getLogger(NetworkManager.class.getSimpleName());
 
-    private static final int PORT = 8080;
+    private static final int PORT = 13205;
 
     static HashMap<Channel, Key> keys;
 

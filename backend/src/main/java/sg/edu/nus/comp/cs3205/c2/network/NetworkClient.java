@@ -18,7 +18,7 @@ public class NetworkClient {
 
     private static Logger logger = LoggerFactory.getLogger(NetworkClient.class.getSimpleName());
 
-    private static final int CLIENT_PORT = 8080;
+    private static final int CLIENT_PORT = 13205;
     private static final String HOST = "localhost";
 
     private ServerChannelHandler serverChannelHandler;
