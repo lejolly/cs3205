@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.SMSTest;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -119,7 +118,7 @@ public class SMSManager {
             // rename "sms-api-keys.json.sample" to "sms-api-keys.json" in the resources folder
             // and fill in the relevant api key details
             return Optional.of(gson.fromJson(new FileReader(
-                    SMSTest.class.getClassLoader().getResource("sms-api-keys.json").getFile()), SMSAPIKeys.class));
+                    SMSManager.class.getClassLoader().getResource("sms-api-keys.json").getFile()), SMSAPIKeys.class));
         } catch (IOException e ) {
             logger.error("IOException: ", e);
             return Optional.empty();
