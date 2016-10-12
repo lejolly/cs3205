@@ -36,3 +36,7 @@ task runC3(type: JavaExec) {
     main = "sg.edu.nus.comp.cs3205.c3.StartC3"
     standardInput = System.in
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+}
