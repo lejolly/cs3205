@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.spec.SecretKeySpec;
 
 @Sharable
-public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
+public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2ClientChannelHandler.class.getSimpleName());
 
-    private NetworkClient networkClient;
+    private C2NetworkClient c2NetworkClient;
 
-    ClientChannelHandler(NetworkClient networkClient) {
-        this.networkClient = networkClient;
+    C2ClientChannelHandler(C2NetworkClient c2NetworkClient) {
+        this.c2NetworkClient = c2NetworkClient;
     }
 
     @Override
@@ -24,11 +24,11 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
         if (msg.startsWith("key: ")) {
             String stringArray = msg.substring(5);
             byte[] bytes = fromString(stringArray);
-            networkClient.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
+            c2NetworkClient.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
             logger.info("Got key from server");
         } else {
             logger.info("Message: \"" + msg + "\"");
-            networkClient.receiveReply(msg);
+            c2NetworkClient.receiveReply(msg);
         }
     }
 

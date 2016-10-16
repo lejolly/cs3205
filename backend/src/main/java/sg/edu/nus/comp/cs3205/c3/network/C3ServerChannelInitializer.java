@@ -1,5 +1,6 @@
-package sg.edu.nus.comp.cs3205.c2.network;
+package sg.edu.nus.comp.cs3205.c3.network;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -8,15 +9,18 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
+import java.security.Key;
+import java.util.HashMap;
+
+public class C3ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    private NetworkManager networkManager;
+    private HashMap<Channel, Key> keys;
 
-    ServerChannelInitializer(NetworkManager networkManager) {
-        this.networkManager = networkManager;
+    C3ServerChannelInitializer(HashMap<Channel, Key> keys) {
+        this.keys = keys;
     }
 
     @Override
@@ -30,7 +34,7 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(new ServerChannelHandler(networkManager));
+        pipeline.addLast(new C3ServerChannelHandler(keys));
     }
 
 }

@@ -14,28 +14,27 @@ import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 
-public class NetworkClient {
+public class C2NetworkClient {
 
-    private static Logger logger = LoggerFactory.getLogger(NetworkClient.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(C2NetworkClient.class.getSimpleName());
 
-    private static final int CLIENT_PORT = 13205;
     private static final String HOST = "localhost";
 
-    private ServerChannelHandler serverChannelHandler;
+    private C2ServerChannelHandler c2ServerChannelHandler;
     public Key key = null;
     private ChannelFuture lastWriteFuture = null;
     private Channel ch;
 
-    public NetworkClient(EventLoopGroup workerGroup, ServerChannelHandler serverChannelHandler) {
-        this.serverChannelHandler = serverChannelHandler;
+    public C2NetworkClient(EventLoopGroup workerGroup, C2ServerChannelHandler c2ServerChannelHandler, int c2ClientPort) {
+        this.c2ServerChannelHandler = c2ServerChannelHandler;
         try {
             Bootstrap b = new Bootstrap();
             b.group(workerGroup)
                     .channel(NioSocketChannel.class)
-                    .handler(new ClientChannelInitializer(this));
+                    .handler(new C2ClientChannelInitializer(this));
 
             // Start the connection attempt.
-            ch = b.connect(HOST, CLIENT_PORT).sync().channel();
+            ch = b.connect(HOST, c2ClientPort).sync().channel();
             // request for key
             ch.writeAndFlush("key\r\n");
         } catch (InterruptedException e) {
@@ -76,7 +75,7 @@ public class NetworkClient {
     }
 
     public void receiveReply(String reply) {
-        serverChannelHandler.forwardReply(reply);
+        c2ServerChannelHandler.forwardReply(reply);
     }
 
     public void stopClient() {

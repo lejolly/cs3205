@@ -15,6 +15,7 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211'
+    compile group: 'com.google.guava', name: 'guava', version: '19.0'
 
     // test dependencies
     testCompile group: 'junit', name: 'junit', version: '4.12'

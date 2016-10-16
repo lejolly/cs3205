@@ -1,9 +1,13 @@
-package sg.edu.nus.comp.cs3205.c3.sms;
+package sg.edu.nus.comp.cs3205.common.sms;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
+import sg.edu.nus.comp.cs3205.common.data.config.SMSAPIKeysConfig;
+import sg.edu.nus.comp.cs3205.common.data.sms.SMSAccessToken;
+import sg.edu.nus.comp.cs3205.common.data.sms.SMSMessage;
+import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -12,7 +16,7 @@ import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.Optional;
 
-public class SMSManager {
+public class SMSManager extends AbstractManager {
 
     private static final Logger logger = LoggerFactory.getLogger(SMSManager.class.getSimpleName());
 
@@ -69,9 +73,8 @@ public class SMSManager {
                 // Send post request
                 connection.setDoOutput(true);
                 DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-                Gson gson = new Gson();
                 SMSMessage sms = new SMSMessage(USER_AGENT, "+65" + to, text);
-                dos.writeBytes(gson.toJson(sms));
+                dos.writeBytes(JsonUtils.toJsonString(sms));
                 dos.flush();
                 dos.close();
 
@@ -103,7 +106,7 @@ public class SMSManager {
     }
 
     private void initializeConnection() {
-        Optional<SMSAPIKeys> apiKeys = readSMSAPIKeysFromFile();
+        Optional<SMSAPIKeysConfig> apiKeys = readSMSAPIKeysFromFile();
         if (apiKeys.isPresent()) {
             getAccessToken(apiKeys.get());
         } else {
@@ -111,21 +114,14 @@ public class SMSManager {
         }
     }
 
-    private Optional<SMSAPIKeys> readSMSAPIKeysFromFile() {
+    private Optional<SMSAPIKeysConfig> readSMSAPIKeysFromFile() {
         logger.info("Reading SMS API keys from file.");
-        Gson gson = new Gson();
-        try {
-            // rename "sms-api-keys.json.sample" to "sms-api-keys.json" in the resources folder
-            // and fill in the relevant api key details
-            return Optional.of(gson.fromJson(new FileReader(
-                    SMSManager.class.getClassLoader().getResource("sms-api-keys.json").getFile()), SMSAPIKeys.class));
-        } catch (IOException e ) {
-            logger.error("IOException: ", e);
-            return Optional.empty();
-        }
+        // rename "sms-api-keys.json.sample" to "sms-api-keys.json" in the config folder
+        // and fill in the relevant api key details
+        return JsonUtils.readJsonFile("config/sms-api-keys.json", SMSAPIKeysConfig.class);
     }
 
-    private String getBearerToken(SMSAPIKeys apiKeys) {
+    private String getBearerToken(SMSAPIKeysConfig apiKeys) {
         try {
             // http://docs.sentlyweb.apiary.io/#introduction/issuing-authenticated-requests/step-1:-encode-consumer-key-and-secret
             String bearerToken = URLEncoder.encode(apiKeys.getApiKey(), "UTF-8") + ":" +
@@ -137,7 +133,7 @@ public class SMSManager {
         }
     }
 
-    private void getAccessToken(SMSAPIKeys apiKeys) {
+    private void getAccessToken(SMSAPIKeysConfig apiKeys) {
         logger.info("Getting SMS access token.");
         String bearerToken = getBearerToken(apiKeys);
         if (!bearerToken.isEmpty()) {
@@ -174,8 +170,7 @@ public class SMSManager {
 
                 if (response.toString().contains("\"token_type\":\"bearer\"")) {
                     logger.info("Received access token.");
-                    Gson gson = new Gson();
-                    accessToken = gson.fromJson(response.toString(), SMSAccessToken.class);
+                    accessToken = JsonUtils.fromJsonString(response.toString(), SMSAccessToken.class);
                     return;
                 }
             } catch (IOException e) {

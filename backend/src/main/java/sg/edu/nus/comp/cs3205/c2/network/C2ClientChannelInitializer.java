@@ -8,17 +8,15 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-import java.security.Key;
-
-public class ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class C2ClientChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    private NetworkClient networkClient;
+    private C2NetworkClient c2NetworkClient;
 
-    ClientChannelInitializer(NetworkClient networkClient) {
-        this.networkClient = networkClient;
+    C2ClientChannelInitializer(C2NetworkClient c2NetworkClient) {
+        this.c2NetworkClient = c2NetworkClient;
     }
 
     @Override
@@ -31,6 +29,6 @@ public class ClientChannelInitializer extends ChannelInitializer<SocketChannel> 
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(new ClientChannelHandler(networkClient));
+        pipeline.addLast(new C2ClientChannelHandler(c2NetworkClient));
     }
 }

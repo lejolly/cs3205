@@ -1,25 +1,25 @@
-package sg.edu.nus.comp.cs3205.c3.database;
+package sg.edu.nus.comp.cs3205.common.data.config;
 
-public class DBCredentials {
+public class DBCredentialsConfig {
 
     private String host;
     private String dbname;
     private String username;
     private String password;
 
-    String getHost() {
+    public String getHost() {
         return host;
     }
 
-    String getDbname() {
+    public String getDbname() {
         return dbname;
     }
 
-    String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    String getPassword() {
+    public String getPassword() {
                 return password;
             }
 

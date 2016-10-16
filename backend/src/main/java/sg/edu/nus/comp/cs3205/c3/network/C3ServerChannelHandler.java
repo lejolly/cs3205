@@ -7,7 +7,7 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.c3.database.DatabaseManager;
+import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
 
 import javax.crypto.KeyGenerator;
 import java.security.Key;
@@ -15,15 +15,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 @ChannelHandler.Sharable
-public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
+public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3ServerChannelHandler.class.getSimpleName());
 
     private HashMap<Channel, Key> keys;
 
-    ServerChannelHandler(HashMap<Channel, Key> keys) {
+    C3ServerChannelHandler(HashMap<Channel, Key> keys) {
         this.keys = keys;
-        System.out.println(DatabaseManager.getActorCount());
+        System.out.println(C3DatabaseManager.getActorCount());
     }
 
     @Override
@@ -32,7 +32,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
         Key key = KeyGenerator.getInstance("HmacSHA256").generateKey();
         keys.put(ctx.channel(), key);
         ctx.write("key: " + Arrays.toString(key.getEncoded()) + "\r\n");
-        ctx.write("Number of actors: " + DatabaseManager.getActorCount() + "\r\n");
+        ctx.write("Number of actors: " + C3DatabaseManager.getActorCount() + "\r\n");
         ctx.flush();
     }
 
@@ -56,7 +56,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
                     JwtClaims jwtClaims = jwtConsumer.processToClaims(request);
                     if (jwtClaims.getClaimsMap().containsKey("actor_id")) {
                         int actor_id = Integer.parseInt(String.valueOf(jwtClaims.getClaimsMap().get("actor_id")));
-                        response = DatabaseManager.getActorInfo(actor_id) + "\r\n";
+                        response = C3DatabaseManager.getActorInfo(actor_id) + "\r\n";
                     } else {
                         response = "Got signed value: \"" + jwtClaims.getClaimsMap().get("line") + "\"\r\n";
                     }

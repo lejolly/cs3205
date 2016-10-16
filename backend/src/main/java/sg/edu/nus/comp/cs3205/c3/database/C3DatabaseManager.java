@@ -1,22 +1,22 @@
 package sg.edu.nus.comp.cs3205.c3.database;
 
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
+import sg.edu.nus.comp.cs3205.common.data.config.DBCredentialsConfig;
+import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class DatabaseManager {
+public class C3DatabaseManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3DatabaseManager.class.getSimpleName());
     private static Connection dbConnection = null;
 
-    public DatabaseManager() {
+    public C3DatabaseManager() {
         if (dbConnection == null) {
             logger.info("Initializing database.");
             initializeConnection();
@@ -31,7 +31,7 @@ public class DatabaseManager {
     }
 
     private void initializeConnection() {
-        Optional<DBCredentials> credentials = readDBCredentialsFromFile();
+        Optional<DBCredentialsConfig> credentials = readDBCredentialsFromFile();
         if (credentials.isPresent()) {
             try {
                 String url = "jdbc:postgresql://" + credentials.get().getHost() + "/" + credentials.get().getDbname();
@@ -54,16 +54,9 @@ public class DatabaseManager {
         }
     }
 
-    private Optional<DBCredentials> readDBCredentialsFromFile() {
+    private Optional<DBCredentialsConfig> readDBCredentialsFromFile() {
         logger.info("Reading database credentials from file.");
-        Gson gson = new Gson();
-        try {
-            return Optional.of(gson.fromJson(new FileReader(DatabaseManager.class.getClassLoader()
-                    .getResource("db-credentials.json").getFile()), DBCredentials.class));
-        } catch (IOException e ) {
-            logger.error("IOException: ", e);
-            return Optional.empty();
-        }
+        return JsonUtils.readJsonFile("config/db-credentials.json", DBCredentialsConfig.class);
     }
 
     public static int getActorCount() {
@@ -98,8 +91,7 @@ public class DatabaseManager {
                 map.put("first_name", resultSet.getString(2));
                 map.put("last_name", resultSet.getString(3));
                 map.put("last_update", resultSet.getString(4));
-                Gson gson = new Gson();
-                return gson.toJson(map);
+                return JsonUtils.toJsonString(map);
             } else {
                 logger.warn("Unable to get number of actors.");
             }

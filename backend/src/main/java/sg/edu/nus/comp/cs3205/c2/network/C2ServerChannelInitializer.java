@@ -1,6 +1,5 @@
-package sg.edu.nus.comp.cs3205.c3.network;
+package sg.edu.nus.comp.cs3205.c2.network;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -8,20 +7,16 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import sg.edu.nus.comp.cs3205.c3.database.DatabaseManager;
 
-import java.security.Key;
-import java.util.HashMap;
-
-public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class C2ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    private static HashMap<Channel, Key> keys;
+    private C2NetworkManager c2NetworkManager;
 
-    ServerChannelInitializer(HashMap<Channel, Key> keys) {
-        ServerChannelInitializer.keys = keys;
+    C2ServerChannelInitializer(C2NetworkManager c2NetworkManager) {
+        this.c2NetworkManager = c2NetworkManager;
     }
 
     @Override
@@ -35,7 +30,7 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(new ServerChannelHandler(keys));
+        pipeline.addLast(new C2ServerChannelHandler(c2NetworkManager));
     }
 
 }

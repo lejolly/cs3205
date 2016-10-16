@@ -5,22 +5,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ChannelHandler.Sharable
-public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
+public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2ServerChannelHandler.class.getSimpleName());
 
-    private NetworkManager networkManager;
-    private NetworkClient networkClient;
+    private C2NetworkManager c2NetworkManager;
+    private C2NetworkClient c2NetworkClient;
     private ChannelHandlerContext channelHandlerContext;
 
-    ServerChannelHandler(NetworkManager networkManager) {
-        this.networkManager = networkManager;
+    C2ServerChannelHandler(C2NetworkManager c2NetworkManager) {
+        this.c2NetworkManager = c2NetworkManager;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("New connection: " + ctx.channel());
-        networkClient = networkManager.getNetworkClient(this);
+        c2NetworkClient = c2NetworkManager.getNetworkClient(this);
         channelHandlerContext = ctx;
         ctx.write("Welcome!\r\n");
         ctx.flush();
@@ -40,7 +40,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
         } else {
             try {
                 response = "Got input: \"" + request + "\"\r\n";
-                networkClient.sendInput(request);
+                c2NetworkClient.sendInput(request);
             } catch (IllegalArgumentException e) {
                 logger.error("IllegalArgumentException: ", e);
             }
@@ -54,7 +54,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
         // if the client has sent 'bye'.
         if (close) {
             logger.info("Closing connection " + ctx.channel());
-            networkClient.stopClient();
+            c2NetworkClient.stopClient();
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }
