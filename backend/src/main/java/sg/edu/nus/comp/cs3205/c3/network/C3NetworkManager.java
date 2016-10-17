@@ -13,7 +13,6 @@ import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.config.C3Config;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
-import java.security.Key;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -25,8 +24,7 @@ public class C3NetworkManager extends AbstractManager {
         logger.info("Initializing network manager.");
         Optional<C3Config> c3Config = JsonUtils.readJsonFile("config/c3.json", C3Config.class);
         if (c3Config.isPresent()) {
-            HashMap<Channel, Key> keys = new HashMap<>();
-
+            HashMap<Channel, String> ids = new HashMap<>();
             EventLoopGroup bossGroup = new NioEventLoopGroup(1);
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             try {
@@ -34,7 +32,7 @@ public class C3NetworkManager extends AbstractManager {
                 b.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .handler(new LoggingHandler(LogLevel.INFO))
-                        .childHandler(new C3ServerChannelInitializer(keys));
+                        .childHandler(new C3ServerChannelInitializer(ids));
                 b.bind(c3Config.get().getC3ServerPort()).sync().channel().closeFuture().sync();
             } catch (InterruptedException e) {
                 logger.error("InterruptedException: ", e);

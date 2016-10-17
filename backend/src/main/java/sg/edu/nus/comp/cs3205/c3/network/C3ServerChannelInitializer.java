@@ -9,7 +9,6 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
-import java.security.Key;
 import java.util.HashMap;
 
 public class C3ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
@@ -17,10 +16,10 @@ public class C3ServerChannelInitializer extends ChannelInitializer<SocketChannel
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    private HashMap<Channel, Key> keys;
+    private HashMap<Channel, String> ids;
 
-    C3ServerChannelInitializer(HashMap<Channel, Key> keys) {
-        this.keys = keys;
+    C3ServerChannelInitializer(HashMap<Channel, String> ids) {
+        this.ids = ids;
     }
 
     @Override
@@ -34,7 +33,7 @@ public class C3ServerChannelInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(new C3ServerChannelHandler(keys));
+        pipeline.addLast(new C3ServerChannelHandler(ids));
     }
 
 }
