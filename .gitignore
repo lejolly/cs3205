@@ -80,3 +80,4 @@ gradle-app.setting
 ## Project files
 ###################################################
 *.json
+keys/
