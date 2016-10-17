@@ -3,10 +3,12 @@ package sg.edu.nus.comp.cs3205.c2.network;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.crypto.spec.SecretKeySpec;
+import sg.edu.nus.comp.cs3205.c2.keys.C2KeyManager;
+import sg.edu.nus.comp.cs3205.common.utils.JwsUtils;
 
 @Sharable
 public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> {
@@ -21,24 +23,13 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        if (msg.startsWith("key: ")) {
-            String stringArray = msg.substring(5);
-            byte[] bytes = fromString(stringArray);
-            c2NetworkClient.key = new SecretKeySpec(bytes, 0, bytes.length, "HmacSHA256");
-            logger.info("Got key from server");
-        } else {
-            logger.info("Message: \"" + msg + "\"");
-            c2NetworkClient.receiveReply(msg);
+        try {
+            JwtClaims jwtClaims = JwsUtils.consumeSignedMessageWithId(C2KeyManager.c3RsaPublicKey, msg);
+            logger.info("Message from C3: \"" + jwtClaims.toString() + "\"");
+            c2NetworkClient.handleMessageFromC3(jwtClaims);
+        } catch (InvalidJwtException e) {
+            logger.error("InvalidJwtException: ", e);
         }
-    }
-
-    private static byte[] fromString(String string) {
-        String[] strings = string.replace("[", "").replace("]", "").split(", ");
-        byte result[] = new byte[strings.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = (byte) Integer.parseInt(strings[i]);
-        }
-        return result;
     }
 
     @Override

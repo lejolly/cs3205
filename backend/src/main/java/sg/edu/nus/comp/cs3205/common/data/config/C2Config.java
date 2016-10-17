@@ -4,6 +4,7 @@ public class C2Config {
 
     private int c2ServerPort;
     private int c2ClientPort;
+    private String c2ClientHost;
 
     public int getC2ServerPort() {
         return c2ServerPort;
@@ -11,6 +12,10 @@ public class C2Config {
 
     public int getC2ClientPort() {
         return c2ClientPort;
+    }
+
+    public String getC2ClientHost() {
+        return c2ClientHost;
     }
 
 }

@@ -36,18 +36,18 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
-        logger.info(ctx.channel() + " received: \"" + request + "\"");
         // Generate and write a response.
         boolean close = false;
         String id = ids.get(ctx.channel());
         String response = JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id, "error") + "\r\n";
         try {
             JwtClaims jwtClaims = JwsUtils.consumeSignedMessageWithId(C3KeyManager.c2RsaPublicKey, request);
-            if (request.isEmpty() || !jwtClaims.hasClaim("message") ||
-                    ((String) jwtClaims.getClaimsMap().get("message")).isEmpty()) {
+            logger.info(ctx.channel() + " received: \"" + jwtClaims.toString() + "\"");
+            if (request.isEmpty()) {
                 response = JwsUtils.getSimpleSignedMessageWithId(
                         C3KeyManager.c3RsaPrivateKey, id, "Please type something") + "\r\n";
-            } else if ("bye".equals(((String) jwtClaims.getClaimsMap().get("message")).toLowerCase())) {
+            } else if (jwtClaims.hasClaim("message") &&
+                    "bye".equals(((String) jwtClaims.getClaimsMap().get("message")).toLowerCase())) {
                 response = JwsUtils.getSimpleSignedMessageWithId(
                         C3KeyManager.c3RsaPrivateKey, id, "Have a good day!") + "\r\n";
                 close = true;
@@ -56,7 +56,7 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
                     int actor_id = Integer.parseInt(String.valueOf(jwtClaims.getClaimsMap().get("actor_id")));
                     response = JwsUtils.getSignedFieldWithId(C3KeyManager.c3RsaPrivateKey, id, "actor_info",
                             C3DatabaseManager.getActorInfo(actor_id)) + "\r\n";
-                } else {
+                } else if (jwtClaims.getClaimsMap().containsKey("message")) {
                     response = JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id,
                             "Got signed value: \"" + jwtClaims.getClaimsMap().get("message")) + "\"\r\n";
                 }

@@ -24,12 +24,14 @@ public class C2NetworkManager extends AbstractManager {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private int c2ClientPort;
+    private String c2ClientHost;
 
     public C2NetworkManager() {
         logger.info("Initializing network manager.");
         Optional<C2Config> c2Config = JsonUtils.readJsonFile("config/c2.json", C2Config.class);
         if (c2Config.isPresent()) {
             c2ClientPort = c2Config.get().getC2ClientPort();
+            c2ClientHost = c2Config.get().getC2ClientHost();
             bossGroup = new NioEventLoopGroup(1);
             workerGroup = new NioEventLoopGroup();
             try {
@@ -48,7 +50,7 @@ public class C2NetworkManager extends AbstractManager {
     }
 
     C2NetworkClient getNetworkClient(C2ServerChannelHandler c2ServerChannelHandler) {
-        return new C2NetworkClient(workerGroup, c2ServerChannelHandler, c2ClientPort);
+        return new C2NetworkClient(workerGroup, c2ServerChannelHandler, c2ClientPort, c2ClientHost);
     }
 
     public void stop() {
