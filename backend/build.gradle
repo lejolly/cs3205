@@ -16,6 +16,7 @@ dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.55'
 
     // test dependencies
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -36,6 +37,11 @@ task runC3(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "sg.edu.nus.comp.cs3205.c3.StartC3"
     standardInput = System.in
+}
+
+task runKeyGenerator(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "sg.edu.nus.comp.cs3205.common.keys.KeyGenerator"
 }
 
 task wrapper(type: Wrapper) {

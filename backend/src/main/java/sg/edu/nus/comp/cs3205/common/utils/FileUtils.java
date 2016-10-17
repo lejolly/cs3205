@@ -70,8 +70,12 @@ public class FileUtils {
      * Writes given string to a file.
      * Will create the file if it does not exist yet.
      */
-    public static void writeToFile(File file, String content) throws IOException {
+    public static void writeToFileString(File file, String content) throws IOException {
         Files.write(file.toPath(), content.getBytes(CHARSET));
+    }
+
+    public static void writeToFileBytes(File file, byte[] content) throws IOException {
+        Files.write(file.toPath(), content);
     }
 
     /**

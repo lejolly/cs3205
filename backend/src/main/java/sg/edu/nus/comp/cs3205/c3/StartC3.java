@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs3205.c3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
+import sg.edu.nus.comp.cs3205.c3.login.C3LoginManager;
 import sg.edu.nus.comp.cs3205.c3.network.C3NetworkManager;
 import sg.edu.nus.comp.cs3205.common.sms.SMSManager;
 
@@ -13,12 +14,14 @@ public class StartC3 {
     private static C3DatabaseManager c3DatabaseManager;
     private static SMSManager smsManager;
     private static C3NetworkManager c3NetworkManager;
+    private static C3LoginManager c3LoginManager;
 
     public static void main(String[] args) {
         logger.info("Starting C3");
         c3DatabaseManager = new C3DatabaseManager();
 //        smsManager = new SMSManager();
         c3NetworkManager = new C3NetworkManager();
+        c3LoginManager = new C3LoginManager();
     }
 
 }
