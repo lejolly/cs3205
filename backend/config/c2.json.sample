@@ -1,5 +1,5 @@
 {
   "c2ServerPort" : "",
   "c2ClientPort" : "",
-  "c2ClientHost" : "localhost"
+  "c2ClientHost" : ""
 }

@@ -75,8 +75,8 @@ public class C2NetworkClient {
         }
     }
 
-    public void stopClient() {
-        lastWriteFuture = ch.writeAndFlush("bye\r\n");
+    public void stopClient() throws JoseException {
+        lastWriteFuture = ch.writeAndFlush(JwsUtils.getSimpleSignedMessageWithId(C2KeyManager.c2RsaPrivateKey, id, "bye") + "\r\n");
         try {
             ch.closeFuture().sync();
         } catch (InterruptedException e) {
