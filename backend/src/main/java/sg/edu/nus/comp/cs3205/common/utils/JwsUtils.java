@@ -34,6 +34,14 @@ public class JwsUtils {
         return jws.getCompactSerialization();
     }
 
+    public static String getSignedClaims(Key key, JwtClaims jwtClaims) throws JoseException {
+        JsonWebSignature jws = new JsonWebSignature();
+        jws.setKey(key);
+        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA512);
+        jws.setPayload(jwtClaims.toJson());
+        return jws.getCompactSerialization();
+    }
+
     public static JwtClaims consumeSignedMessageWithId(Key key, String jws) throws InvalidJwtException {
         JwtConsumer jwtConsumer = new JwtConsumerBuilder().setVerificationKey(key).build();
         return jwtConsumer.processToClaims(jws);

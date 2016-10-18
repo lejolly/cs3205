@@ -11,7 +11,7 @@ import java.util.Map;
 public class CSRFResponse extends BaseUniversalPacketFormat {
 
     public CSRFResponse(String csrf_token, String id) {
-        super("csrf_response", "", "", id, "", "");
+        super("csrf_response", null, null, id, "");
         Map<String, String> map = new LinkedHashMap<>();
         map.put("csrf_token", csrf_token);
         setData(JsonUtils.toJsonString(map));

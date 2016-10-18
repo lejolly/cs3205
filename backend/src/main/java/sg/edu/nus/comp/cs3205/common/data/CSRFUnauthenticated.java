@@ -6,7 +6,7 @@ package sg.edu.nus.comp.cs3205.common.data;
 public class CSRFUnauthenticated extends BaseUniversalPacketFormat {
 
     public CSRFUnauthenticated(String id) {
-        super("csrf_request", "", "", id, "", "");
+        super("csrf_request", null, null, id, "");
     }
 
 }

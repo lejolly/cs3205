@@ -15,10 +15,6 @@ import org.jose4j.jwt.JwtClaims;
  * id - An identifier for the current layer that generated this packet
  *
  * input - The universal packet received as input
- *
- * sign - Signature generated from concatenating the entire packet contents signed with the
- * private key of the processing component, can be verified by an auditor possessing the
- * corresponding public keys
  */
 abstract class BaseUniversalPacketFormat {
 
@@ -27,15 +23,13 @@ abstract class BaseUniversalPacketFormat {
     private String error;
     private String id;
     private String input;
-    private String sign;
 
-    BaseUniversalPacketFormat(String action, String data, String error, String id, String input, String sign) {
+    BaseUniversalPacketFormat(String action, String data, String error, String id, String input) {
         this.action = action;
         this.data = data;
         this.error = error;
         this.id = id;
         this.input = input;
-        this.sign = sign;
     }
 
     public JwtClaims getClaims() {
@@ -45,7 +39,6 @@ abstract class BaseUniversalPacketFormat {
         jwtClaims.setClaim("error", error);
         jwtClaims.setClaim("id", id);
         jwtClaims.setClaim("input", input);
-        jwtClaims.setClaim("sign", sign);
         return jwtClaims;
     }
 
@@ -69,10 +62,6 @@ abstract class BaseUniversalPacketFormat {
         return input;
     }
 
-    public String getSign() {
-        return sign;
-    }
-
     void setAction(String action) {
         this.action = action;
     }
@@ -91,10 +80,6 @@ abstract class BaseUniversalPacketFormat {
 
     void setInput(String input) {
         this.input = input;
-    }
-
-    void setSign(String sign) {
-        this.sign = sign;
     }
 
 }
