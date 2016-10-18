@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs3205.c3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.auth.C3TOTPManager;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
 import sg.edu.nus.comp.cs3205.c3.keys.C3KeyManager;
 import sg.edu.nus.comp.cs3205.c3.login.C3LoginManager;
@@ -19,6 +20,7 @@ public class StartC3 {
     private static C3NetworkManager c3NetworkManager;
     private static C3SessionManager c3SessionManager;
     private static C3LoginManager c3LoginManager;
+    private static C3TOTPManager c3TOTPManager;
 
     public static void main(String[] args) {
         logger.info("Starting C3");
@@ -28,6 +30,7 @@ public class StartC3 {
         c3NetworkManager = new C3NetworkManager();
         c3SessionManager = new C3SessionManager();
 //        c3LoginManager = new C3LoginManager();
+        c3TOTPManager = new C3TOTPManager();
     }
 
 }
