@@ -36,6 +36,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
             response = "Please type something.\r\n";
         } else if ("bye".equals(request.toLowerCase())) {
 //            response = "Have a good day!\r\n";
+            response = "";
             close = true;
         } else {
             try {

@@ -45,7 +45,7 @@ class Session extends CI_Controller {
 		}
 		socket_write($socket, $request, strlen($request));
 
-		$response = socket_getline($socket);
+		$response = $this->socket_getline($socket);
 		$packet = json_decode($response, true);
 		return $packet['data']['auth_token'];
 	}
