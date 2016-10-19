@@ -10,9 +10,9 @@ import java.util.Map;
 /**
  * Request for authentication
  */
-public class LoginRequest extends BaseUniversalPacketFormat {
+public class OldLoginRequest extends BaseUniversalPacketFormat {
 
-    public LoginRequest(String username, String password, String otp, String csrf_token, String id) {
+    public OldLoginRequest(String username, String password, String otp, String csrf_token, String id) {
         super("login_request", null, null, id, "");
         Map<String, String> map = new LinkedHashMap<>();
         map.put("username", username);
@@ -22,7 +22,7 @@ public class LoginRequest extends BaseUniversalPacketFormat {
         setData(JsonUtils.toJsonString(map));
     }
 
-    public LoginRequest(JwtClaims jwtClaims) {
+    public OldLoginRequest(JwtClaims jwtClaims) {
         super("login_request", null, null, null, "");
         if (jwtClaims.hasClaim("data")) {
             setData((String) jwtClaims.getClaimsMap().get("data"));
@@ -32,9 +32,9 @@ public class LoginRequest extends BaseUniversalPacketFormat {
         }
     }
 
-    public static LoginRequest parseJSON(String json) throws InvalidJwtException {
+    public static OldLoginRequest parseJSON(String json) throws InvalidJwtException {
         JwtClaims jwtClaims = JwtClaims.parse(json);
-        return new LoginRequest(jwtClaims);
+        return new OldLoginRequest(jwtClaims);
     }
 
 }

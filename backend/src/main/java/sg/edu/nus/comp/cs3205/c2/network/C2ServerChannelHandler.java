@@ -22,7 +22,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         logger.info("New connection: " + ctx.channel());
         c2NetworkClient = c2NetworkManager.getNetworkClient(this);
         channelHandlerContext = ctx;
-        ctx.write("Welcome!\r\n");
+//        ctx.write("C2 says welcome!\r\n");
         ctx.flush();
     }
 
@@ -35,11 +35,12 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         if (request.isEmpty()) {
             response = "Please type something.\r\n";
         } else if ("bye".equals(request.toLowerCase())) {
-            response = "Have a good day!\r\n";
+//            response = "Have a good day!\r\n";
             close = true;
         } else {
             try {
-                response = "Got input: \"" + request + "\"\r\n";
+//                response = "Got input: \"" + request + "\"\r\n";
+                response = "";
                 c2NetworkClient.handleInput(request);
             } catch (IllegalArgumentException e) {
                 logger.error("IllegalArgumentException: ", e);

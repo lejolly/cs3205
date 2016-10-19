@@ -28,9 +28,9 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         String id = ctx.channel().toString();
         logger.info("New connection: " + id);
         ids.put(ctx.channel(), id);
-        ctx.write(JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id, "Welcome") + "\r\n");
-        ctx.write(JwsUtils.getSignedFieldWithId(C3KeyManager.c3RsaPrivateKey, id, "num_actors",
-                String.valueOf(C3DatabaseManager.getActorCount())) + "\r\n");
+//        ctx.write(JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id, "C3 says welcome!") + "\r\n");
+//        ctx.write(JwsUtils.getSignedFieldWithId(C3KeyManager.c3RsaPrivateKey, id, "num_actors",
+//                String.valueOf(C3DatabaseManager.getActorCount())) + "\r\n");
         ctx.flush();
     }
 
@@ -48,8 +48,9 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
                         C3KeyManager.c3RsaPrivateKey, id, "Please type something") + "\r\n";
             } else if (jwtClaims.hasClaim("message") &&
                     "bye".equals(((String) jwtClaims.getClaimsMap().get("message")).toLowerCase())) {
-                response = JwsUtils.getSimpleSignedMessageWithId(
-                        C3KeyManager.c3RsaPrivateKey, id, "Have a good day!") + "\r\n";
+//                response = JwsUtils.getSimpleSignedMessageWithId(
+//                        C3KeyManager.c3RsaPrivateKey, id, "Have a good day!") + "\r\n";
+                response = "";
                 close = true;
             } else {
                 if (jwtClaims.getClaimsMap().containsKey("actor_id")) {

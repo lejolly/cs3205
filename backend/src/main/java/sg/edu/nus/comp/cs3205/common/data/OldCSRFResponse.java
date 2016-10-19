@@ -8,9 +8,9 @@ import java.util.Map;
 /**
  * Response to CSRF token request
  */
-public class CSRFResponse extends BaseUniversalPacketFormat {
+public class OldCSRFResponse extends BaseUniversalPacketFormat {
 
-    public CSRFResponse(String csrf_token, String id) {
+    public OldCSRFResponse(String csrf_token, String id) {
         super("csrf_response", null, null, id, "");
         Map<String, String> map = new LinkedHashMap<>();
         map.put("csrf_token", csrf_token);

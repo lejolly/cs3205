@@ -6,22 +6,22 @@ import org.jose4j.jwt.consumer.InvalidJwtException;
 /**
  * Request for CSRF token (unauthenticated)
  */
-public class CSRFUnauthenticated extends BaseUniversalPacketFormat {
+public class OldCSRFUnauthenticated extends BaseUniversalPacketFormat {
 
-    public CSRFUnauthenticated(String id) {
+    public OldCSRFUnauthenticated(String id) {
         super("csrf_request", null, null, id, "");
     }
 
-    public CSRFUnauthenticated(JwtClaims jwtClaims) {
+    public OldCSRFUnauthenticated(JwtClaims jwtClaims) {
         super("csrf_request", null, null, null, "");
         if (jwtClaims.hasClaim("id")) {
             setId((String) jwtClaims.getClaimsMap().get("id"));
         }
     }
 
-    public static CSRFUnauthenticated parseJSON(String json) throws InvalidJwtException {
+    public static OldCSRFUnauthenticated parseJSON(String json) throws InvalidJwtException {
         JwtClaims jwtClaims = JwtClaims.parse(json);
-        return new CSRFUnauthenticated(jwtClaims);
+        return new OldCSRFUnauthenticated(jwtClaims);
     }
 
 }

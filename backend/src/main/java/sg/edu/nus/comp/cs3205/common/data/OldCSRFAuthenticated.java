@@ -6,15 +6,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Response for authentication
+ * Request for CSRF token (authenticated)
  */
-public class LoginResponse extends BaseUniversalPacketFormat {
+public class OldCSRFAuthenticated extends BaseUniversalPacketFormat {
 
-    public LoginResponse(String auth_token, String csrf_token, String id) {
-        super("login_response", null, null, id, "");
+    public OldCSRFAuthenticated(String username, String auth_token, String id) {
+        super("csrf_request_auth", null, null, id, "");
         Map<String, String> map = new LinkedHashMap<>();
+        map.put("username", username);
         map.put("auth_token", auth_token);
-        map.put("csrf_token", csrf_token);
         setData(JsonUtils.toJsonString(map));
     }
 

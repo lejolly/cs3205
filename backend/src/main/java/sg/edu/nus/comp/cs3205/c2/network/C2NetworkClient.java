@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -10,7 +12,13 @@ import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c2.keys.C2KeyManager;
+import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
+import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
 import sg.edu.nus.comp.cs3205.common.utils.JwsUtils;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class C2NetworkClient {
 
@@ -41,8 +49,24 @@ public class C2NetworkClient {
         try {
             // Sends the received line to the server.
             if (!line.isEmpty()) {
-
-
+                Gson gson = new Gson();
+                LoginRequest loginRequest = gson.fromJson(line, LoginRequest.class);
+                String username = loginRequest.getData().get("username");
+                String password = loginRequest.getData().get("password");
+                System.out.println("username: " + username);
+                System.out.println("password: " + password);
+                if (username.equals("user") && password.equals("pass")) {
+                    LoginResponse loginResponse = new LoginResponse();
+                    Map<String, String> map = new LinkedHashMap<>();
+                    String auth_token = String.valueOf(Math.abs(ThreadLocalRandom.current().nextLong()));
+                    map.put("auth_token", auth_token);
+                    map.put("csrf_token", "");
+                    loginResponse.setData(map);
+                    System.out.println("auth_token: " + auth_token);
+                    c2ServerChannelHandler.forwardReply(gson.toJson(loginResponse, LoginResponse.class));
+                    lastWriteFuture = ch.writeAndFlush(JwsUtils.getSignedFieldWithId(C2KeyManager.c2RsaPrivateKey, id,
+                            "actor_id", String.valueOf(ThreadLocalRandom.current().nextInt(1, 200 + 1))) + "\r\n");
+                }
 
 //                int actor_id = 0;
 //                try {
@@ -61,10 +85,11 @@ public class C2NetworkClient {
             }
         } catch (InterruptedException e) {
             logger.error("InterruptedException: ", e);
+        } catch (JsonSyntaxException e) {
+            logger.error("Invalid input.");
+        } catch (JoseException e) {
+            logger.error("JoseException: ", e);
         }
-//        } catch (JoseException e) {
-//            logger.error("JoseException: ", e);
-//        }
     }
 
     public void handleMessageFromC3(JwtClaims jwtClaims) {
@@ -72,7 +97,7 @@ public class C2NetworkClient {
             id = (String) jwtClaims.getClaimsMap().get("id");
         }
         if (jwtClaims.hasClaim("message")) {
-            logger.info("Received from C3: " + jwtClaims.getClaimsMap().get("message"));
+            logger.info("Received from C3: \"" + jwtClaims.getClaimsMap().get("message") + "\"");
             c2ServerChannelHandler.forwardReply((String) jwtClaims.getClaimsMap().get("message"));
         } else if (jwtClaims.hasClaim("actor_info")) {
             c2ServerChannelHandler.forwardReply((String) jwtClaims.getClaimsMap().get("actor_info"));
