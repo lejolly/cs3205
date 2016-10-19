@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs3205.common.data.json;
 
-public class LoginRequest extends BaseJSONFormat {
+public class LoginRequest extends BaseJsonFormat {
 
     private static final String ACTION = "login_request";
 
@@ -8,20 +8,8 @@ public class LoginRequest extends BaseJSONFormat {
         setAction(ACTION);
     }
 
-    private LoginRequest(BaseJSONFormat baseJSONFormat) {
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setData(baseJSONFormat.getData());
-        loginRequest.setId(baseJSONFormat.getId());
-        loginRequest.setError(baseJSONFormat.getError());
-        loginRequest.setInput(baseJSONFormat.getInput());
-    }
-
-    public static LoginRequest fromBaseFormat(BaseJSONFormat baseJSONFormat) {
-        if (baseJSONFormat.getAction().equals(ACTION)) {
-            return new LoginRequest(baseJSONFormat);
-        } else {
-            return null;
-        }
+    public static LoginRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
+        return fromBaseFormat(baseJsonFormat, new LoginRequest());
     }
 
 }

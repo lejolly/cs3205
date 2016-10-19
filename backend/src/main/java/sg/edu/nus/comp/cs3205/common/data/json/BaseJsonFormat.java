@@ -5,7 +5,7 @@ import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseJSONFormat {
+public class BaseJsonFormat {
 
     private String action;
     private Map<String, String> data;
@@ -13,7 +13,7 @@ public class BaseJSONFormat {
     private String id;
     private String input;
 
-    public BaseJSONFormat(String action, Map<String, String> data, String error, String id, String input) {
+    public BaseJsonFormat(String action, Map<String, String> data, String error, String id, String input) {
         this.action = action;
         this.data = data;
         this.error = error;
@@ -21,7 +21,7 @@ public class BaseJSONFormat {
         this.input = input;
     }
 
-    public BaseJSONFormat() {
+    public BaseJsonFormat() {
         this.action = "";
         this.data = new HashMap<>();
         this.error = "";
@@ -33,7 +33,21 @@ public class BaseJSONFormat {
         return JsonUtils.toJsonString(this);
     }
 
-    // public static void setEverythingExceptAction(BaseJsonFormat baseJsonFormat, )
+    public static void setEverythingExceptAction(BaseJsonFormat source, BaseJsonFormat destination) {
+        destination.setData(source.getData());
+        destination.setError(source.getError());
+        destination.setId(source.getId());
+        destination.setInput(source.getInput());
+    }
+
+    public static <T extends BaseJsonFormat> T fromBaseFormat(BaseJsonFormat source, T destination) {
+        if (source.getAction().equals(destination.getAction())) {
+            setEverythingExceptAction(source, destination);
+            return destination;
+        } else {
+            return null;
+        }
+    }
 
     public String getAction() {
         return action;
