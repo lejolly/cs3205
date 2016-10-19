@@ -37,20 +37,23 @@ public class C2NetworkClient {
         }
     }
 
-    public void sendInput(String line) {
+    public void handleInput(String line) {
         try {
             // Sends the received line to the server.
             if (!line.isEmpty()) {
-                int actor_id = 0;
-                try {
-                    actor_id = Integer.parseInt(line);
-                } catch (NumberFormatException e) {
-                    logger.info("Not a number, NumberFormatException.");
-                }
-                lastWriteFuture = ch.writeAndFlush(JwsUtils.getSignedFieldWithId(
-                        C2KeyManager.c2RsaPrivateKey, id, "actor_id", String.valueOf(actor_id)) + "\r\n");
+
+
+
+//                int actor_id = 0;
+//                try {
+//                    actor_id = Integer.parseInt(line);
+//                } catch (NumberFormatException e) {
+//                    logger.info("Not a number, NumberFormatException.");
+//                }
+//                lastWriteFuture = ch.writeAndFlush(JwsUtils.getSignedFieldWithId(
+//                        C2KeyManager.c2RsaPrivateKey, id, "actor_id", String.valueOf(actor_id)) + "\r\n");
             } else {
-                lastWriteFuture = ch.writeAndFlush(line + "\r\n");
+//                lastWriteFuture = ch.writeAndFlush(line + "\r\n");
             }
             // Wait until all messages are flushed before closing the channel.
             if (lastWriteFuture != null) {
@@ -58,9 +61,10 @@ public class C2NetworkClient {
             }
         } catch (InterruptedException e) {
             logger.error("InterruptedException: ", e);
-        } catch (JoseException e) {
-            logger.error("JoseException: ", e);
         }
+//        } catch (JoseException e) {
+//            logger.error("JoseException: ", e);
+//        }
     }
 
     public void handleMessageFromC3(JwtClaims jwtClaims) {

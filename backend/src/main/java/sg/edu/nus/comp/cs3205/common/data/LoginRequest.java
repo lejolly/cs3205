@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs3205.common.data;
 
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.util.LinkedHashMap;
@@ -18,6 +20,21 @@ public class LoginRequest extends BaseUniversalPacketFormat {
         map.put("otp", otp);
         map.put("csrf_token", csrf_token);
         setData(JsonUtils.toJsonString(map));
+    }
+
+    public LoginRequest(JwtClaims jwtClaims) {
+        super("login_request", null, null, null, "");
+        if (jwtClaims.hasClaim("data")) {
+            setData((String) jwtClaims.getClaimsMap().get("data"));
+        }
+        if (jwtClaims.hasClaim("id")) {
+            setId((String) jwtClaims.getClaimsMap().get("id"));
+        }
+    }
+
+    public static LoginRequest parseJSON(String json) throws InvalidJwtException {
+        JwtClaims jwtClaims = JwtClaims.parse(json);
+        return new LoginRequest(jwtClaims);
     }
 
 }

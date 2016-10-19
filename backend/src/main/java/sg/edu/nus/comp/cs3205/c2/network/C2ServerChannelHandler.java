@@ -40,7 +40,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         } else {
             try {
                 response = "Got input: \"" + request + "\"\r\n";
-                c2NetworkClient.sendInput(request);
+                c2NetworkClient.handleInput(request);
             } catch (IllegalArgumentException e) {
                 logger.error("IllegalArgumentException: ", e);
             }
