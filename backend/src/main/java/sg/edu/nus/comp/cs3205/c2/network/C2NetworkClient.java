@@ -45,7 +45,7 @@ public class C2NetworkClient {
         }
     }
 
-    public void handleInput(String line) {
+    public void handleInput(String line) throws Exception {
         try {
             // Sends the received line to the server.
             if (!line.isEmpty()) {
@@ -66,6 +66,8 @@ public class C2NetworkClient {
                     c2ServerChannelHandler.forwardReply(gson.toJson(loginResponse, LoginResponse.class));
                     lastWriteFuture = ch.writeAndFlush(JwsUtils.getSignedFieldWithId(C2KeyManager.c2RsaPrivateKey, id,
                             "actor_id", String.valueOf(ThreadLocalRandom.current().nextInt(1, 200 + 1))) + "\r\n");
+                } else {
+                    throw new Exception();
                 }
 
 //                int actor_id = 0;

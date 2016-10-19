@@ -21,12 +21,16 @@ class Session extends CI_Controller {
 		}
 	}
 
-	public function login()
-	{
+	public function login() {
 		$data = array();
 		$data['title'] = "Login";
 		$data['content'] = $this->parser->parse('login_form', array(), true);
 		$this->parser->parse('layout', $data);
+	}
+
+	public function logout() {
+		unset($_SESSION['auth_token']);
+		redirect('session/login');
 	}
 
 	private function get_auth_token($username, $password) {
@@ -61,7 +65,7 @@ class Session extends CI_Controller {
 		$packet['error'] = null;
 		$packet['id'] = get_class($this);
 		$packet['input'] = null;
-		return json_encode($packet);
+		return json_encode($packet)."\r\n";
 	}
 
 	function socket_getline($socket) {
