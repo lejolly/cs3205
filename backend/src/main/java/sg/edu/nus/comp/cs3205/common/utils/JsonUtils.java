@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.json.BaseJSONFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +46,11 @@ public class JsonUtils {
     public static <T> String toJsonString(T instance) {
         Gson gson = new Gson();
         return gson.toJson(instance);
+    }
+
+    public static BaseJSONFormat fromJsonString(String json) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, BaseJSONFormat.class);
     }
 
 }

@@ -1,28 +1,27 @@
 package sg.edu.nus.comp.cs3205.common.data.json;
 
-import java.util.Map;
+public class LoginRequest extends BaseJSONFormat {
 
-public class LoginRequest {
+    private static final String ACTION = "login_request";
 
-    private String action;
-    private Map<String, String> data;
-    private String error;
-    private String id;
-
-    public String getAction() {
-        return action;
+    public LoginRequest() {
+        setAction(ACTION);
     }
 
-    public Map<String, String> getData() {
-        return data;
+    private LoginRequest(BaseJSONFormat baseJSONFormat) {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setData(baseJSONFormat.getData());
+        loginRequest.setId(baseJSONFormat.getId());
+        loginRequest.setError(baseJSONFormat.getError());
+        loginRequest.setInput(baseJSONFormat.getInput());
     }
 
-    public String getError() {
-        return error;
-    }
-
-    public String getId() {
-        return id;
+    public static LoginRequest fromBaseFormat(BaseJSONFormat baseJSONFormat) {
+        if (baseJSONFormat.getAction().equals(ACTION)) {
+            return new LoginRequest(baseJSONFormat);
+        } else {
+            return null;
+        }
     }
 
 }
