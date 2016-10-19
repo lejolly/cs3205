@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
 import io.netty.channel.*;
+import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,9 +73,10 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws JoseException {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
+        c2NetworkClient.stopClient();
         ctx.close();
     }
 

@@ -15,8 +15,9 @@ class Session extends CI_Controller {
 			redirect('authorized/index');
 		} else {
 			$data = array();
-			$data['title'] = "JSON Blob";
-			$data['content'] = $this->parser->parse('display_block', array('title' => 'JSON Blob', 'content' => $jwt), true);
+			$data['title'] = "Login Error";
+			$data['content'] = $this->parser->parse('display_block', array('title' => 'Login Error', 'content' => 'Please try logging in again.'), true);
+			// $data['content'] = $this->parser->parse('display_block', array('title' => 'Error - JSON Blob', 'content' => $jwt), true);
 			$this->parser->parse('layout', $data);
 		}
 	}
@@ -51,6 +52,7 @@ class Session extends CI_Controller {
 
 		$response = $this->socket_getline($socket);
 		$packet = json_decode($response, true);
+		$_SESSION['data'] = json_decode($this->socket_getline($socket), true);
 		return $packet['data']['auth_token'];
 	}
 
