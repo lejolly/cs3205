@@ -28,7 +28,7 @@ class Session extends CI_Controller {
 	}
 
 	private function get_auth_token($username, $password) {
-		$request = $this->get_login_request($username, $password, $csrf_token);
+		$request = $this->get_login_request($username, $password);
 
 		$service_port = '8081';
 		$address = '127.0.0.1';
@@ -41,7 +41,7 @@ class Session extends CI_Controller {
 		if ($result === false) {
 		    return null;
 		}
-		socket_write($socket, $string, strlen($string));
+		socket_write($socket, $request, strlen($request));
 
 		$response = socket_getline($socket);
 		$packet = json_decode($response, true);
