@@ -9,7 +9,7 @@ class Session extends CI_Controller {
 		$payload = $this->get_login_request($username, $password);
 		$jwt = \Firebase\JWT\JWT::encode(array('payload' => $payload), 'secret');
 
-		if($auth_token = $this->get_auth_token($username, $password) || true) {
+		if($auth_token = $this->get_auth_token($username, $password)) {
 			redirect('authorized/index');
 		} else {
 			$data = array();
