@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+session_start();
 
 class Session extends CI_Controller {
 	public function verify() {
@@ -10,6 +11,7 @@ class Session extends CI_Controller {
 		$jwt = \Firebase\JWT\JWT::encode(array('payload' => $payload), 'secret');
 
 		if($auth_token = $this->get_auth_token($username, $password)) {
+			$_SESSION['auth_token'] = $auth_token;
 			redirect('authorized/index');
 		} else {
 			$data = array();
