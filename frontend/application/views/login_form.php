@@ -39,9 +39,9 @@
 
 <script>
 function submitForm() {
-	var username = $('username').val();
+	var username = $('#username').val() == undefined ? '' : $('#username').val();
 	$.ajax({
-		url: '/cs3205/index.php/session/get_salt/'
+		url: '/index.php/session/get_salt/' + username
 	}).done(function(data) {
 		console.log('success');
 		console.log(data);

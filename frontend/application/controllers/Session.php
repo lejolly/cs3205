@@ -44,11 +44,13 @@ class Session extends CI_Controller {
 
 	public function get_salt($username = null) {
 		error_reporting(0); // All errors handled via Exceptions
+		log_message('debug', '[PARAMS] username: ' . $username);
 		$this->load->library('request');
 
 		$action = 'salt_request';
 		$data = array();
-		$data['username'] = $username;
+		$data['username'] = $username == null ? '' : $username;
+		$data['password'] = 'pass'; // TODO: remove this
 		$id = get_class($this);
 
 		try {
