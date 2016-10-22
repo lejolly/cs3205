@@ -11,7 +11,9 @@ public class HashUtils {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         System.out.println(getMD5Hash("hello"));
-        System.out.println(getBcryptHash("pass", BCrypt.gensalt()));
+        String salt = BCrypt.gensalt();
+        System.out.println(salt);
+        System.out.println(getBcryptHash("pass", salt));
     }
 
     // http://stackoverflow.com/questions/415953/how-can-i-generate-an-md5-hash/421696#421696
