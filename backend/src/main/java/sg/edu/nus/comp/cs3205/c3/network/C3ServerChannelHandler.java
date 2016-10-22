@@ -1,44 +1,60 @@
 package sg.edu.nus.comp.cs3205.c3.network;
 
+import com.google.gson.JsonSyntaxException;
 import io.netty.channel.*;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
-import sg.edu.nus.comp.cs3205.c3.keys.C3KeyManager;
+import sg.edu.nus.comp.cs3205.c3.key.C3KeyManager;
+import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
+import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
+import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
+import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JwsUtils;
-
-import java.util.HashMap;
 
 @ChannelHandler.Sharable
 public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(C3ServerChannelHandler.class.getSimpleName());
 
-    private HashMap<Channel, String> ids;
+    private C3SessionManager c3SessionManager;
+    private C3LoginManager c3LoginManager;
 
-    C3ServerChannelHandler(HashMap<Channel, String> ids) {
-        this.ids = ids;
-        System.out.println(C3DatabaseManager.getActorCount());
+    C3ServerChannelHandler(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager) {
+        this.c3SessionManager = c3SessionManager;
+        this.c3LoginManager = c3LoginManager;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String id = ctx.channel().toString();
         logger.info("New connection: " + id);
-        ids.put(ctx.channel(), id);
-//        ctx.write(JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id, "C3 says welcome!") + "\r\n");
-//        ctx.write(JwsUtils.getSignedFieldWithId(C3KeyManager.c3RsaPrivateKey, id, "num_actors",
-//                String.valueOf(C3DatabaseManager.getActorCount())) + "\r\n");
         ctx.flush();
     }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
+        logger.info("Received: " + request);
+        String response = "error" + "\r\n";
+        try {
+            BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(request);
+            SaltRequest saltRequest = SaltRequest.fromBaseFormat(baseJsonFormat);
+            if (saltRequest != null) {
+                response = c3LoginManager.getUserSalt(saltRequest).getJsonString() + "\r\n";
+            }
+        } catch (JsonSyntaxException e) {
+            logger.error("JsonSyntaxException: ", e);
+        }
+        ChannelFuture future = ctx.write(response);
+    }
+
+    public void oldChannelRead0(ChannelHandlerContext ctx, String request) throws Exception {
         // Generate and write a response.
         boolean close = false;
-        String id = ids.get(ctx.channel());
+        String id = "";
         String response = JwsUtils.getSimpleSignedMessageWithId(C3KeyManager.c3RsaPrivateKey, id, "error") + "\r\n";
         try {
             JwtClaims jwtClaims = JwsUtils.consumeSignedMessageWithId(C3KeyManager.c2RsaPublicKey, request);
@@ -78,7 +94,6 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         // if the client has sent 'bye'.
         if (close) {
             logger.info("Closing connection " + ctx.channel());
-            ids.remove(ctx.channel());
             future.addListener(ChannelFutureListener.CLOSE);
         }
     }
@@ -92,7 +107,6 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
-        ids.remove(ctx.channel());
         ctx.close();
     }
 

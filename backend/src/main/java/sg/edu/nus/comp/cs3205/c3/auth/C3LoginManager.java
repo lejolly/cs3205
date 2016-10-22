@@ -1,48 +1,41 @@
-package sg.edu.nus.comp.cs3205.c3.login;
+package sg.edu.nus.comp.cs3205.c3.auth;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltResponse;
+import sg.edu.nus.comp.cs3205.common.utils.ByteUtils;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class C3LoginManager extends AbstractManager {
 
     private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class.getSimpleName());
 
-    private static final String TEST_USER = "user";
-    private static final String TEST_PASS = "pass";
-    private static final String TEST_SALT = "$2a$10$HfD19HLiOQPT1vhpgKYCFO"; // from BCrypt.gensalt()
-    private String testPasswordHash;
-    private Set<String> challenges;
-    private Map<String, String> auth_tokens;
+    private C3SessionManager c3SessionManager;
 
-    public C3LoginManager() {
-        challenges = new HashSet<>();
-        try {
-            testPasswordHash = HashUtils.getMD5Hash(BCrypt.hashpw(TEST_PASS, TEST_SALT));
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("NoSuchAlgorithmException: ", e);
-        }
+    public C3LoginManager(C3SessionManager c3SessionManager) {
+        this.c3SessionManager = c3SessionManager;
     }
 
     public SaltResponse getUserSalt(SaltRequest saltRequest) {
         if (saltRequest.getData().containsKey("username")
-                && saltRequest.getData().get("username").equals(TEST_USER)) {
+                && saltRequest.getData().get("username").equals(c3SessionManager.getTestUser())) {
             try {
                 SaltResponse saltResponse = new SaltResponse();
                 Map<String, String> map = new HashMap<>();
-                map.put("username", TEST_USER);
-                map.put("salt", TEST_SALT);
+                map.put("username", c3SessionManager.getTestUser());
+                map.put("salt", c3SessionManager.getTestSalt());
                 String challenge = HashUtils.get32CharNonce();
-                challenges.add(challenge);
+                c3SessionManager.addChallenge(challenge);
                 map.put("challenge", challenge);
                 saltResponse.setData(map);
                 saltResponse.setId("c3");
@@ -59,29 +52,24 @@ public class C3LoginManager extends AbstractManager {
     public LoginResponse login(LoginRequest loginRequest) throws NoSuchAlgorithmException {
         // check for challenge
         if (loginRequest.getData().containsKey("challenge")
-                && challenges.contains(loginRequest.getData().get("challenge"))) {
+                && c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {
             // check username and response
             if (loginRequest.getData().containsKey("username")
-                    && loginRequest.getData().get("username").equals(TEST_USER)
+                    && loginRequest.getData().get("username").equals(c3SessionManager.getTestUser())
                     && loginRequest.getData().containsKey("response")
                     && loginRequest.getData().get("response").length() == 32) {
-                // http://stackoverflow.com/questions/14243922/java-xor-over-two-arrays/14244006#14244006
                 byte[] array1 = HashUtils.getMD5Hash(
-                        testPasswordHash + loginRequest.getData().get("challenge")).getBytes();
+                        c3SessionManager.getTestPasswordHash() + loginRequest.getData().get("challenge")).getBytes();
                 byte[] array2 = loginRequest.getData().get("response").getBytes();
-                byte[] array3 = new byte[32];
-                int i = 0;
-                for (byte b : array1) {
-                    array3[i] = (byte) (b ^ array2[i++]);
-                }
-                if (Arrays.equals(array3, testPasswordHash.getBytes())) {
+                byte[] array3 = ByteUtils.xorByteArrays(array1, array2);
+                if (Arrays.equals(array3, c3SessionManager.getTestPasswordHash().getBytes())) {
                     LoginResponse loginResponse = new LoginResponse();
                     String auth_token = HashUtils.get32CharNonce();
                     String username = loginRequest.getData().get("username");
-                    if (auth_tokens.containsKey(username)) {
-                        auth_tokens.remove(username);
+                    if (c3SessionManager.isUsernameInAuth_tokens(username)) {
+                        c3SessionManager.removeUsernameFromAuth_tokens(username);
                     }
-                    auth_tokens.put(username, auth_token);
+                    c3SessionManager.addAuth_token(username, auth_token);
                     Map<String, String> map = new HashMap<>();
                     map.put("auth_token", auth_token);
                     loginResponse.setData(map);

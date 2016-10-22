@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs3205.c3.keys;
+package sg.edu.nus.comp.cs3205.c2.key;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +12,18 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 
-public class C3KeyManager extends AbstractManager {
+public class C2KeyManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3KeyManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2KeyManager.class.getSimpleName());
 
-    public static RSAPublicKey c2RsaPublicKey = null;
-    public static RSAPrivateKey c3RsaPrivateKey = null;
+    public static RSAPublicKey c3RsaPublicKey = null;
+    public static RSAPrivateKey c2RsaPrivateKey = null;
 
-    public C3KeyManager() {
-        logger.info("Initialising keys for C3.");
+    public C2KeyManager() {
+        logger.info("Initialising keys for C2.");
         try {
-            c2RsaPublicKey = (RSAPublicKey) KeyUtils.readPemFile("keys/c2_id_rsa.pub");
-            c3RsaPrivateKey = (RSAPrivateKey) KeyUtils.readPemFile("keys/c3_id_rsa");
+            c3RsaPublicKey = (RSAPublicKey) KeyUtils.readPemFile("keys/c3_id_rsa.pub");
+            c2RsaPrivateKey = (RSAPrivateKey) KeyUtils.readPemFile("keys/c2_id_rsa");
         } catch (IOException e) {
             logger.error("IOException: ", e);
         } catch (NoSuchProviderException e) {

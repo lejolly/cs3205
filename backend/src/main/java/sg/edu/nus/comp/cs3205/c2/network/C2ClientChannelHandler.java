@@ -7,7 +7,7 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.c2.keys.C2KeyManager;
+import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
 import sg.edu.nus.comp.cs3205.common.utils.JwsUtils;
 
 @Sharable
