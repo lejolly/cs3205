@@ -46,13 +46,16 @@
       </div>
     </nav>
 
-    <div class="container">{content}</div><!-- /.container -->
+    <div class="container" id="wrapper">
+      <div class="row" id="alerts"></div>
+      <div class="row" id="content">{content}</div>
+    </div><!-- /.container -->
 
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <?php echo link_tag('js/jquery-3.1.1.min.js'); ?>
-    <?php echo link_tag('js/bootstrap.min.js'); ?>
+    <script src="<?php echo base_url().'js/jquery-3.1.1.min.js'; ?>" type="text/javascript"></script>
+    <script src="<?php echo base_url().'js/bootstrap.min.js'; ?>" type="text/javascript"></script>
   </body>
 </html>
