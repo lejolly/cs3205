@@ -17,6 +17,7 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1211'
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
     compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.55'
+    compile group: 'de.svenkubiak', name: 'jBCrypt', version: '0.4.1'
 
     // test dependencies
     testCompile group: 'junit', name: 'junit', version: '4.12'
