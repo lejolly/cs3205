@@ -10,18 +10,6 @@ class Session extends CI_Controller {
 		$password = $this->input->post('password');
 		$otp = $this->input->post('otp');
 
-<<<<<<< Updated upstream
-		if($auth_token = $this->get_auth_token($username, $password)) {
-			$_SESSION['auth_token'] = $auth_token;
-			redirect('authorized/index');
-		} else {
-			$data = array();
-			$data['title'] = "Login Error";
-			$data['content'] = $this->parser->parse('display_block', array('title' => 'Login Error', 'content' => 'Please try logging in again.'), true);
-			// $data['content'] = $this->parser->parse('display_block', array('title' => 'Error - JSON Blob', 'content' => $jwt), true);
-			$this->parser->parse('layout', $data);
-		}
-=======
 		$packet = $this->get_salt($username);
 
 		$data = array();
@@ -40,7 +28,6 @@ class Session extends CI_Controller {
 		// 	$data['content'] = $this->parser->parse('display_block', array('title' => 'JSON Blob', 'content' => $jwt), true);
 		// 	$this->parser->parse('layout', $data);
 		// }
->>>>>>> Stashed changes
 	}
 
 	public function login() {
@@ -50,11 +37,11 @@ class Session extends CI_Controller {
 		$this->parser->parse('layout', $data);
 	}
 
-<<<<<<< Updated upstream
 	public function logout() {
 		unset($_SESSION['auth_token']);
 		redirect('session/login');
-=======
+	}
+
 	public function get_salt($username = null) {
 		error_reporting(0); // All errors handled via Exceptions
 		$this->load->library('request');
@@ -80,7 +67,6 @@ class Session extends CI_Controller {
 
 		$this->output->set_content_type('application/json');
         $this->output->set_output($output);
->>>>>>> Stashed changes
 	}
 
 	private function get_auth_token($username, $password) {
