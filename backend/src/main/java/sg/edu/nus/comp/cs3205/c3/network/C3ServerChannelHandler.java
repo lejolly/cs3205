@@ -11,7 +11,9 @@ import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
 import sg.edu.nus.comp.cs3205.c3.key.C3KeyManager;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
+import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
+import sg.edu.nus.comp.cs3205.common.utils.BaseJsonFormatUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JwsUtils;
 
@@ -41,10 +43,18 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         String response = "error" + "\r\n";
         try {
             BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(request);
-            SaltRequest saltRequest = SaltRequest.fromBaseFormat(baseJsonFormat);
-            if (saltRequest != null) {
-                logger.info("Received salt_request");
-                response = c3LoginManager.getUserSalt(saltRequest).getJsonString() + "\r\n";
+            BaseJsonFormatUtils.JSON_FORMAT format = BaseJsonFormatUtils.getJsonFormat(baseJsonFormat);
+            logger.info("Received " + format);
+            if (format == BaseJsonFormatUtils.JSON_FORMAT.SALT_REQUEST) {
+                SaltRequest saltRequest = SaltRequest.fromBaseFormat(baseJsonFormat);
+                if (saltRequest != null) {
+                    response = c3LoginManager.getUserSalt(saltRequest).getJsonString() + "\r\n";
+                }
+            } else if (format == BaseJsonFormatUtils.JSON_FORMAT.LOGIN_REQUEST) {
+                LoginRequest loginRequest = LoginRequest.fromBaseFormat(baseJsonFormat);
+                if (loginRequest != null) {
+                    response = c3LoginManager.getLoginResponse(loginRequest).getJsonString() + "\r\n";
+                }
             }
         } catch (JsonSyntaxException e) {
             logger.error("JsonSyntaxException: ", e);

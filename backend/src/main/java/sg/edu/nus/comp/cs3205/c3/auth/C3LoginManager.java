@@ -49,7 +49,7 @@ public class C3LoginManager extends AbstractManager {
     }
 
     // http://openwall.info/wiki/people/solar/algorithms/challenge-response-authentication
-    public LoginResponse login(LoginRequest loginRequest) throws NoSuchAlgorithmException {
+    public LoginResponse getLoginResponse(LoginRequest loginRequest) throws NoSuchAlgorithmException {
         // check for challenge
         if (loginRequest.getData().containsKey("challenge")
                 && c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {

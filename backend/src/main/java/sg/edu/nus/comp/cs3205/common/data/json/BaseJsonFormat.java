@@ -1,11 +1,15 @@
 package sg.edu.nus.comp.cs3205.common.data.json;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BaseJsonFormat {
+
+    private static Logger logger = LoggerFactory.getLogger(BaseJsonFormat.class.getSimpleName());
 
     private String action;
     private Map<String, String> data;
@@ -41,10 +45,15 @@ public class BaseJsonFormat {
     }
 
     public static <T extends BaseJsonFormat> T fromBaseFormat(BaseJsonFormat source, T destination) {
-        if (source.getAction().equals(destination.getAction())) {
-            setEverythingExceptAction(source, destination);
-            return destination;
-        } else {
+        try {
+            if (source.getAction().equals(destination.getAction())) {
+                setEverythingExceptAction(source, destination);
+                return destination;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Exception: ", e);
             return null;
         }
     }
