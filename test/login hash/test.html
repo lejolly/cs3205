@@ -1,0 +1,43 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="sha256.js"></script>
+    <script type="text/javascript" src="bCrypt.js"></script>
+    <script type="text/javascript">
+    	var salt = gensalt(10);
+    	var password = "secret";
+    	var challenge = Sha256.hash(Math.random().toString());
+    	var hash;
+    	var response;
+    	var server;
+    	console.log('salt = ' + salt);
+    	console.log('password = ' + password);
+    	console.log('challenge = ' + challenge);
+    	hashpw(password, salt, function(hs, err) {
+    		hs = btoa(hs);
+    		console.log('[SECRET] hs = base_64(Hs(password, salt)) = ' + hs);
+    		hash = Sha256.hash(hs);
+    		console.log('hash = H(Hs(password, salt)) = ' + hash);
+    		response = stringXOR(Sha256.hash(hash + challenge), hs);
+    		console.log('response = H(H(Hs(password, salt)), challenge) xor Hs(password, salt) = ' + response);
+    		server = Sha256.hash(stringXOR(Sha256.hash(hash + challenge), response));
+    		console.log('server = H(H(hash, challenge) xor response) = ' + server);
+    		console.log('(server == hash) = ' + !server.localeCompare(hash));
+    	});
+
+    	function stringXOR(s1, s2) {
+    		s1 = atob(s1);
+    		s2 = atob(s2);
+    		result = '';
+    		for(var i = 0; i < s2.length; i++) {
+    			result += String.fromCharCode(s1.charCodeAt(i) ^ s2.charCodeAt(i));
+    		}
+    		return btoa(result);
+    	}
+    </script>
+    </head>
+</html>
+
+client = H(hash, challenge) xor Hs
+server = H(hash, challenge) xor Hs xor H(hash, challenge)
+H(Hs) = hash
