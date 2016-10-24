@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Request {
 
 	public function send_request($request) {
-		$port = '8081';
+		$port = '8080'; // Temporarily talking to C3 directly
 		$address = '127.0.0.1';
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
@@ -22,11 +22,11 @@ class Request {
 		} else {
 			// TODO: Make socket reading asynchronous and with timeout
 			$response = $this->socket_getline($socket);
-			return json_decode($response, true);
+			return $response;
 		}
 	}
 
-	public function get_packet($action, $data, $id) {
+	public function get_packet($action, $data, $id = '') {
 		$packet = array();
 		$packet['action'] = $action;
 		$packet['data'] = $data;
@@ -38,7 +38,7 @@ class Request {
 
 	public function verify_payload($json_payload, $action, $data_fields) {
 		$payload = json_decode($json_payload, true);
-		if(!isset($payload['acton'])) {
+		if(!isset($payload['action'])) {
 			throw new Exception('Missing field <action> in response payload');
 		} else if(strcmp($payload['action'], $action) != 0) {
 			throw new Exception('Expected <action=' . $action . '> in response payload');
