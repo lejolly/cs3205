@@ -43,11 +43,13 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
             BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(request);
             SaltRequest saltRequest = SaltRequest.fromBaseFormat(baseJsonFormat);
             if (saltRequest != null) {
+                logger.info("Received salt_request");
                 response = c3LoginManager.getUserSalt(saltRequest).getJsonString() + "\r\n";
             }
         } catch (JsonSyntaxException e) {
             logger.error("JsonSyntaxException: ", e);
         }
+        logger.info("Sending response: " + response);
         ChannelFuture future = ctx.write(response);
     }
 

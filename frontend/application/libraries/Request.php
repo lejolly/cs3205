@@ -30,9 +30,9 @@ class Request {
 		$packet = array();
 		$packet['action'] = $action;
 		$packet['data'] = $data;
-		$packet['error'] = null;
+		$packet['error'] = '';
 		$packet['id'] = $id;
-		$packet['input'] = null;
+		$packet['input'] = '';
 		return json_encode($packet) . "\r\n";
 	}
 

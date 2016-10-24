@@ -101,9 +101,9 @@ class Session extends CI_Controller {
 			'password' => $password,
 			'csrf_token' => $csrf_token
 		);
-		$packet['error'] = null;
+		$packet['error'] = '';
 		$packet['id'] = get_class($this);
-		$packet['input'] = null;
+		$packet['input'] = '';
 		return json_encode($packet)."\r\n";
 	}
 
