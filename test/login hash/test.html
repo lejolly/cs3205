@@ -4,9 +4,11 @@
     <script type="text/javascript" src="sha256.js"></script>
     <script type="text/javascript" src="bCrypt.js"></script>
     <script type="text/javascript">
-    	var salt = gensalt(10);
-    	var password = "secret";
-    	var challenge = Sha256.hash(Math.random().toString());
+    	// var salt = gensalt(10);
+    	var salt = '$2a$10$HfD19HLiOQPT1vhpgKYCFO';
+    	var password = 'pass';
+    	// var challenge = Sha256.hash(Math.random().toString());
+    	var challenge = '437d9417244e7dbe497088c7678034bbc31ce9c2a148bce60234fe28de073d4f';
     	var hash;
     	var response;
     	var server;
@@ -18,26 +20,35 @@
     		console.log('[SECRET] hs = base_64(Hs(password, salt)) = ' + hs);
     		hash = Sha256.hash(hs);
     		console.log('hash = H(Hs(password, salt)) = ' + hash);
+    		console.log('hash+challenge: ' + Sha256.hash(hash + challenge));
     		response = stringXOR(Sha256.hash(hash + challenge), hs);
     		console.log('response = H(H(Hs(password, salt)), challenge) xor Hs(password, salt) = ' + response);
-    		server = Sha256.hash(stringXOR(Sha256.hash(hash + challenge), response));
-    		console.log('server = H(H(hash, challenge) xor response) = ' + server);
-    		console.log('(server == hash) = ' + !server.localeCompare(hash));
+    		// server = Sha256.hash(stringXOR(Sha256.hash(hash + challenge), response));
+    		// console.log('server = H(H(hash, challenge) xor response) = ' + server);
+    		// console.log('(server == hash) = ' + !server.localeCompare(hash));
     	});
 
     	function stringXOR(s1, s2) {
     		s1 = atob(s1);
+    		console.log('s1: ' + s1);
+    		console.log('s1 length: ' + s1.length);
     		s2 = atob(s2);
+    		console.log('s2: ' + s2);
+    		console.log('s2 length: ' + s2.length);
     		result = '';
     		for(var i = 0; i < s2.length; i++) {
     			result += String.fromCharCode(s1.charCodeAt(i) ^ s2.charCodeAt(i));
     		}
+    		console.log('result: ' + result);
+    		console.log('btoa(result): ' + btoa(result));
     		return btoa(result);
     	}
     </script>
     </head>
 </html>
 
+<pre>
 client = H(hash, challenge) xor Hs
 server = H(hash, challenge) xor Hs xor H(hash, challenge)
 H(Hs) = hash
+</pre>
