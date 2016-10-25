@@ -4,18 +4,17 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
-import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class C3SessionManager extends AbstractManager {
 
     private static Logger logger = LoggerFactory.getLogger(C3SessionManager.class.getSimpleName());
+
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     private static final String TEST_USER = "user";
     private static final String TEST_PASS = "pass";
@@ -27,17 +26,10 @@ public class C3SessionManager extends AbstractManager {
 
     public C3SessionManager() {
         challenges = new HashSet<>();
+        auth_tokens = new HashMap<>();
         try {
-            String challenge = "437d9417244e7dbe497088c7678034bbc31ce9c2a148bce60234fe28de073d4f";
-            System.out.println("challenge: " + challenge);
-            String secret = Base64.getEncoder().encodeToString(BCrypt.hashpw(TEST_PASS, TEST_SALT).getBytes());
-            System.out.println("secret: " + secret);
+            String secret = ENCODER.encodeToString(BCrypt.hashpw(TEST_PASS, TEST_SALT).getBytes());
             testPasswordHash = HashUtils.getSha256HashFromString(secret);
-            System.out.println("hash: " + testPasswordHash);
-            String hashPlusChallenge = HashUtils.getSha256HashFromString(testPasswordHash + challenge);
-            System.out.println("hash+challenge: " + hashPlusChallenge);
-            String response = XorUtils.xorBase64ByteArrays(hashPlusChallenge.getBytes(), secret.getBytes());
-            System.out.println("response: " + response);
         } catch (NoSuchAlgorithmException e) {
             logger.error("NoSuchAlgorithmException: ", e);
         }

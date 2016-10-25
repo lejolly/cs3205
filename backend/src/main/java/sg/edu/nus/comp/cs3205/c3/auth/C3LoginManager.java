@@ -58,12 +58,13 @@ public class C3LoginManager extends AbstractManager {
             if (loginRequest.getData().containsKey("username")
                     && loginRequest.getData().get("username").equals(c3SessionManager.getTestUser())
                     && loginRequest.getData().containsKey("response")
-                    && loginRequest.getData().get("response").length() == 32) {
-                byte[] array1 = HashUtils.getSha256HashFromString(
-                        c3SessionManager.getTestPasswordHash() + loginRequest.getData().get("challenge")).getBytes();
-                byte[] array2 = loginRequest.getData().get("response").getBytes();
-                byte[] array3 = XorUtils.xorByteArrays(array1, array2);
-                if (Arrays.equals(array3, c3SessionManager.getTestPasswordHash().getBytes())) {
+                    && loginRequest.getData().get("response").length() == 80) {
+                String challenge = loginRequest.getData().get("challenge");
+                String hashPlusChallenge = HashUtils.getSha256HashFromString(
+                        c3SessionManager.getTestPasswordHash() + challenge);
+                String response = loginRequest.getData().get("response");
+                String server = HashUtils.getSha256HashFromString(XorUtils.stringXOR(hashPlusChallenge, response));
+                if (server.compareTo(c3SessionManager.getTestPasswordHash()) == 0) {
                     LoginResponse loginResponse = new LoginResponse();
                     String auth_token = HashUtils.getShaNonce();
                     String username = loginRequest.getData().get("username");

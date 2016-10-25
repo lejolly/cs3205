@@ -23,9 +23,9 @@
     		console.log('hash+challenge: ' + Sha256.hash(hash + challenge));
     		response = stringXOR(Sha256.hash(hash + challenge), hs);
     		console.log('response = H(H(Hs(password, salt)), challenge) xor Hs(password, salt) = ' + response);
-    		// server = Sha256.hash(stringXOR(Sha256.hash(hash + challenge), response));
-    		// console.log('server = H(H(hash, challenge) xor response) = ' + server);
-    		// console.log('(server == hash) = ' + !server.localeCompare(hash));
+    		server = Sha256.hash(stringXOR(Sha256.hash(hash + challenge), response));
+    		console.log('server = H(H(hash, challenge) xor response) = ' + server);
+    		console.log('(server == hash) = ' + !server.localeCompare(hash));
     	});
 
     	function stringXOR(s1, s2) {
