@@ -8,7 +8,7 @@ import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltResponse;
-import sg.edu.nus.comp.cs3205.common.utils.ByteUtils;
+import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +34,7 @@ public class C3LoginManager extends AbstractManager {
                 Map<String, String> map = new HashMap<>();
                 map.put("username", c3SessionManager.getTestUser());
                 map.put("salt", c3SessionManager.getTestSalt());
-                String challenge = HashUtils.get32CharNonce();
+                String challenge = HashUtils.getShaNonce();
                 c3SessionManager.addChallenge(challenge);
                 map.put("challenge", challenge);
                 saltResponse.setData(map);
@@ -45,6 +45,7 @@ public class C3LoginManager extends AbstractManager {
                 return null;
             }
         }
+        logger.warn("Invalid SaltRequest received.");
         return null;
     }
 
@@ -58,13 +59,13 @@ public class C3LoginManager extends AbstractManager {
                     && loginRequest.getData().get("username").equals(c3SessionManager.getTestUser())
                     && loginRequest.getData().containsKey("response")
                     && loginRequest.getData().get("response").length() == 32) {
-                byte[] array1 = HashUtils.getMD5Hash(
+                byte[] array1 = HashUtils.getSha256HashFromString(
                         c3SessionManager.getTestPasswordHash() + loginRequest.getData().get("challenge")).getBytes();
                 byte[] array2 = loginRequest.getData().get("response").getBytes();
-                byte[] array3 = ByteUtils.xorByteArrays(array1, array2);
+                byte[] array3 = XorUtils.xorByteArrays(array1, array2);
                 if (Arrays.equals(array3, c3SessionManager.getTestPasswordHash().getBytes())) {
                     LoginResponse loginResponse = new LoginResponse();
-                    String auth_token = HashUtils.get32CharNonce();
+                    String auth_token = HashUtils.getShaNonce();
                     String username = loginRequest.getData().get("username");
                     if (c3SessionManager.isUsernameInAuth_tokens(username)) {
                         c3SessionManager.removeUsernameFromAuth_tokens(username);
@@ -78,6 +79,7 @@ public class C3LoginManager extends AbstractManager {
                 }
             }
         }
+        logger.warn("Invalid LoginRequest received.");
         return null;
     }
 

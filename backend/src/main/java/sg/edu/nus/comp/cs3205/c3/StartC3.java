@@ -29,7 +29,7 @@ public class StartC3 {
 //        smsManager = new SMSManager();
         c3SessionManager = new C3SessionManager();
         c3LoginManager = new C3LoginManager(c3SessionManager);
-        c3NetworkManager = new C3NetworkManager(c3SessionManager, c3LoginManager);
+//        c3NetworkManager = new C3NetworkManager(c3SessionManager, c3LoginManager);
 //        c3TOTPManager = new C3TOTPManager();
     }
 
