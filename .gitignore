@@ -81,3 +81,4 @@ gradle-app.setting
 ###################################################
 *.json
 /frontend/application/logs/*
+*.class
