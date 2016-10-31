@@ -8,11 +8,10 @@ import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltResponse;
-import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
+import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +20,11 @@ public class C3LoginManager extends AbstractManager {
     private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class.getSimpleName());
 
     private C3SessionManager c3SessionManager;
+    private C3TotpManager c3TotpManager;
 
-    public C3LoginManager(C3SessionManager c3SessionManager) {
+    public C3LoginManager(C3SessionManager c3SessionManager, C3TotpManager c3TotpManager) {
         this.c3SessionManager = c3SessionManager;
+        this.c3TotpManager = c3TotpManager;
     }
 
     public SaltResponse getUserSalt(SaltRequest saltRequest) {
@@ -58,7 +59,9 @@ public class C3LoginManager extends AbstractManager {
             if (loginRequest.getData().containsKey("username")
                     && loginRequest.getData().get("username").equals(c3SessionManager.getTestUser())
                     && loginRequest.getData().containsKey("response")
-                    && loginRequest.getData().get("response").length() == 80) {
+                    && loginRequest.getData().get("response").length() == 80
+                    && loginRequest.getData().containsKey("otp")
+                    && c3TotpManager.checkOTP(loginRequest.getData().get("otp"))) {
                 String challenge = loginRequest.getData().get("challenge");
                 String hashPlusChallenge = HashUtils.getSha256HashFromString(
                         c3SessionManager.getTestPasswordHash() + challenge);
