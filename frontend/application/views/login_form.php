@@ -74,8 +74,12 @@ function submitForm(_username, salt, _challenge) {
 
 		$.post('/index.php/session/verify/', {username: _username, challenge: _challenge, response: _response, csrf_token: _csrf_token, otp: _otp})
 		.done(function(response) {
-			if(response.hasOwnProperty('error')) {
+			if(response.hasOwnProperty('error') && response.error != '') {
 				showDangerAlert(response.error);
+			} else {
+				sessionStorage.setItem('auth_token', response.auth_token);
+				sessionStorage.setItem('session_token', response.session_token);
+				window.location = '/index.php/authorized/index';
 			}
 		})
 	});

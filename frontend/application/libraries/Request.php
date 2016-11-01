@@ -59,6 +59,15 @@ class Request {
 		}
 	}
 
+	public function get_error($json_payload) {
+		$payload = json_decode($json_payload, true);
+		if(!isset($payload['error']) || empty($payload['error'])) {
+			return null;
+		} else {
+			return $payload['error'];
+		}
+	}
+
 	public static function error_output_json($message) {
 		$data = array();
 		$data['error'] = $message;

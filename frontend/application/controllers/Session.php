@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+@session_start();
 class Session extends CI_Controller {
 	public function login() {
 		$data = array();
@@ -10,7 +11,7 @@ class Session extends CI_Controller {
 	}
 
 	public function logout() {
-		delete_cookie('auth_token');
+		unset($_SESSION['auth_token']);
 		redirect('session/login');
 	}
 
@@ -49,17 +50,19 @@ class Session extends CI_Controller {
 				$response = $this->request->send_request($packet);
 				log_message('debug', '[RESPONSE] login_response: ' . var_export($response, true));
 // TODO: signature verification?
-				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'csrf_token'));
-				set_cookie('auth_token', $data['auth_token']);
-				redirect('authorized/index');
+				$data = $this->request->verify_payload($response, 'login_response', array('auth_token'/*, 'csrf_token' exclude for now*/));
+				$data['session_token'] = md5(rand());
+				$_SESSION['auth_token'] = $data['auth_token'];
+				$output = json_encode($data);
 			} catch (Exception $e) {
 				log_message('error', 'Exception when trying to login: ' . $e->getMessage());
-				$output = Request::error_output_json('Unable to login, perhaps the server is down?');
-				log_message('debug', '[OUTPUT] ' . $output);
-				$this->output->set_content_type('application/json');
-        		$this->output->set_output($output);
+				$error = $this->request->get_error($response);
+				$output = Request::error_output_json($error == null ? 'Unable to login, perhaps the server is down?' : $error);
 			}
-			
+
+			$this->output->set_content_type('application/json');
+        	$this->output->set_output($output);
+        	log_message('debug', '[OUTPUT] ' . $output);
 		}
 	}
 
