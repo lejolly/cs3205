@@ -36,9 +36,9 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
-        logger.info("Received: " + request);
         BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C3KeyManager.c2RsaPublicKey, request);
         if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
+            logger.info("Received from C2: " + baseJsonFormat.getJsonString());
             BaseJsonFormat response = null;
             JSON_FORMAT format = JsonUtils.getJsonFormat(baseJsonFormat);
             logger.info("Received " + format);
@@ -59,7 +59,7 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
                 return;
             }
         }
-        logger.info("Invalid request received");
+        logger.info("Invalid request received: " + request);
         logger.info("Closing connection " + ctx.channel());
         ctx.write("error\r\n");
         ctx.flush();
