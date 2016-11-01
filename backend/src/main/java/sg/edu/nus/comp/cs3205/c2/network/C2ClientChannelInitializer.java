@@ -13,10 +13,10 @@ public class C2ClientChannelInitializer extends ChannelInitializer<SocketChannel
     private static final StringDecoder DECODER = new StringDecoder();
     private static final StringEncoder ENCODER = new StringEncoder();
 
-    private C2NetworkClient c2NetworkClient;
+    private C2NetworkForwarder c2NetworkForwarder;
 
-    C2ClientChannelInitializer(C2NetworkClient c2NetworkClient) {
-        this.c2NetworkClient = c2NetworkClient;
+    C2ClientChannelInitializer(C2NetworkForwarder c2NetworkForwarder) {
+        this.c2NetworkForwarder = c2NetworkForwarder;
     }
 
     @Override
@@ -29,6 +29,6 @@ public class C2ClientChannelInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(ENCODER);
 
         // and then business logic.
-        pipeline.addLast(new C2ClientChannelHandler(c2NetworkClient));
+        pipeline.addLast(new C2ClientChannelHandler(c2NetworkForwarder));
     }
 }

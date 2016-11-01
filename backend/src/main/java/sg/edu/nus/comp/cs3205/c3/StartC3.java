@@ -24,8 +24,8 @@ public class StartC3 {
 
     public static void main(String[] args) {
         logger.info("Starting C3");
-//        c3KeyManager = new C3KeyManager();
-//        c3DatabaseManager = new C3DatabaseManager();
+        c3KeyManager = new C3KeyManager();
+        c3DatabaseManager = new C3DatabaseManager();
 //        smsManager = new SMSManager();
         c3SessionManager = new C3SessionManager();
         c3TotpManager = new C3TotpManager();

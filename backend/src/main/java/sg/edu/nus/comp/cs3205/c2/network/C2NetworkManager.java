@@ -49,8 +49,8 @@ public class C2NetworkManager extends AbstractManager {
         }
     }
 
-    C2NetworkClient getNetworkClient(C2ServerChannelHandler c2ServerChannelHandler) {
-        return new C2NetworkClient(workerGroup, c2ServerChannelHandler, c2ClientPort, c2ClientHost);
+    C2NetworkForwarder getNetworkClient(C2ServerChannelHandler c2ServerChannelHandler) {
+        return new C2NetworkForwarder(workerGroup, c2ServerChannelHandler, c2ClientPort, c2ClientHost);
     }
 
     public void stop() {

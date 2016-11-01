@@ -18,6 +18,17 @@ public class TotpUtils {
 
     private static final int INTERVAL = 30;
 
+    public static void main (String[] args) {
+        List<String> otps = getOTPS("Test");
+        if (otps.size() == 3) {
+            for (String otp : otps) {
+                System.out.println(otp);
+            }
+        } else {
+            System.out.println("Unable to get OTPs");
+        }
+    }
+
     public static List<String> getOTPS(String key) {
         long currentTime = System.currentTimeMillis();
         long C = currentTime / 1000 / INTERVAL;
