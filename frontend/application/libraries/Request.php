@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Request {
 
 	public function send_request($request) {
-		$port = '8080'; // Temporarily talking to C3 directly
+		$port = '8081'; // Temporarily talking to C3 directly
 		$address = '127.0.0.1';
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
@@ -20,9 +20,9 @@ class Request {
 		if(!socket_write($socket, $request, strlen($request))) {
 			throw new Exception("Socket write error: " . socket_strerror(socket_last_error()));
 		} else {
-			// TODO: Make socket reading asynchronous and with timeout
-			$response = $this->socket_getline($socket);
-			return $response;
+			if($response = $this->socket_getline($socket)) {
+				return $response;
+			}
 		}
 	}
 
@@ -66,11 +66,26 @@ class Request {
 	}
 
 	private function socket_getline($socket) {
+		socket_set_nonblock($socket);
+		$start = time();
+		$timeout = 1;
 	    $response = '';
-	    while ($out = socket_read($socket, 1024)) {
-	        $response .= $out;
-	        if (strpos($response, "\r\n") !== false) break;
+	    log_message('debug', 'Socket read start: ' . $start);
+
+	    while (true) {
+	    	$data = socket_read($socket, 1024);
+
+	    	if($data) {
+	    		$response .= $data;
+	    	}
+
+	        if (strpos($data, "\r\n") !== false) {
+	        	return $response;
+	        } else if(time() > $start + $timeout) {
+	        	log_message('error', 'Server response timeout');
+	        	break;
+	        }
 	    }
-	    return $response;
+	    return false;
 	}
 }
