@@ -20,7 +20,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        logger.info("New connection: " + ctx.channel());
+        logger.info("New connection from C1: " + ctx.channel());
         c2NetworkForwarder = c2NetworkManager.getNetworkClient(this);
         channelHandlerContext = ctx;
         ctx.flush();

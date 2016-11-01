@@ -30,7 +30,7 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         String id = ctx.channel().toString();
-        logger.info("New connection: " + id);
+        logger.info("New connection from C2: " + id);
         ctx.flush();
     }
 
@@ -61,6 +61,8 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         }
         logger.info("Invalid request received");
         logger.info("Closing connection " + ctx.channel());
+        ctx.write("error\r\n");
+        ctx.flush();
         ctx.close();
     }
 
@@ -73,6 +75,8 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
+        ctx.write("error\r\n");
+        ctx.flush();
         ctx.close();
     }
 

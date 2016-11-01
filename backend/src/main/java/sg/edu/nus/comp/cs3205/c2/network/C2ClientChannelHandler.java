@@ -23,17 +23,19 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        try {
-            BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C2KeyManager.c3RsaPublicKey, msg);
-            if (baseJsonFormat != null) {
-                logger.info("Received from C3: \"" + baseJsonFormat.getJsonString() + "\"");
-                c2NetworkForwarder.handleMessageFromC3(baseJsonFormat);
-                return;
+        if (!msg.equals("error")) {
+            try {
+                BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C2KeyManager.c3RsaPublicKey, msg);
+                if (baseJsonFormat != null) {
+                    logger.info("Received from C3: \"" + baseJsonFormat.getJsonString() + "\"");
+                    c2NetworkForwarder.handleMessageFromC3(baseJsonFormat);
+                    return;
+                }
+            } catch (InvalidJwtException e) {
+                logger.error("InvalidJwtException: ", e);
             }
-        } catch (InvalidJwtException e) {
-            logger.error("InvalidJwtException: ", e);
         }
-        logger.info("Invalid request received");
+        logger.info("Invalid reply from C3 received");
         logger.info("Closing connection " + ctx.channel());
         ctx.close();
     }
