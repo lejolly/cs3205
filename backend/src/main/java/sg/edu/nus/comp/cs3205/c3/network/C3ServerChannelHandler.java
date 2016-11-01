@@ -56,12 +56,12 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
             if (response != null) {
                 logger.info("Sending response: " +  response.getJsonString());
                 ctx.write(JsonUtils.getSignedBaseJsonFormat(C3KeyManager.c3RsaPrivateKey, response) + "\r\n");
+                return;
             }
-        } else {
-            logger.info("Invalid request received");
-            logger.info("Closing connection " + ctx.channel());
-            ctx.close();
         }
+        logger.info("Invalid request received");
+        logger.info("Closing connection " + ctx.channel());
+        ctx.close();
     }
 
     @Override

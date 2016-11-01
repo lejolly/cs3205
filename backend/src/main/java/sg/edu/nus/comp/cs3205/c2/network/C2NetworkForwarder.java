@@ -36,23 +36,22 @@ public class C2NetworkForwarder {
     }
 
     public void handleInputFromC1(String line) throws Exception {
-        BaseJsonFormat baseJsonFormat = null;
         try {
-            baseJsonFormat = JsonUtils.fromJsonString(line);
+            BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(line);
+            if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
+                logger.info("Sending to C3: \"" + baseJsonFormat.getJsonString() + "\"");
+                ChannelFuture lastWriteFuture = channel.writeAndFlush(JsonUtils.getSignedBaseJsonFormat(
+                        C2KeyManager.c2RsaPrivateKey, baseJsonFormat) + "\r\n");
+                if (lastWriteFuture != null) {
+                    lastWriteFuture.sync();
+                }
+                return;
+            }
         } catch (JsonSyntaxException e) {
             logger.error("JsonSyntaxException: ", e);
         }
-        if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
-            logger.info("Sending to C3: \"" + baseJsonFormat.getJsonString() + "\"");
-            ChannelFuture lastWriteFuture = channel.writeAndFlush(JsonUtils.getSignedBaseJsonFormat(
-                    C2KeyManager.c2RsaPrivateKey, baseJsonFormat) + "\r\n");
-            if (lastWriteFuture != null) {
-                lastWriteFuture.sync();
-            }
-        } else {
-            logger.info("Invalid request received");
-            throw new Exception();
-        }
+        logger.info("Invalid request received");
+        throw new Exception();
     }
 
     public void handleMessageFromC3(BaseJsonFormat baseJsonFormat) {

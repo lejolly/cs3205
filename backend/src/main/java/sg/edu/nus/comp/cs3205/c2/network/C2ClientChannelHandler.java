@@ -28,13 +28,14 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
             if (baseJsonFormat != null) {
                 logger.info("Received from C3: \"" + baseJsonFormat.getJsonString() + "\"");
                 c2NetworkForwarder.handleMessageFromC3(baseJsonFormat);
+                return;
             }
         } catch (InvalidJwtException e) {
             logger.error("InvalidJwtException: ", e);
-            logger.info("Invalid request received");
-            logger.info("Closing connection " + ctx.channel());
-            ctx.close();
         }
+        logger.info("Invalid request received");
+        logger.info("Closing connection " + ctx.channel());
+        ctx.close();
     }
 
     @Override
