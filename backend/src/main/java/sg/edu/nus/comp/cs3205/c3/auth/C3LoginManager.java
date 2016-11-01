@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs3205.c3.auth;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
@@ -28,25 +29,35 @@ public class C3LoginManager extends AbstractManager {
     }
 
     public SaltResponse getUserSalt(SaltRequest saltRequest) {
-        if (saltRequest.getData().containsKey("username")
-                && saltRequest.getData().get("username").equals(c3SessionManager.getTestUser())) {
-            try {
-                SaltResponse saltResponse = new SaltResponse();
-                Map<String, String> map = new HashMap<>();
-                map.put("username", c3SessionManager.getTestUser());
-                map.put("salt", c3SessionManager.getTestSalt());
-                String challenge = HashUtils.getShaNonce();
-                c3SessionManager.addChallenge(challenge);
-                map.put("challenge", challenge);
-                saltResponse.setData(map);
-                saltResponse.setId("c3");
-                return saltResponse;
-            } catch (NoSuchAlgorithmException e) {
-                logger.error("NoSuchAlgorithmException: ", e);
-                return null;
+        try {
+            SaltResponse saltResponse = new SaltResponse();
+            Map<String, String> map = new HashMap<>();
+            if (saltRequest.getData().containsKey("username")) {
+                if (saltRequest.getData().get("username").equals(c3SessionManager.getTestUser())) {
+                    map.put("username", c3SessionManager.getTestUser());
+                    map.put("salt", c3SessionManager.getTestSalt());
+                    String challenge = HashUtils.getShaNonce();
+                    c3SessionManager.addChallenge(challenge);
+                    map.put("challenge", challenge);
+                    saltResponse.setData(map);
+                    saltResponse.setId("c3");
+                    return saltResponse;
+                } else {
+                    // just generate a random salt for invalid usernames
+                    logger.warn("Invalid SaltRequest received.");
+                    map.put("username", saltRequest.getData().get("username"));
+                    map.put("salt", BCrypt.gensalt());
+                    String challenge = HashUtils.getShaNonce();
+                    c3SessionManager.addChallenge(challenge);
+                    map.put("challenge", challenge);
+                    saltResponse.setData(map);
+                    saltResponse.setId("c3");
+                    return saltResponse;
+                }
             }
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("NoSuchAlgorithmException: ", e);
         }
-        logger.warn("Invalid SaltRequest received.");
         return null;
     }
 
@@ -84,7 +95,9 @@ public class C3LoginManager extends AbstractManager {
             }
         }
         logger.warn("Invalid LoginRequest received.");
-        return null;
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setError("Incorrect credentials");
+        return loginResponse;
     }
 
 }
