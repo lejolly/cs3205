@@ -47,8 +47,8 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws JoseException {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
-        c2NetworkForwarder.stopClient();
         ctx.close();
+        c2NetworkForwarder.stopClient();
     }
 
 }

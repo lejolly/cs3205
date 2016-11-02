@@ -6,7 +6,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
@@ -58,7 +57,7 @@ public class C2NetworkForwarder {
         c2ServerChannelHandler.forwardReplyToC1(baseJsonFormat.getJsonString());
     }
 
-    public void stopClient() throws JoseException {
+    public void stopClient() {
         try {
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
