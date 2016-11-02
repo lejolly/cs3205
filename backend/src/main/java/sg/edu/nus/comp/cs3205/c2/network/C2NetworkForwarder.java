@@ -59,6 +59,7 @@ public class C2NetworkForwarder {
 
     public void stopClient() {
         try {
+            c2ServerChannelHandler.close();
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
             logger.error("InterruptedException: ", e);

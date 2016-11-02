@@ -38,6 +38,7 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
         logger.info("Invalid reply from C3 received");
         logger.info("Closing connection " + ctx.channel());
         ctx.close();
+        c2NetworkForwarder.stopClient();
     }
 
     @Override
