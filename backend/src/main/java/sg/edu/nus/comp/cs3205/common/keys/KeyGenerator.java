@@ -14,7 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 
 public class KeyGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeyGenerator.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(KeyGenerator.class);
 
     public static void main(String[] args) {
         try {

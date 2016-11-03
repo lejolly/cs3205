@@ -21,7 +21,7 @@ import java.util.Optional;
 
 public class JsonUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
     public static <T> Optional<T> readJsonFile(String filePath, Class<T> classOfObjectToDeserialize) {
         if (filePath != null && !filePath.isEmpty()) {

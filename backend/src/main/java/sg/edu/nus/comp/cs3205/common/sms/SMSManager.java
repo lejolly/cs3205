@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class SMSManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMSManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(SMSManager.class);
 
     private static final String USER_AGENT = "CS3205";
     private static final String TOKEN_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=UTF-8";

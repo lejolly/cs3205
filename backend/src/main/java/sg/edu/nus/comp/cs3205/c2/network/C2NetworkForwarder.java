@@ -14,7 +14,7 @@ import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 public class C2NetworkForwarder {
 
-    private static Logger logger = LoggerFactory.getLogger(C2NetworkForwarder.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(C2NetworkForwarder.class);
 
     private C2ServerChannelHandler c2ServerChannelHandler;
     private Channel channel;
@@ -39,8 +39,8 @@ public class C2NetworkForwarder {
             BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(line);
             if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
                 logger.info("Sending to C3: \"" + baseJsonFormat.getJsonString() + "\"");
-                ChannelFuture lastWriteFuture = channel.writeAndFlush(JsonUtils.getSignedBaseJsonFormat(
-                        C2KeyManager.c2RsaPrivateKey, baseJsonFormat) + "\r\n");
+                ChannelFuture lastWriteFuture = sendMessageToC3(JsonUtils.getSignedBaseJsonFormat(
+                        C2KeyManager.c2RsaPrivateKey, baseJsonFormat));
                 if (lastWriteFuture != null) {
                     lastWriteFuture.sync();
                 }
@@ -64,6 +64,11 @@ public class C2NetworkForwarder {
         } catch (InterruptedException e) {
             logger.error("InterruptedException: ", e);
         }
+    }
+
+    private ChannelFuture sendMessageToC3(String message) {
+        logger.debug("Sending to C3: \"" + message + "\"");
+        return channel.writeAndFlush(message + "\r\n");
     }
 
 }

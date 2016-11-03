@@ -13,7 +13,7 @@ import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 @Sharable
 public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(C2ClientChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2ClientChannelHandler.class);
 
     private C2NetworkForwarder c2NetworkForwarder;
 
@@ -23,6 +23,7 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        logger.debug("Received from C3: \"" + msg + "\"");
         if (!msg.equals("error")) {
             try {
                 BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C2KeyManager.c3RsaPublicKey, msg);

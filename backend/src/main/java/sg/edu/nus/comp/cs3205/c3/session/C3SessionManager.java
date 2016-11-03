@@ -11,7 +11,7 @@ import java.util.*;
 
 public class C3SessionManager extends AbstractManager {
 
-    private static Logger logger = LoggerFactory.getLogger(C3SessionManager.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(C3SessionManager.class);
 
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();

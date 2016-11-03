@@ -9,10 +9,11 @@ import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
 import sg.edu.nus.comp.cs3205.c3.network.C3NetworkManager;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.sms.SMSManager;
+import sg.edu.nus.comp.cs3205.common.utils.LogUtils;
 
 public class StartC3 {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartC3.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(StartC3.class);
 
     private static C3KeyManager c3KeyManager;
     private static C3DatabaseManager c3DatabaseManager;
@@ -23,6 +24,7 @@ public class StartC3 {
     private static C3TotpManager c3TotpManager;
 
     public static void main(String[] args) {
+        LogUtils.configureLogger("c3-logback.xml");
         logger.info("Starting C3");
         c3KeyManager = new C3KeyManager();
         c3DatabaseManager = new C3DatabaseManager();

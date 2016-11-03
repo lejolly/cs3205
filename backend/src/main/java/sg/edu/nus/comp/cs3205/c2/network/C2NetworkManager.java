@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class C2NetworkManager extends AbstractManager {
 
-    private static Logger logger = LoggerFactory.getLogger(C2NetworkManager.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(C2NetworkManager.class);
 
     public Key key = null;
 

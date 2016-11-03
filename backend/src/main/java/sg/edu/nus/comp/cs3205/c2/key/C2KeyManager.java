@@ -14,7 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 
 public class C2KeyManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(C2KeyManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2KeyManager.class);
 
     public static RSAPublicKey c3RsaPublicKey = null;
     public static RSAPrivateKey c2RsaPrivateKey = null;

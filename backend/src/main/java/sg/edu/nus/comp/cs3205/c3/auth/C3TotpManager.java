@@ -7,7 +7,7 @@ import sg.edu.nus.comp.cs3205.common.utils.TotpUtils;
 
 public class C3TotpManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3TotpManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3TotpManager.class);
 
     private static final String KEY = "Test";
 

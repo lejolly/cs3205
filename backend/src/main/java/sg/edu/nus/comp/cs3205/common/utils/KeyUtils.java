@@ -22,7 +22,7 @@ import java.security.spec.X509EncodedKeySpec;
 // https://www.txedo.com/blog/java-read-rsa-keys-pem-file/
 public class KeyUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeyUtils.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(KeyUtils.class);
 
     private static final String RSA_PUBLIC_KEY_TYPE = "RSA PUBLIC KEY";
     private static final String RSA_PRIVATE_KEY_TYPE = "RSA PRIVATE KEY";

@@ -14,7 +14,7 @@ import java.util.List;
 // https://en.wikipedia.org/wiki/Time-based_One-time_Password_Algorithm#Implementation
 public class TotpUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(TotpUtils.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(TotpUtils.class);
 
     private static final int INTERVAL = 30;
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class BaseJsonFormat {
 
-    private static Logger logger = LoggerFactory.getLogger(BaseJsonFormat.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(BaseJsonFormat.class);
 
     public enum JSON_FORMAT {SALT_REQUEST, SALT_RESPONSE, LOGIN_REQUEST, LOGIN_RESPONSE, ERROR}
 

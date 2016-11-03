@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class C3LoginManager extends AbstractManager {
 
-    private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class.getSimpleName());
+    private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class);
 
     private C3SessionManager c3SessionManager;
     private C3TotpManager c3TotpManager;

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class C3DatabaseManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3DatabaseManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3DatabaseManager.class);
     private static Connection dbConnection = null;
 
     public C3DatabaseManager() {

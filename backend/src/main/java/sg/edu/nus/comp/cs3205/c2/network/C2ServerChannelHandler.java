@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 @ChannelHandler.Sharable
 public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(C2ServerChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C2ServerChannelHandler.class);
 
     private C2NetworkManager c2NetworkManager;
     private C2NetworkForwarder c2NetworkForwarder;

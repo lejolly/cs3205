@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventsCenter {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EventsCenter.class.getSimpleName());
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EventsCenter.class);
 
     private final EventBus eventBus;
     private static EventsCenter instance;

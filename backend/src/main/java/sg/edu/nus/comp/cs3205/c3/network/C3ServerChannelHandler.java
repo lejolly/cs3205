@@ -17,7 +17,7 @@ import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 @ChannelHandler.Sharable
 public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3ServerChannelHandler.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3ServerChannelHandler.class);
 
     private C3SessionManager c3SessionManager;
     private C3LoginManager c3LoginManager;
@@ -55,14 +55,13 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
             }
             if (response != null) {
                 logger.info("Sending response: " +  response.getJsonString());
-                ctx.write(JsonUtils.getSignedBaseJsonFormat(C3KeyManager.c3RsaPrivateKey, response) + "\r\n");
+                sendMessageToC2(ctx, JsonUtils.getSignedBaseJsonFormat(C3KeyManager.c3RsaPrivateKey, response));
                 return;
             }
         }
-        logger.info("Invalid request received: " + request);
+        logger.warn("Invalid request received: " + request);
         logger.info("Closing connection " + ctx.channel());
-        ctx.write("error\r\n");
-        ctx.flush();
+        sendMessageToC2(ctx, "error");
         ctx.close();
     }
 
@@ -75,9 +74,14 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("Exception: ", cause);
         logger.info("Closing connection " + ctx.channel());
-        ctx.write("error\r\n");
-        ctx.flush();
+        sendMessageToC2(ctx, "error");
         ctx.close();
+    }
+
+    private void sendMessageToC2(ChannelHandlerContext ctx, String message) {
+        logger.debug("Sending to C2: \"" + message + "\"");
+        ctx.write(message + "\r\n");
+        ctx.flush();
     }
 
 }

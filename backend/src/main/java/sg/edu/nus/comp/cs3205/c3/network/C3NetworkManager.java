@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class C3NetworkManager extends AbstractManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3NetworkManager.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(C3NetworkManager.class);
 
     public C3NetworkManager(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager) {
         logger.info("Initializing network manager.");
