@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs3205.c3.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.data.database.DataItem;
+import sg.edu.nus.comp.cs3205.common.data.database.Item;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class C3DataQueries {
         return null;
     }
 
-    public static DataItem getDataObject(Connection dbConnection, int id) {
+    public static Item getItem(Connection dbConnection, int id) {
         try {
             logger.info("Getting item: " + id);
             PreparedStatement preparedStatement =
@@ -60,7 +60,7 @@ public class C3DataQueries {
                 int quantity = resultSet.getInt(3);
                 String comment = resultSet.getString(4);
                 logger.info(id + ": " + name + " quantity: " + quantity + " comment: " + comment);
-                return new DataItem(id, name, quantity, comment);
+                return new Item(id, name, quantity, comment);
             } else {
                 logger.warn("Unable to get item: " + id);
             }
@@ -70,19 +70,19 @@ public class C3DataQueries {
         return null;
     }
 
-    public static List<DataItem> getAllDataObjects(Connection dbConnection) {
+    public static List<Item> getAllItems(Connection dbConnection) {
         try {
             logger.info("Getting all items");
             Statement statement = dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * from data");
-            List<DataItem> items = new ArrayList<>();
+            List<Item> items = new ArrayList<>();
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
                 String name = resultSet.getString(2);
                 int quantity = resultSet.getInt(3);
                 String comment = resultSet.getString(4);
                 logger.info(id + ": " + name + " quantity: " + quantity + " comment: " + comment);
-                items.add(new DataItem(id, name, quantity, comment));
+                items.add(new Item(id, name, quantity, comment));
             }
             if (items.size() > 0) {
                 return items;
@@ -95,7 +95,7 @@ public class C3DataQueries {
         return null;
     }
 
-    public static boolean updateItem(Connection dbConnection, DataItem item) {
+    public static boolean updateItem(Connection dbConnection, Item item) {
         try {
             logger.info("Updating item: " + item.getName());
             PreparedStatement preparedStatement =
@@ -107,6 +107,39 @@ public class C3DataQueries {
             preparedStatement.execute();
             logger.info("Updated: " + item.getId() + ": " + item.getName() +
                     " quantity: " + item.getQuantity() + " comment: " + item.getComment());
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
+
+    public static boolean addItem(Connection dbConnection, Item item) {
+        // ignores id
+        try {
+            logger.info("Adding item: " + item.getName());
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
+                    "data (name, quantity, comment) VALUES (?, ?, ?)");
+            preparedStatement.setString(1, item.getName());
+            preparedStatement.setInt(2, item.getQuantity());
+            preparedStatement.setString(3, item.getComment());
+            preparedStatement.execute();
+            logger.info("Added: " + item.getName() + " quantity: " + item.getQuantity() +
+                    " comment: " + item.getComment());
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
+
+    public static boolean deleteItem(Connection dbConnection, int id) {
+        try {
+            logger.info("Deleting item: " + id);
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM data WHERE id = ?");
+            preparedStatement.setInt(1, id);
+            preparedStatement.execute();
+            logger.info("Deleted item: " + id);
             return true;
         } catch (SQLException e) {
             logger.error("SQLException: ", e);

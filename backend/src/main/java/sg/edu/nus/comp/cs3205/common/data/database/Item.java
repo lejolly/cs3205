@@ -1,13 +1,13 @@
 package sg.edu.nus.comp.cs3205.common.data.database;
 
-public class DataItem {
+public class Item {
 
     private final int id;
     private final String name;
     private final int quantity;
     private final String comment;
 
-    public DataItem(int id, String name, int quantity, String comment) {
+    public Item(int id, String name, int quantity, String comment) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;

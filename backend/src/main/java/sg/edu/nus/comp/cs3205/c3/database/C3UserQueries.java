@@ -130,9 +130,8 @@ public class C3UserQueries {
         // ignores user id and role
         try {
             logger.info("Adding user: " + user.getUsername());
-            PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("INSERT INTO " +
-                            "users (username, hash, salt, otp_seed, role, full_name) VALUES (?, ?, ?, ?, 'user', ?)");
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
+                    "users (username, hash, salt, otp_seed, role, full_name) VALUES (?, ?, ?, ?, 'user', ?)");
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getHash());
             preparedStatement.setString(3, user.getSalt());
