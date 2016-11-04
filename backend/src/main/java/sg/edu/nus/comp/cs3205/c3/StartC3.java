@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs3205.c3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.c3.auth.C3TotpManager;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
 import sg.edu.nus.comp.cs3205.c3.key.C3KeyManager;
 import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
@@ -21,7 +20,6 @@ public class StartC3 {
     private static C3SessionManager c3SessionManager;
     private static C3LoginManager c3LoginManager;
     private static C3NetworkManager c3NetworkManager;
-    private static C3TotpManager c3TotpManager;
 
     public static void main(String[] args) {
         LogUtils.configureLogger("c3-logback.xml");
@@ -30,8 +28,7 @@ public class StartC3 {
         c3DatabaseManager = new C3DatabaseManager();
 //        smsManager = new SMSManager();
         c3SessionManager = new C3SessionManager();
-        c3TotpManager = new C3TotpManager();
-        c3LoginManager = new C3LoginManager(c3SessionManager, c3TotpManager, c3DatabaseManager);
+        c3LoginManager = new C3LoginManager(c3SessionManager, c3DatabaseManager);
         c3NetworkManager = new C3NetworkManager(c3SessionManager, c3LoginManager);
     }
 

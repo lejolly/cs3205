@@ -43,6 +43,10 @@ public class TotpUtils {
         return otps;
     }
 
+    public static boolean checkOTP(String seed, String otp) {
+        return getOTPS(seed).contains(otp);
+    }
+
     public static long getTruncatedHash(String hash, int offset) {
         int bitOffset = offset * 4 + 1;
         String truncatedHashString = hash.substring(bitOffset, bitOffset + 32);

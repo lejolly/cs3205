@@ -11,6 +11,7 @@ import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltResponse;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
+import sg.edu.nus.comp.cs3205.common.utils.TotpUtils;
 import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -23,13 +24,10 @@ public class C3LoginManager extends AbstractManager {
     private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class);
 
     private C3SessionManager c3SessionManager;
-    private C3TotpManager c3TotpManager;
     private Connection dbConnection;
 
-    public C3LoginManager(C3SessionManager c3SessionManager, C3TotpManager c3TotpManager,
-                          C3DatabaseManager c3DatabaseManager) {
+    public C3LoginManager(C3SessionManager c3SessionManager, C3DatabaseManager c3DatabaseManager) {
         this.c3SessionManager = c3SessionManager;
-        this.c3TotpManager = c3TotpManager;
         this.dbConnection = c3DatabaseManager.getDbConnection();
     }
 
@@ -81,28 +79,32 @@ public class C3LoginManager extends AbstractManager {
                     && C3LoginQueries.doesUserExist(dbConnection, loginRequest.getData().get("username"))
                     && loginRequest.getData().containsKey("response")
                     && loginRequest.getData().get("response").length() == 80
-                    && loginRequest.getData().containsKey("otp")
-                    && c3TotpManager.checkOTP(loginRequest.getData().get("otp"))) {
+                    && loginRequest.getData().containsKey("otp")) {
                 String user = loginRequest.getData().get("username");
-                String challenge = loginRequest.getData().get("challenge");
-                String hash = C3LoginQueries.getUserHash(dbConnection, user);
-                if (hash != null) {
-                    String hashPlusChallenge = HashUtils.getSha256HashFromString(hash + challenge);
-                    String response = loginRequest.getData().get("response");
-                    String server = HashUtils.getSha256HashFromString(XorUtils.stringXOR(hashPlusChallenge, response));
-                    if (server.compareTo(hash) == 0) {
-                        LoginResponse loginResponse = new LoginResponse();
-                        String auth_token = HashUtils.getShaNonce();
-                        String username = loginRequest.getData().get("username");
-                        if (c3SessionManager.isUsernameInAuth_tokens(username)) {
-                            c3SessionManager.removeUsernameFromAuth_tokens(username);
+
+                String otp = loginRequest.getData().get("otp");
+                String otpSeed = C3LoginQueries.getUserOtpSeed(dbConnection, user);
+                if (otpSeed != null && TotpUtils.checkOTP(otpSeed, otp)) {
+                    String challenge = loginRequest.getData().get("challenge");
+                    String hash = C3LoginQueries.getUserHash(dbConnection, user);
+                    if (hash != null) {
+                        String hashPlusChallenge = HashUtils.getSha256HashFromString(hash + challenge);
+                        String response = loginRequest.getData().get("response");
+                        String server = HashUtils.getSha256HashFromString(XorUtils.stringXOR(hashPlusChallenge, response));
+                        if (server.compareTo(hash) == 0) {
+                            LoginResponse loginResponse = new LoginResponse();
+                            String auth_token = HashUtils.getShaNonce();
+                            String username = loginRequest.getData().get("username");
+                            if (c3SessionManager.isUsernameInAuth_tokens(username)) {
+                                c3SessionManager.removeUsernameFromAuth_tokens(username);
+                            }
+                            c3SessionManager.addAuth_token(username, auth_token);
+                            Map<String, String> map = new HashMap<>();
+                            map.put("auth_token", auth_token);
+                            loginResponse.setData(map);
+                            loginResponse.setId("c3");
+                            return loginResponse;
                         }
-                        c3SessionManager.addAuth_token(username, auth_token);
-                        Map<String, String> map = new HashMap<>();
-                        map.put("auth_token", auth_token);
-                        loginResponse.setData(map);
-                        loginResponse.setId("c3");
-                        return loginResponse;
                     }
                 }
             }

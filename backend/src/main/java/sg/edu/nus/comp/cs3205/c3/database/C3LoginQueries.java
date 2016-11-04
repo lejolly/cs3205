@@ -40,6 +40,14 @@ public class C3LoginQueries {
         return getUserDetail(dbConnection, user, "role");
     }
 
+    public static String getUserOtpSeed(Connection dbConnection, String user) {
+        return getUserDetail(dbConnection, user, "otp_seed");
+    }
+
+    public static String getUserFullName(Connection dbConnection, String user) {
+        return getUserDetail(dbConnection, user, "full_name");
+    }
+
     private static String getUserDetail(Connection dbConnection, String user, String column) {
         try {
             logger.info("Getting " + column + " for: " + user);
