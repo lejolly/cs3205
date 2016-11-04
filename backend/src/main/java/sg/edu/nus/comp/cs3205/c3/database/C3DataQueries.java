@@ -33,7 +33,7 @@ public class C3DataQueries {
         try {
             logger.info("Getting " + column + " for item: " + id);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT " + column + " FROM users WHERE id = ? LIMIT 1");
+                    dbConnection.prepareStatement("SELECT " + column + " FROM data WHERE id = ? LIMIT 1");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -41,6 +41,28 @@ public class C3DataQueries {
                 return resultSet.getString(1);
             } else {
                 logger.warn("Unable to get " + column + " for: " + id);
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return null;
+    }
+
+    public static C3DataObject getDataObject(Connection dbConnection, int id) {
+        try {
+            logger.info("Getting item: " + id);
+            PreparedStatement preparedStatement =
+                    dbConnection.prepareStatement("SELECT * FROM data WHERE id = ? LIMIT 1");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String name = resultSet.getString(2);
+                int quantity = resultSet.getInt(3);
+                String comment = resultSet.getString(4);
+                logger.info(id + ": " + name + " quantity: " + quantity + " comment: " + comment);
+                return new C3DataObject(id, name, quantity, comment);
+            } else {
+                logger.warn("Unable to get item: " + id);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
