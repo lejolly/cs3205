@@ -3,7 +3,7 @@ package sg.edu.nus.comp.cs3205.c3.auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3LoginQueries;
+import sg.edu.nus.comp.cs3205.c3.database.C3UserQueries;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
@@ -36,9 +36,9 @@ public class C3LoginManager extends AbstractManager {
             SaltResponse saltResponse = new SaltResponse();
             Map<String, String> map = new HashMap<>();
             if (saltRequest.getData().containsKey("username")) {
-                if (C3LoginQueries.doesUserExist(dbConnection, saltRequest.getData().get("username"))) {
+                if (C3UserQueries.doesUserExist(dbConnection, saltRequest.getData().get("username"))) {
                     String user = saltRequest.getData().get("username");
-                    String salt = C3LoginQueries.getUserSalt(dbConnection, user);
+                    String salt = C3UserQueries.getUserSalt(dbConnection, user);
                     if (salt != null) {
                         map.put("username", user);
                         map.put("salt", salt);
@@ -76,17 +76,17 @@ public class C3LoginManager extends AbstractManager {
                 && c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {
             // check username and response
             if (loginRequest.getData().containsKey("username")
-                    && C3LoginQueries.doesUserExist(dbConnection, loginRequest.getData().get("username"))
+                    && C3UserQueries.doesUserExist(dbConnection, loginRequest.getData().get("username"))
                     && loginRequest.getData().containsKey("response")
                     && loginRequest.getData().get("response").length() == 80
                     && loginRequest.getData().containsKey("otp")) {
                 String user = loginRequest.getData().get("username");
 
                 String otp = loginRequest.getData().get("otp");
-                String otpSeed = C3LoginQueries.getUserOtpSeed(dbConnection, user);
+                String otpSeed = C3UserQueries.getUserOtpSeed(dbConnection, user);
                 if (otpSeed != null && TotpUtils.checkOTP(otpSeed, otp)) {
                     String challenge = loginRequest.getData().get("challenge");
-                    String hash = C3LoginQueries.getUserHash(dbConnection, user);
+                    String hash = C3UserQueries.getUserHash(dbConnection, user);
                     if (hash != null) {
                         String hashPlusChallenge = HashUtils.getSha256HashFromString(hash + challenge);
                         String response = loginRequest.getData().get("response");
