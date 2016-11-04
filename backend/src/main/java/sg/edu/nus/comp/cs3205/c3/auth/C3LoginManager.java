@@ -1,8 +1,9 @@
 package sg.edu.nus.comp.cs3205.c3.auth;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
+import sg.edu.nus.comp.cs3205.c3.database.C3LoginQueries;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
@@ -13,6 +14,7 @@ import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +24,13 @@ public class C3LoginManager extends AbstractManager {
 
     private C3SessionManager c3SessionManager;
     private C3TotpManager c3TotpManager;
+    private Connection dbConnection;
 
-    public C3LoginManager(C3SessionManager c3SessionManager, C3TotpManager c3TotpManager) {
+    public C3LoginManager(C3SessionManager c3SessionManager, C3TotpManager c3TotpManager,
+                          C3DatabaseManager c3DatabaseManager) {
         this.c3SessionManager = c3SessionManager;
         this.c3TotpManager = c3TotpManager;
+        this.dbConnection = c3DatabaseManager.getDbConnection();
     }
 
     public SaltResponse getUserSalt(SaltRequest saltRequest) {
@@ -33,20 +38,25 @@ public class C3LoginManager extends AbstractManager {
             SaltResponse saltResponse = new SaltResponse();
             Map<String, String> map = new HashMap<>();
             if (saltRequest.getData().containsKey("username")) {
-                if (saltRequest.getData().get("username").equals(c3SessionManager.getTestUser())) {
-                    map.put("username", c3SessionManager.getTestUser());
-                    map.put("salt", c3SessionManager.getTestSalt());
-                    String challenge = HashUtils.getShaNonce();
-                    c3SessionManager.addChallenge(challenge);
-                    map.put("challenge", challenge);
-                    saltResponse.setData(map);
-                    saltResponse.setId("c3");
-                    return saltResponse;
+                if (C3LoginQueries.doesUserExist(dbConnection, saltRequest.getData().get("username"))) {
+                    String user = saltRequest.getData().get("username");
+                    String salt = C3LoginQueries.getUserSalt(dbConnection, user);
+                    if (salt != null) {
+                        map.put("username", user);
+                        map.put("salt", salt);
+                        String challenge = HashUtils.getShaNonce();
+                        c3SessionManager.addChallenge(challenge);
+                        map.put("challenge", challenge);
+                        saltResponse.setData(map);
+                        saltResponse.setId("c3");
+                        return saltResponse;
+                    }
                 } else {
-                    // just generate a random salt for invalid usernames
+                    // just generate a deterministic salt for invalid usernames
                     logger.warn("Invalid SaltRequest received.");
-                    map.put("username", saltRequest.getData().get("username"));
-                    map.put("salt", BCrypt.gensalt());
+                    String user = saltRequest.getData().get("username");
+                    map.put("username", user);
+                    map.put("salt", "$2a$10$" + HashUtils.getSha256HashFromString(user).substring(0, 22));
                     String challenge = HashUtils.getShaNonce();
                     c3SessionManager.addChallenge(challenge);
                     map.put("challenge", challenge);
@@ -68,29 +78,32 @@ public class C3LoginManager extends AbstractManager {
                 && c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {
             // check username and response
             if (loginRequest.getData().containsKey("username")
-                    && loginRequest.getData().get("username").equals(c3SessionManager.getTestUser())
+                    && C3LoginQueries.doesUserExist(dbConnection, loginRequest.getData().get("username"))
                     && loginRequest.getData().containsKey("response")
                     && loginRequest.getData().get("response").length() == 80
                     && loginRequest.getData().containsKey("otp")
                     && c3TotpManager.checkOTP(loginRequest.getData().get("otp"))) {
+                String user = loginRequest.getData().get("username");
                 String challenge = loginRequest.getData().get("challenge");
-                String hashPlusChallenge = HashUtils.getSha256HashFromString(
-                        c3SessionManager.getTestPasswordHash() + challenge);
-                String response = loginRequest.getData().get("response");
-                String server = HashUtils.getSha256HashFromString(XorUtils.stringXOR(hashPlusChallenge, response));
-                if (server.compareTo(c3SessionManager.getTestPasswordHash()) == 0) {
-                    LoginResponse loginResponse = new LoginResponse();
-                    String auth_token = HashUtils.getShaNonce();
-                    String username = loginRequest.getData().get("username");
-                    if (c3SessionManager.isUsernameInAuth_tokens(username)) {
-                        c3SessionManager.removeUsernameFromAuth_tokens(username);
+                String hash = C3LoginQueries.getUserHash(dbConnection, user);
+                if (hash != null) {
+                    String hashPlusChallenge = HashUtils.getSha256HashFromString(hash + challenge);
+                    String response = loginRequest.getData().get("response");
+                    String server = HashUtils.getSha256HashFromString(XorUtils.stringXOR(hashPlusChallenge, response));
+                    if (server.compareTo(hash) == 0) {
+                        LoginResponse loginResponse = new LoginResponse();
+                        String auth_token = HashUtils.getShaNonce();
+                        String username = loginRequest.getData().get("username");
+                        if (c3SessionManager.isUsernameInAuth_tokens(username)) {
+                            c3SessionManager.removeUsernameFromAuth_tokens(username);
+                        }
+                        c3SessionManager.addAuth_token(username, auth_token);
+                        Map<String, String> map = new HashMap<>();
+                        map.put("auth_token", auth_token);
+                        loginResponse.setData(map);
+                        loginResponse.setId("c3");
+                        return loginResponse;
                     }
-                    c3SessionManager.addAuth_token(username, auth_token);
-                    Map<String, String> map = new HashMap<>();
-                    map.put("auth_token", auth_token);
-                    loginResponse.setData(map);
-                    loginResponse.setId("c3");
-                    return loginResponse;
                 }
             }
         }

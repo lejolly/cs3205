@@ -31,7 +31,7 @@ public class StartC3 {
 //        smsManager = new SMSManager();
         c3SessionManager = new C3SessionManager();
         c3TotpManager = new C3TotpManager();
-        c3LoginManager = new C3LoginManager(c3SessionManager, c3TotpManager);
+        c3LoginManager = new C3LoginManager(c3SessionManager, c3TotpManager, c3DatabaseManager);
         c3NetworkManager = new C3NetworkManager(c3SessionManager, c3LoginManager);
     }
 

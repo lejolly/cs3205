@@ -101,4 +101,8 @@ public class C3DatabaseManager extends AbstractManager {
         return "";
     }
 
+    public Connection getDbConnection() {
+        return dbConnection;
+    }
+
 }

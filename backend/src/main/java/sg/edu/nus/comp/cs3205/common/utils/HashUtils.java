@@ -7,14 +7,19 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 public class HashUtils {
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        System.out.println(getSha256HashFromString("123456"));
-        String salt = BCrypt.gensalt();
-        System.out.println(salt);
-        System.out.println(getBcryptHash("pass", salt));
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+    public static String getPasswordHashWithSalt(String password, String salt) throws NoSuchAlgorithmException {
+        String secret = ENCODER.encodeToString(getBcryptHash(password, salt).getBytes());
+        return HashUtils.getSha256HashFromString(secret);
+    }
+
+    public static String getNewSalt() {
+        return BCrypt.gensalt();
     }
 
     // https://www.mkyong.com/java/java-sha-hashing-example/
