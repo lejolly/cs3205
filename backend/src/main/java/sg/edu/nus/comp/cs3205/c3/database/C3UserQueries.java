@@ -101,7 +101,7 @@ public class C3UserQueries {
 
     public static User getUser(Connection dbConnection, String user) {
         try {
-            logger.info("Getting user:" + user);
+            logger.info("Getting user: " + user);
             PreparedStatement preparedStatement =
                     dbConnection.prepareStatement("SELECT * FROM users WHERE username = ? LIMIT 1");
             preparedStatement.setString(1, user);
@@ -124,6 +124,43 @@ public class C3UserQueries {
             logger.error("SQLException: ", e);
         }
         return null;
+    }
+
+    public static boolean addUser(Connection dbConnection, User user) {
+        // ignores user id and role
+        try {
+            logger.info("Adding user: " + user.getUsername());
+            PreparedStatement preparedStatement =
+                    dbConnection.prepareStatement("INSERT INTO " +
+                            "users (username, hash, salt, otp_seed, role, full_name) VALUES (?, ?, ?, ?, 'user', ?)");
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getHash());
+            preparedStatement.setString(3, user.getSalt());
+            preparedStatement.setString(4, user.getOtp_seed());
+            preparedStatement.setString(5, user.getFull_name());
+            preparedStatement.execute();
+            logger.info("Added normal user: " + user.getUsername() + " hash: " + user.getHash() + " salt: "
+                    + user.getSalt() + " otp_seed: " + user.getOtp_seed() + " full_name: " + user.getFull_name());
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
+
+    public static boolean deleteUser(Connection dbConnection, String user) {
+        try {
+            logger.info("Deleting user: " + user);
+            PreparedStatement preparedStatement =
+                    dbConnection.prepareStatement("DELETE FROM users WHERE username = ?");
+            preparedStatement.setString(1, user);
+            preparedStatement.execute();
+            logger.info("Deleted user: " + user);
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
     }
 
 }

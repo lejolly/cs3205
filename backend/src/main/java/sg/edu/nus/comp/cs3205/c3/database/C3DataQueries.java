@@ -104,7 +104,7 @@ public class C3DataQueries {
             preparedStatement.setInt(2, item.getQuantity());
             preparedStatement.setString(3, item.getComment());
             preparedStatement.setInt(4, item.getId());
-            preparedStatement.executeQuery();
+            preparedStatement.execute();
             logger.info("Updated: " + item.getId() + ": " + item.getName() +
                     " quantity: " + item.getQuantity() + " comment: " + item.getComment());
             return true;
