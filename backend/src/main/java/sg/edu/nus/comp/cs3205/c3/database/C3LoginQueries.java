@@ -29,36 +29,29 @@ public class C3LoginQueries {
     }
 
     public static String getUserSalt(Connection dbConnection, String user) {
-        try {
-            logger.info("Getting salt for: " + user);
-            PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT salt FROM users WHERE username = ? LIMIT 1");
-            preparedStatement.setString(1, user);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                logger.info(user + "'s salt: " + resultSet.getString(1));
-                return resultSet.getString(1);
-            } else {
-                logger.warn("Unable to get salt for: " + user);
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException: ", e);
-        }
-        return null;
+        return getUserDetail(dbConnection, user, "salt");
     }
 
     public static String getUserHash(Connection dbConnection, String user) {
+        return getUserDetail(dbConnection, user, "hash");
+    }
+
+    public static String getUserRole(Connection dbConnection, String user) {
+        return getUserDetail(dbConnection, user, "role");
+    }
+
+    private static String getUserDetail(Connection dbConnection, String user, String column) {
         try {
-            logger.info("Getting hash for: " + user);
+            logger.info("Getting " + column + " for: " + user);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT hash FROM users WHERE username = ? LIMIT 1");
+                    dbConnection.prepareStatement("SELECT " + column + " FROM users WHERE username = ? LIMIT 1");
             preparedStatement.setString(1, user);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                logger.info(user + "'s hash: " + resultSet.getString(1));
+                logger.info(user + "'s " + column + ": " + resultSet.getString(1));
                 return resultSet.getString(1);
             } else {
-                logger.warn("Unable to get hash for: " + user);
+                logger.warn("Unable to get " + column + " for: " + user);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
