@@ -51,6 +51,10 @@ public class C3UserQueries {
         return getUserDetail(dbConnection, user, "full_name");
     }
 
+    public static String getUserNumber(Connection dbConnection, String user) {
+        return getUserDetail(dbConnection, user, "number");
+    }
+
     private static String getUserDetail(Connection dbConnection, String user, String column) {
         try {
             logger.info("Getting " + column + " for: " + user);
@@ -84,9 +88,10 @@ public class C3UserQueries {
                 String otp_seed = resultSet.getString(5);
                 String role = resultSet.getString(6);
                 String full_name = resultSet.getString(7);
+                int number = resultSet.getInt(8);
                 logger.info(id + ": " + username + " hash: " + hash + " salt: " + salt + " otp_seed: "
-                        + otp_seed + " role: " + role + " full_name: " + full_name);
-                users.add(new User(id, username, hash, salt, otp_seed, role, full_name));
+                        + otp_seed + " role: " + role + " full_name: " + full_name + " number: " + number);
+                users.add(new User(id, username, hash, salt, otp_seed, role, full_name, number));
             }
             if (users.size() > 0) {
                 return users;
@@ -114,9 +119,10 @@ public class C3UserQueries {
                 String otp_seed = resultSet.getString(5);
                 String role = resultSet.getString(6);
                 String full_name = resultSet.getString(7);
+                int number = resultSet.getInt(8);
                 logger.info(id + ": " + username + " hash: " + hash + " salt: " + salt + " otp_seed: "
-                        + otp_seed + " role: " + role + " full_name: " + full_name);
-                return new User(id, username, hash, salt, otp_seed, role, full_name);
+                        + otp_seed + " role: " + role + " full_name: " + full_name + " number: " + number);
+                return new User(id, username, hash, salt, otp_seed, role, full_name, number);
             } else {
                 logger.warn("Unable to get user: " + user);
             }
@@ -131,15 +137,17 @@ public class C3UserQueries {
         try {
             logger.info("Adding user: " + user.getUsername());
             PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
-                    "users (username, hash, salt, otp_seed, role, full_name) VALUES (?, ?, ?, ?, 'user', ?)");
+                    "users (username, hash, salt, otp_seed, role, full_name, number) VALUES (?, ?, ?, ?, 'user', ?, ?)");
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getHash());
             preparedStatement.setString(3, user.getSalt());
             preparedStatement.setString(4, user.getOtp_seed());
             preparedStatement.setString(5, user.getFull_name());
+            preparedStatement.setInt(6, user.getNumber());
             preparedStatement.execute();
             logger.info("Added normal user: " + user.getUsername() + " hash: " + user.getHash() + " salt: "
-                    + user.getSalt() + " otp_seed: " + user.getOtp_seed() + " full_name: " + user.getFull_name());
+                    + user.getSalt() + " otp_seed: " + user.getOtp_seed() + " full_name: " + user.getFull_name()
+                    + " number: " + user.getNumber());
             return true;
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
@@ -161,5 +169,7 @@ public class C3UserQueries {
         }
         return false;
     }
+
+    // TODO: update user
 
 }

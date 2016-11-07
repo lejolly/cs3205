@@ -12,8 +12,10 @@ public class User {
     private final String otp_seed;
     private final String role;
     private final String full_name;
+    private final int number;
 
-    public User(int id, String username, String hash, String salt, String otp_seed, String role, String full_name) {
+    public User(int id, String username, String hash, String salt, String otp_seed, String role,
+                String full_name, int number) {
         this.id = id;
         this.username = username;
         this.hash = hash;
@@ -21,6 +23,7 @@ public class User {
         this.otp_seed = otp_seed;
         this.role = role;
         this.full_name = full_name;
+        this.number = number;
     }
 
     public static Map<String, String> getSanitizedUserMap(SanitizedUser sanitizedUser) {
@@ -29,6 +32,7 @@ public class User {
         map.put("username", sanitizedUser.getUsername());
         map.put("role", sanitizedUser.getRole());
         map.put("full_name", sanitizedUser.getFull_name());
+        map.put("number", String.valueOf(sanitizedUser.getNumber()));
         return map;
     }
 
@@ -58,6 +62,10 @@ public class User {
 
     public String getFull_name() {
         return full_name;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
 }

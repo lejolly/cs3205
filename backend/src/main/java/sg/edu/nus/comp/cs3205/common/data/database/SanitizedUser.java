@@ -7,12 +7,14 @@ public class SanitizedUser {
     private final String username;
     private final String role;
     private final String full_name;
+    private final int number;
 
     public SanitizedUser(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.role = user.getRole();
         this.full_name = user.getFull_name();
+        this.number = user.getNumber();
     }
 
     public int getId() {
@@ -29,6 +31,10 @@ public class SanitizedUser {
 
     public String getFull_name() {
         return full_name;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
 }

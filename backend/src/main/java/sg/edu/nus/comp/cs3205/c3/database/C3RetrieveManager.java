@@ -23,6 +23,7 @@ public class C3RetrieveManager {
         RetrieveResponse retrieveResponse = new RetrieveResponse();
         if (retrieveRequest.getData().containsKey("table_id")) {
             if (retrieveRequest.getData().get("table_id").equals("users")) {
+                // TODO: check that user has admin role
                 logger.info("Received request for users table");
                 List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers(dbConnection).stream()
                         .map(SanitizedUser::new).map(User::getSanitizedUserMap).collect(Collectors.toList());
