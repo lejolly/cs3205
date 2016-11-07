@@ -3,7 +3,9 @@ package sg.edu.nus.comp.cs3205.c3.database;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.database.Item;
 import sg.edu.nus.comp.cs3205.common.data.database.SanitizedUser;
+import sg.edu.nus.comp.cs3205.common.data.database.User;
 import sg.edu.nus.comp.cs3205.common.data.json.RetrieveRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.RetrieveResponse;
 
@@ -30,7 +32,7 @@ public class C3RetrieveManager {
                 headers.add("Full Name");
                 retrieveResponse.setHeaders(headers);
                 List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers(dbConnection).stream()
-                        .map(SanitizedUser::new).map(C3UserQueries::getSanitizedUserMap).collect(Collectors.toList());
+                        .map(SanitizedUser::new).map(User::getSanitizedUserMap).collect(Collectors.toList());
                 retrieveResponse.setRows(sanitizedUsers);
             } else if (retrieveRequest.getData().get("table_id").equals("items")) {
                 logger.info("Received request for items table");
@@ -41,7 +43,7 @@ public class C3RetrieveManager {
                 headers.add("Comment");
                 retrieveResponse.setHeaders(headers);
                 List<Map<String, String>> items = C3ItemQueries.getAllItems(dbConnection).stream()
-                        .map(C3ItemQueries::getItemMap).collect(Collectors.toList());
+                        .map(Item::getItemMap).collect(Collectors.toList());
                 retrieveResponse.setRows(items);
             }
         }

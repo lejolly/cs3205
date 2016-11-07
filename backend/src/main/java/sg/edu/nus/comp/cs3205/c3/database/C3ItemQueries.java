@@ -149,13 +149,4 @@ public class C3ItemQueries {
         return false;
     }
 
-    public static Map<String, String> getItemMap(Item item) {
-        Map<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(item.getId()));
-        map.put("name", item.getName());
-        map.put("quantity", String.valueOf(item.getQuantity()));
-        map.put("comment", item.getComment());
-        return map;
-    }
-
 }

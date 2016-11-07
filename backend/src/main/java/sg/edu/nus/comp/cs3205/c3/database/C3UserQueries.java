@@ -2,14 +2,11 @@ package sg.edu.nus.comp.cs3205.c3.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.data.database.SanitizedUser;
 import sg.edu.nus.comp.cs3205.common.data.database.User;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class C3UserQueries {
 
@@ -163,15 +160,6 @@ public class C3UserQueries {
             logger.error("SQLException: ", e);
         }
         return false;
-    }
-
-    public static Map<String, String> getSanitizedUserMap(SanitizedUser sanitizedUser) {
-        Map<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(sanitizedUser.getId()));
-        map.put("username", sanitizedUser.getUsername());
-        map.put("role", sanitizedUser.getRole());
-        map.put("full_name", sanitizedUser.getFull_name());
-        return map;
     }
 
 }

@@ -1,5 +1,8 @@
 package sg.edu.nus.comp.cs3205.common.data.database;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class User {
 
     private final int id;
@@ -18,6 +21,15 @@ public class User {
         this.otp_seed = otp_seed;
         this.role = role;
         this.full_name = full_name;
+    }
+
+    public static Map<String, String> getSanitizedUserMap(SanitizedUser sanitizedUser) {
+        Map<String, String> map = new HashMap<>();
+        map.put("id", String.valueOf(sanitizedUser.getId()));
+        map.put("username", sanitizedUser.getUsername());
+        map.put("role", sanitizedUser.getRole());
+        map.put("full_name", sanitizedUser.getFull_name());
+        return map;
     }
 
     public int getId() {
