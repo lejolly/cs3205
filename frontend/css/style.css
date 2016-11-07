@@ -9,3 +9,7 @@
 #alerts:empty {
 	display: none;
 }
+
+body {
+	padding-top: 30px;
+}

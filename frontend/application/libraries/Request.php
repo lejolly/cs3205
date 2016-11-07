@@ -36,27 +36,35 @@ class Request {
 		return json_encode($packet) . "\r\n";
 	}
 
-	public function verify_payload($json_payload, $action, $data_fields) {
+	public function verify_payload($json_payload, $action, $data_fields, $toplevel_fields = array()) {
 		$payload = json_decode($json_payload, true);
 		if(!isset($payload['action'])) {
 			throw new Exception('Missing field <action> in response payload');
-		} else if(strcmp($payload['action'], $action) != 0) {
-			throw new Exception('Expected <action=' . $action . '> in response payload');
-		} else {
-			if(!isset($payload['data'])) {
-				throw new Exception('Missing field <data> in response payload');
-			} else {
-				$data = array();
-				foreach($data_fields as $data_field) {
-					if(!isset($payload['data'][$data_field])) {
-						throw new Exception('Expected <data[' . $data_field . ']> in response payload');
-					} else {
-						$data[$data_field] = $payload['data'][$data_field];
-					}
-				}
-				return $data;
-			}
 		}
+
+		if(strcmp($payload['action'], $action) != 0) {
+			throw new Exception('Expected <action=' . $action . '> in response payload');
+		}
+		
+		if(!isset($payload['data'])) {
+			throw new Exception('Missing field <data> in response payload');
+		}
+
+		$data = array();
+		foreach($data_fields as $data_field) {
+			if(!isset($payload['data'][$data_field])) {
+				throw new Exception('Expected <data[' . $data_field . ']> in response payload');
+			}
+			$data[$data_field] = $payload['data'][$data_field];
+		}
+
+		foreach($toplevel_fields as $toplevel_field) {
+			if(!isset($payload[$toplevel_field])) {
+				throw new Exception('Expected <' . $toplevel_field . '> in response payload');
+			}
+			$data[$toplevel_field] = $payload[$toplevel_field];
+		}
+		return $data;
 	}
 
 	public function get_error($json_payload) {
