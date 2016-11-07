@@ -38,8 +38,6 @@ public class BaseJsonFormat {
 
     public String getJsonString() {
         String json = JsonUtils.toJsonString(this);
-//        return json;
-//        return json.replace("\\\"", "\"");
         json = json.replace("\\\"", "\"");
         json = json.replace("\"[{\"", "[{\"");
         json = json.replace("\"}]\"", "\"}]");

@@ -31,17 +31,6 @@ public class C3RetrieveManager {
                 headers.add("Full Name");
                 retrieveResponse.setHeaders(headers);
                 retrieveResponse.setRows(sanitizedUsers);
-//                String headersString = gson.toJson(headers);
-//                headersString = "{" + headersString.substring(1, headersString.length() - 1) + "}";
-//                String sanitizedUsersString = gson.toJson(sanitizedUsers);
-//                sanitizedUsersString = "{" +
-//                        sanitizedUsersString.substring(1, sanitizedUsersString.length() - 1) + "}";
-//                System.out.println(headersString);
-//                System.out.println(sanitizedUsersString);
-//                Map<String, String> data = new HashMap<>();
-//                data.put("headers", headersString);
-//                data.put("rows", sanitizedUsersString);
-//                retrieveResponse.setData(data);
             }
         }
         return retrieveResponse;

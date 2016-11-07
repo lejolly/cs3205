@@ -31,7 +31,6 @@ public class RetrieveResponse extends BaseJsonFormat {
     public void setHeaders(List<String> headers) {
         Gson gson = new Gson();
         String headersString = gson.toJson(headers);
-        System.out.println(headersString);
         data.put("headers", headersString);
     }
 
@@ -41,7 +40,6 @@ public class RetrieveResponse extends BaseJsonFormat {
         rowsString = rowsString.replace("\\\"", "\"");
         rowsString = rowsString.replace("\"{\"", "{\"");
         rowsString = rowsString.replace("\"}\"", "\"}");
-        System.out.println(rowsString);
         data.put("rows", rowsString);
     }
 
