@@ -4,10 +4,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 @session_start();
 class Session extends CI_Controller {
 	public function login() {
-		$data = array();
-		$data['title'] = "Login";
-		$data['content'] = $this->parser->parse('login_form', array(), true);
-		$this->parser->parse('layout', $data);
+		$page = array();
+		$page['title'] = "Login";
+		$page['contents'] = $this->load->view('login_form', array(), true);
+		$this->load->view('layout', $page);
 	}
 
 	public function logout() {
