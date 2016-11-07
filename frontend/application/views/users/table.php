@@ -3,10 +3,10 @@
         <thead>
             <tr>
                 <th class="col-md-1">ID</th>
-                <th class="col-md-3">Username</th>
-                <th class="col-md-4">Full Name</th>
-                <th class="col-md-4">OTP Seed</th>
-                <th class="col-md-2">Role</th>
+                <th class="col-md-2">Username</th>
+                <th class="col-md-2">Full Name</th>
+                <th class="col-md-2">OTP Seed</th>
+                <th class="col-md-1">Role</th>
                 <th class="col-md-2">Phone Number</th>
                 <th class="col-md-2">Actions</th>
             </tr>
@@ -29,6 +29,8 @@
 
 <div class="row">
     <div class="col-md-12">
-        <button class="btn btn-primary center-block">Add User</button>
+        <center>
+            <?php echo anchor('admin/users/add', 'Add User', 'class="btn btn-primary" role="button"'); ?>
+        </center>
     </div>
 </div>

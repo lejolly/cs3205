@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <!--<link rel="icon" href="../../favicon.ico">-->
 
-    <title><?php echo $title; ?></title>
+    <title><?php echo isset($title) ? $title : '<no title>'; ?></title>
 
     <!-- Bootstrap core CSS -->
     <?php echo link_tag('css/bootstrap.min.css'); ?>
@@ -48,7 +48,7 @@
 
     <div class="container" id="wrapper">
       <div class="row" id="alerts"></div>
-      <div class="row" id="content"><?php echo $contents; ?></div>
+      <div class="row" id="content"><?php echo isset($contents) ? $contents : '<h1>No Content</h1>'; ?></div>
     </div><!-- /.container -->
 
 

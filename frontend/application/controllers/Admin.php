@@ -34,4 +34,8 @@ class Admin extends CI_Controller {
 			$this->load->view('layout', $page);
 		}
 	}
+
+	public function user_add() {
+		$this->load->view('layout');
+	}
 }
