@@ -26,16 +26,6 @@ public class User {
         this.number = number;
     }
 
-    public static Map<String, String> getSanitizedUserMap(SanitizedUser sanitizedUser) {
-        Map<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(sanitizedUser.getId()));
-        map.put("username", sanitizedUser.getUsername());
-        map.put("role", sanitizedUser.getRole());
-        map.put("full_name", sanitizedUser.getFull_name());
-        map.put("number", String.valueOf(sanitizedUser.getNumber()));
-        return map;
-    }
-
     public int getId() {
         return id;
     }

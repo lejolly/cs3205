@@ -172,4 +172,23 @@ public class C3UserQueries {
 
     // TODO: update user
 
+//    public static boolean updateUser(Connection dbConnection, User user) {
+//        try {
+//            logger.info("Updating user: " + user.getUsername());
+//            PreparedStatement preparedStatement =
+//                    dbConnection.prepareStatement("UPDATE users SET name = ?, quantity = ?, comment = ? WHERE id = ?");
+//            preparedStatement.setString(1, item.getName());
+//            preparedStatement.setInt(2, item.getQuantity());
+//            preparedStatement.setString(3, item.getComment());
+//            preparedStatement.setInt(4, item.getId());
+//            preparedStatement.execute();
+//            logger.info("Updated: " + item.getId() + ": " + item.getName() +
+//                    " quantity: " + item.getQuantity() + " comment: " + item.getComment());
+//            return true;
+//        } catch (SQLException e) {
+//            logger.error("SQLException: ", e);
+//        }
+//        return false;
+//    }
+
 }
