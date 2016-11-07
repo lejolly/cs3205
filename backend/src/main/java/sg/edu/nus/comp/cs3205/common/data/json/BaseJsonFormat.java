@@ -21,7 +21,6 @@ public class BaseJsonFormat {
     private String error;
     private String id;
     private String input;
-    private List<String> headers;
     private List<Map<String, String>> rows;
 
     public BaseJsonFormat(String action, Map<String, String> data, String error, String id, String input) {
@@ -30,6 +29,7 @@ public class BaseJsonFormat {
         this.error = error;
         this.id = id;
         this.input = input;
+        this.rows = new ArrayList<>();
     }
 
     public BaseJsonFormat() {
@@ -38,7 +38,6 @@ public class BaseJsonFormat {
         this.error = "";
         this.id = "";
         this.input = "";
-        this.headers = new ArrayList<>();
         this.rows = new ArrayList<>();
     }
 
@@ -51,7 +50,6 @@ public class BaseJsonFormat {
         destination.setError(source.getError());
         destination.setId(source.getId());
         destination.setInput(source.getInput());
-        destination.setHeaders(source.getHeaders());
         destination.setRows(source.getRows());
     }
 
@@ -107,14 +105,6 @@ public class BaseJsonFormat {
 
     public void setInput(String input) {
         this.input = input;
-    }
-
-    public List<String> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(List<String> headers) {
-        this.headers = headers;
     }
 
     public List<Map<String, String>> getRows() {
