@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BaseJsonFormat {
@@ -19,6 +21,8 @@ public class BaseJsonFormat {
     private String error;
     private String id;
     private String input;
+    private List<String> headers;
+    private List<Map<String, String>> rows;
 
     public BaseJsonFormat(String action, Map<String, String> data, String error, String id, String input) {
         this.action = action;
@@ -34,15 +38,12 @@ public class BaseJsonFormat {
         this.error = "";
         this.id = "";
         this.input = "";
+        this.headers = new ArrayList<>();
+        this.rows = new ArrayList<>();
     }
 
     public String getJsonString() {
-        String json = JsonUtils.toJsonString(this);
-        json = json.replace("\\\"", "\"");
-        json = json.replace("\"[{\"", "[{\"");
-        json = json.replace("\"}]\"", "\"}]");
-        json = json.replace("\"[\"", "[\"");
-        return json.replace("\"]\"", "\"]");
+        return JsonUtils.toJsonString(this);
     }
 
     public static void setEverythingExceptAction(BaseJsonFormat source, BaseJsonFormat destination) {
@@ -50,6 +51,8 @@ public class BaseJsonFormat {
         destination.setError(source.getError());
         destination.setId(source.getId());
         destination.setInput(source.getInput());
+        destination.setHeaders(source.getHeaders());
+        destination.setRows(source.getRows());
     }
 
     public static <T extends BaseJsonFormat> T fromBaseFormat(BaseJsonFormat source, T destination) {
@@ -104,6 +107,22 @@ public class BaseJsonFormat {
 
     public void setInput(String input) {
         this.input = input;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<String> headers) {
+        this.headers = headers;
+    }
+
+    public List<Map<String, String>> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<Map<String, String>> rows) {
+        this.rows = rows;
     }
 
 }

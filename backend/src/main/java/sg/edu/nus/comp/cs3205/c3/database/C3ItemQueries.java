@@ -6,7 +6,9 @@ import sg.edu.nus.comp.cs3205.common.data.database.Item;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class C3ItemQueries {
 
@@ -145,6 +147,15 @@ public class C3ItemQueries {
             logger.error("SQLException: ", e);
         }
         return false;
+    }
+
+    public static Map<String, String> getItemMap(Item item) {
+        Map<String, String> map = new HashMap<>();
+        map.put("id", String.valueOf(item.getId()));
+        map.put("name", item.getName());
+        map.put("quantity", String.valueOf(item.getQuantity()));
+        map.put("comment", item.getComment());
+        return map;
     }
 
 }
