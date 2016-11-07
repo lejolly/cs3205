@@ -31,6 +31,17 @@ public class C3RetrieveManager {
                 headers.add("Full Name");
                 retrieveResponse.setHeaders(headers);
                 retrieveResponse.setRows(sanitizedUsers);
+            } else if (retrieveRequest.getData().get("table_id").equals("items")) {
+                logger.info("Received request for items table");
+                List<String> items = C3ItemQueries.getAllItems(dbConnection).stream()
+                        .map(gson::toJson).collect(Collectors.toList());
+                List<String> headers = new ArrayList<>();
+                headers.add("Id");
+                headers.add("Name");
+                headers.add("Quantity");
+                headers.add("Comment");
+                retrieveResponse.setHeaders(headers);
+                retrieveResponse.setRows(items);
             }
         }
         return retrieveResponse;
