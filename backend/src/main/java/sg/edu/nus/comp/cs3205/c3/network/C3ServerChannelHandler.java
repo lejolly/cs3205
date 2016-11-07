@@ -6,13 +6,18 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
+import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
+import sg.edu.nus.comp.cs3205.c3.database.C3RetrieveManager;
 import sg.edu.nus.comp.cs3205.c3.key.C3KeyManager;
 import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat.JSON_FORMAT;
 import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
+import sg.edu.nus.comp.cs3205.common.data.json.RetrieveRequest;
 import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
+
+import java.sql.Connection;
 
 @ChannelHandler.Sharable
 public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> {
@@ -21,10 +26,13 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
 
     private C3SessionManager c3SessionManager;
     private C3LoginManager c3LoginManager;
+    private Connection dbConnection;
 
-    C3ServerChannelHandler(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager) {
+    C3ServerChannelHandler(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager,
+                           C3DatabaseManager c3DatabaseManager) {
         this.c3SessionManager = c3SessionManager;
         this.c3LoginManager = c3LoginManager;
+        this.dbConnection = c3DatabaseManager.getDbConnection();
     }
 
     @Override
@@ -51,6 +59,12 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
                 LoginRequest loginRequest = LoginRequest.fromBaseFormat(baseJsonFormat);
                 if (loginRequest != null) {
                     response = c3LoginManager.getLoginResponse(loginRequest);
+                }
+            } else if (format == JSON_FORMAT.RETRIEVE_REQUEST) {
+                RetrieveRequest retrieveRequest = RetrieveRequest.fromBaseFormat(baseJsonFormat);
+                if (retrieveRequest != null) {
+                    //TODO: check for auth
+                    response = C3RetrieveManager.parseRetrieveRequest(dbConnection, retrieveRequest);
                 }
             }
             if (response != null) {

@@ -8,9 +8,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class C3DataQueries {
+public class C3ItemQueries {
 
-    private static final Logger logger = LoggerFactory.getLogger(C3DataQueries.class);
+    private static final Logger logger = LoggerFactory.getLogger(C3ItemQueries.class);
 
     public static String getItemName(Connection dbConnection, int id) {
         return getItemDetail(dbConnection, id, "name");
@@ -33,7 +33,7 @@ public class C3DataQueries {
         try {
             logger.info("Getting " + column + " for item: " + id);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT " + column + " FROM data WHERE id = ? LIMIT 1");
+                    dbConnection.prepareStatement("SELECT " + column + " FROM items WHERE id = ? LIMIT 1");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -52,7 +52,7 @@ public class C3DataQueries {
         try {
             logger.info("Getting item: " + id);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT * FROM data WHERE id = ? LIMIT 1");
+                    dbConnection.prepareStatement("SELECT * FROM items WHERE id = ? LIMIT 1");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -74,7 +74,7 @@ public class C3DataQueries {
         try {
             logger.info("Getting all items");
             Statement statement = dbConnection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * from data");
+            ResultSet resultSet = statement.executeQuery("SELECT * from items");
             List<Item> items = new ArrayList<>();
             while (resultSet.next()) {
                 int id = resultSet.getInt(1);
@@ -99,7 +99,7 @@ public class C3DataQueries {
         try {
             logger.info("Updating item: " + item.getName());
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("UPDATE data SET name = ?, quantity = ?, comment = ? WHERE id = ?");
+                    dbConnection.prepareStatement("UPDATE items SET name = ?, quantity = ?, comment = ? WHERE id = ?");
             preparedStatement.setString(1, item.getName());
             preparedStatement.setInt(2, item.getQuantity());
             preparedStatement.setString(3, item.getComment());
@@ -119,7 +119,7 @@ public class C3DataQueries {
         try {
             logger.info("Adding item: " + item.getName());
             PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
-                    "data (name, quantity, comment) VALUES (?, ?, ?)");
+                    "items (name, quantity, comment) VALUES (?, ?, ?)");
             preparedStatement.setString(1, item.getName());
             preparedStatement.setInt(2, item.getQuantity());
             preparedStatement.setString(3, item.getComment());
@@ -136,7 +136,7 @@ public class C3DataQueries {
     public static boolean deleteItem(Connection dbConnection, int id) {
         try {
             logger.info("Deleting item: " + id);
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM data WHERE id = ?");
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM items WHERE id = ?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             logger.info("Deleted item: " + id);

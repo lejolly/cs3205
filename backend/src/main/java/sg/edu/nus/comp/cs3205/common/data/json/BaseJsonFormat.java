@@ -11,10 +11,11 @@ public class BaseJsonFormat {
 
     private static Logger logger = LoggerFactory.getLogger(BaseJsonFormat.class);
 
-    public enum JSON_FORMAT {SALT_REQUEST, SALT_RESPONSE, LOGIN_REQUEST, LOGIN_RESPONSE, ERROR}
+    public enum JSON_FORMAT {SALT_REQUEST, SALT_RESPONSE, LOGIN_REQUEST, LOGIN_RESPONSE, ERROR,
+        RETRIEVE_REQUEST, RETRIEVE_RESPONSE}
 
     private String action;
-    private Map<String, String> data;
+    protected Map<String, String> data;
     private String error;
     private String id;
     private String input;
@@ -36,7 +37,14 @@ public class BaseJsonFormat {
     }
 
     public String getJsonString() {
-        return JsonUtils.toJsonString(this);
+        String json = JsonUtils.toJsonString(this);
+//        return json;
+//        return json.replace("\\\"", "\"");
+        json = json.replace("\\\"", "\"");
+        json = json.replace("\"[{\"", "[{\"");
+        json = json.replace("\"}]\"", "\"}]");
+        json = json.replace("\"[\"", "[\"");
+        return json.replace("\"]\"", "\"]");
     }
 
     public static void setEverythingExceptAction(BaseJsonFormat source, BaseJsonFormat destination) {

@@ -1,0 +1,50 @@
+package sg.edu.nus.comp.cs3205.c3.database;
+
+import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.database.SanitizedUser;
+import sg.edu.nus.comp.cs3205.common.data.json.RetrieveRequest;
+import sg.edu.nus.comp.cs3205.common.data.json.RetrieveResponse;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class C3RetrieveManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(C3RetrieveManager.class);
+
+    public static RetrieveResponse parseRetrieveRequest(Connection dbConnection, RetrieveRequest retrieveRequest) {
+        Gson gson = new Gson();
+        RetrieveResponse retrieveResponse = new RetrieveResponse();
+        if (retrieveRequest.getData().containsKey("table_id")) {
+            if (retrieveRequest.getData().get("table_id").equals("users")) {
+                logger.info("Received request for users table");
+                List<String> sanitizedUsers = C3UserQueries.getAllUsers(dbConnection).stream()
+                        .map(SanitizedUser::new).map(gson::toJson).collect(Collectors.toList());
+                List<String> headers = new ArrayList<>();
+                headers.add("Id");
+                headers.add("Username");
+                headers.add("Role");
+                headers.add("Full Name");
+                retrieveResponse.setHeaders(headers);
+                retrieveResponse.setRows(sanitizedUsers);
+//                String headersString = gson.toJson(headers);
+//                headersString = "{" + headersString.substring(1, headersString.length() - 1) + "}";
+//                String sanitizedUsersString = gson.toJson(sanitizedUsers);
+//                sanitizedUsersString = "{" +
+//                        sanitizedUsersString.substring(1, sanitizedUsersString.length() - 1) + "}";
+//                System.out.println(headersString);
+//                System.out.println(sanitizedUsersString);
+//                Map<String, String> data = new HashMap<>();
+//                data.put("headers", headersString);
+//                data.put("rows", sanitizedUsersString);
+//                retrieveResponse.setData(data);
+            }
+        }
+        return retrieveResponse;
+    }
+
+}
