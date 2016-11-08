@@ -16,8 +16,6 @@ class Session extends CI_Controller {
 	}
 
 	public function verify() {
-		$this->load->library('jwt');
-		$this->load->library('request');
 		$username = $this->input->post('username');
 		$challenge = $this->input->post('challenge');
 		$response = $this->input->post('response');
@@ -50,9 +48,11 @@ class Session extends CI_Controller {
 				$response = $this->request->send_request($packet);
 				log_message('debug', '[RESPONSE] login_response: ' . var_export($response, true));
 // TODO: signature verification?
-				$data = $this->request->verify_payload($response, 'login_response', array('auth_token'/*, 'csrf_token' exclude for now*/));
+				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'/*, 'csrf_token' exclude for now*/));
 				$data['session_token'] = md5(rand());
 				$_SESSION['auth_token'] = $data['auth_token'];
+				$_SESSION[$data['role']] = true;
+				$_SESSION['username'] = $data['username'];
 				$output = json_encode($data);
 			} catch (Exception $e) {
 				log_message('error', 'Exception when trying to login: ' . $e->getMessage());
@@ -67,9 +67,7 @@ class Session extends CI_Controller {
 	}
 
 	public function get_salt($username = null) {
-		//error_reporting(0); // All errors handled via Exceptions
 		log_message('debug', '[PARAMS] username: ' . $username);
-		$this->load->library('request');
 
 		$action = 'salt_request';
 		$data = array();

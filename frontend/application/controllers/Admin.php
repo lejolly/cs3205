@@ -4,8 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Admin extends CI_Controller {
 
 	public function user_index() {
-		$this->load->library('request');
-		// $this->auth->check_admin();
+		$this->auth->check_admin();
 
 		$action = 'retrieve_request';
 		$data = array();
@@ -36,6 +35,46 @@ class Admin extends CI_Controller {
 	}
 
 	public function user_add() {
-		$this->load->view('layout');
+		$this->auth->check_admin();
+
+		$full_name = $this->input->post('full_name');
+		$username = $this->input->post('username');
+		$salt = $this->input->post('salt');
+		$hash = $this->input->post('hash');
+		$number = $this->input->post('number');
+		$role = $this->input->post('role');
+		$otp_seed = substr(md5(rand()), 0, 10);
+		if($full_name != null && $username != null && $salt != null && $hash != null && $number != null) {
+			log_message('debug', '[PARAMS] full_name='.$full_name);
+			log_message('debug', '[PARAMS] username='.$username);
+			log_message('debug', '[PARAMS] salt='.$salt);
+			log_message('debug', '[PARAMS] hash='.$hash);
+			log_message('debug', '[PARAMS] number='.$number);
+			log_message('debug', '[PARAMS] role='.$role);
+			log_message('debug', '[PARAMS] otp_seed='.$otp_seed);
+			$action = 'create_request';
+			$data['auth_token'] = $this->auth->get_auth_token();
+			$data['csrf_token'] = md5(rand()); //TODO: Implement csrf
+			$data['table_id'] = 'users';
+			$rows = compact('full_name', 'username', 'salt', 'hash', 'number', 'role', 'otp_seed');
+			$id = get_class($this);
+
+			try {
+				$packet = $this->request->get_packet($action, $data, $id, $rows);
+				log_message('debug', '[REQUEST] create_request: ' . $packet);
+				$response = $this->request->send_request($packet);
+				log_message('debug', '[RESPONSE] create_response: ' . var_export($response, true));
+				//$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
+				//redirect('admin/users');
+			} catch(Exception $e) {
+				log_message('error', 'Exception when trying to create user: ' . $e->getMessage());
+				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to create new user');
+			}
+		}
+
+
+		$page['title'] = 'Add New User';
+		$page['contents'] = $this->load->view('users/form', null, true);
+		$this->load->view('layout', $page);
 	}
 }

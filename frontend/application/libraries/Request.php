@@ -20,19 +20,23 @@ class Request {
 		if(!socket_write($socket, $request, strlen($request))) {
 			throw new Exception("Socket write error: " . socket_strerror(socket_last_error()));
 		} else {
-			if($response = $this->socket_getline($socket)) {
+			$response = $this->socket_getline($socket);
+			if($response == null) {
+				throw new Exception('NULL response');
+			} else {
 				return $response;
 			}
 		}
 	}
 
-	public function get_packet($action, $data, $id = '') {
+	public function get_packet($action, $data, $id = '', $rows = array()) {
 		$packet = array();
 		$packet['action'] = $action;
 		$packet['data'] = $data;
 		$packet['error'] = '';
 		$packet['id'] = $id;
 		$packet['input'] = '';
+		$packet['rows'] = $rows;
 		return json_encode($packet) . "\r\n";
 	}
 

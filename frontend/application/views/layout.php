@@ -47,7 +47,7 @@
     </nav>
 
     <div class="container" id="wrapper">
-      <div class="row" id="alerts"></div>
+      <div class="row" id="alerts"><?php echo isset($_SESSION['flash']) ? $_SESSION['flash'] : ''; unset($_SESSION['flash']); ?></div>
       <div class="row" id="content"><?php echo isset($contents) ? $contents : '<h1>No Content</h1>'; ?></div>
     </div><!-- /.container -->
 
