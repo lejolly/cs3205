@@ -170,25 +170,23 @@ public class C3UserQueries {
         return false;
     }
 
-    // TODO: update user
-
-//    public static boolean updateUser(Connection dbConnection, User user) {
-//        try {
-//            logger.info("Updating user: " + user.getUsername());
-//            PreparedStatement preparedStatement =
-//                    dbConnection.prepareStatement("UPDATE users SET name = ?, quantity = ?, comment = ? WHERE id = ?");
-//            preparedStatement.setString(1, item.getName());
-//            preparedStatement.setInt(2, item.getQuantity());
-//            preparedStatement.setString(3, item.getComment());
-//            preparedStatement.setInt(4, item.getId());
-//            preparedStatement.execute();
-//            logger.info("Updated: " + item.getId() + ": " + item.getName() +
-//                    " quantity: " + item.getQuantity() + " comment: " + item.getComment());
-//            return true;
-//        } catch (SQLException e) {
-//            logger.error("SQLException: ", e);
-//        }
-//        return false;
-//    }
+    // does not include changing password
+    public static boolean updateUser(Connection dbConnection, User user) {
+        try {
+            logger.info("Updating user: " + user.getUsername());
+            PreparedStatement preparedStatement =
+                    dbConnection.prepareStatement("UPDATE users SET full_name = ?, number = ? WHERE id = ?");
+            preparedStatement.setString(1, user.getFull_name());
+            preparedStatement.setInt(2, user.getNumber());
+            preparedStatement.setInt(3, user.getId());
+            preparedStatement.execute();
+            logger.info("Updated: " + user.getId() + ": " + user.getUsername() +
+                    " full_name: " + user.getFull_name() + " number: " + user.getNumber());
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
 
 }
