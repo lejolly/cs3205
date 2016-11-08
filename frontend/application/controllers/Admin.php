@@ -56,11 +56,11 @@ class Admin extends CI_Controller {
 			$data['auth_token'] = $this->auth->get_auth_token();
 			$data['csrf_token'] = md5(rand()); //TODO: Implement csrf
 			$data['table_id'] = 'users';
-			$rows = compact('full_name', 'username', 'salt', 'hash', 'number', 'role', 'otp_seed');
+			$data = array_merge($data, compact('full_name', 'username', 'salt', 'hash', 'number', 'role', 'otp_seed'));
 			$id = get_class($this);
 
 			try {
-				$packet = $this->request->get_packet($action, $data, $id, $rows);
+				$packet = $this->request->get_packet($action, $data, $id);
 				log_message('debug', '[REQUEST] create_request: ' . $packet);
 				$response = $this->request->send_request($packet);
 				log_message('debug', '[RESPONSE] create_response: ' . var_export($response, true));
