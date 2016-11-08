@@ -81,7 +81,6 @@ public class C3LoginManager extends AbstractManager {
                     && loginRequest.getData().get("response").length() == 80
                     && loginRequest.getData().containsKey("otp")) {
                 String user = loginRequest.getData().get("username");
-
                 String otp = loginRequest.getData().get("otp");
                 String otpSeed = C3UserQueries.getUserOtpSeed(dbConnection, user);
                 if (otpSeed != null && TotpUtils.checkOTP(otpSeed, otp)) {
@@ -101,6 +100,8 @@ public class C3LoginManager extends AbstractManager {
                             c3SessionManager.addAuth_token(username, auth_token);
                             Map<String, String> map = new HashMap<>();
                             map.put("auth_token", auth_token);
+                            map.put("username", user);
+                            map.put("role", C3UserQueries.getUserRole(dbConnection, user));
                             loginResponse.setData(map);
                             loginResponse.setId("c3");
                             return loginResponse;
