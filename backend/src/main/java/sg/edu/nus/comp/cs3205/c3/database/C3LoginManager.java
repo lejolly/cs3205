@@ -15,13 +15,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class C3UserManager {
+public class C3LoginManager {
 
-    private static Logger logger = LoggerFactory.getLogger(C3UserManager.class);
+    private static Logger logger = LoggerFactory.getLogger(C3LoginManager.class);
 
     private C3RequestManager c3RequestManager;
 
-    public C3UserManager(C3RequestManager c3RequestManager) {
+    public C3LoginManager(C3RequestManager c3RequestManager) {
         this.c3RequestManager = c3RequestManager;
     }
 

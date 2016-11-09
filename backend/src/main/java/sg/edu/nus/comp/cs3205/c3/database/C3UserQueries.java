@@ -16,7 +16,8 @@ public class C3UserQueries {
         try {
             logger.info("Checking for the existence of user: " + user);
             PreparedStatement preparedStatement =
-                    C3DatabaseManager.dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM users WHERE username = ? LIMIT 1)");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM users WHERE " +
+                            "username = ? LIMIT 1)");
             preparedStatement.setString(1, user);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -177,10 +178,10 @@ public class C3UserQueries {
             logger.info("Updating user: " + user.getUsername());
             PreparedStatement preparedStatement =
                     C3DatabaseManager.dbConnection.prepareStatement("UPDATE users SET full_name = ?, " +
-                            "number = ? WHERE id = ?");
+                            "number = ? WHERE username = ?");
             preparedStatement.setString(1, user.getFull_name());
             preparedStatement.setInt(2, user.getNumber());
-            preparedStatement.setInt(3, user.getId());
+            preparedStatement.setString(3, user.getUsername());
             preparedStatement.execute();
             logger.info("Updated: " + user.getId() + ": " + user.getUsername() +
                     " full_name: " + user.getFull_name() + " number: " + user.getNumber());
@@ -190,5 +191,27 @@ public class C3UserQueries {
         }
         return false;
     }
+
+    // changes hash + salt
+    public static boolean changeUserPassword(User user) {
+        try {
+            logger.info("Updating password for user: " + user.getUsername());
+            PreparedStatement preparedStatement =
+                    C3DatabaseManager.dbConnection.prepareStatement("UPDATE users SET hash = ?, " +
+                            "salt = ? WHERE username = ?");
+            preparedStatement.setString(1, user.getHash());
+            preparedStatement.setString(2, user.getSalt());
+            preparedStatement.setString(3, user.getUsername());
+            preparedStatement.execute();
+            logger.info("Updated: " + user.getId() + ": " + user.getUsername() +
+                    " hash: " + user.getHash() + " salt: " + user.getSalt());
+            return true;
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
+
+    // TODO: reset OTP seed?
 
 }

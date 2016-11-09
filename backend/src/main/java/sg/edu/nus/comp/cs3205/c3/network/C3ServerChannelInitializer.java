@@ -8,9 +8,6 @@ import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import sg.edu.nus.comp.cs3205.c3.C3RequestManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3UserManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
-import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 
 public class C3ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 

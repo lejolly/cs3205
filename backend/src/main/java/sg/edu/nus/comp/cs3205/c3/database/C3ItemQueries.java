@@ -153,4 +153,24 @@ public class C3ItemQueries {
         return false;
     }
 
+    public static boolean doesItemExist(String item) {
+        try {
+            logger.info("Checking for the existence of item: " + item);
+            PreparedStatement preparedStatement =
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM items " +
+                            "WHERE name = ? LIMIT 1)");
+            preparedStatement.setString(1, item);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                logger.info(item + " exists: " + resultSet.getBoolean(1));
+                return resultSet.getBoolean(1);
+            } else {
+                logger.warn("Unable to determine existence of item: " + item);
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return false;
+    }
+
 }
