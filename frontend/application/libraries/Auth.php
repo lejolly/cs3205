@@ -10,11 +10,11 @@ class Auth {
 	}
 
 	public function is_logged_in() {
-		return isset($_SESSION['auth_token']);
+		return isset($_SESSION['auth_token']) && !empty($_SESSION['auth_token']);
 	}
 
 	public function is_admin() {
-		return isset($_SESSION['admin']);
+		return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 	}
 
 	public function check_auth() {

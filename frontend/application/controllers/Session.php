@@ -11,7 +11,7 @@ class Session extends CI_Controller {
 	}
 
 	public function logout() {
-		unset($_SESSION['auth_token']);
+		session_destroy();
 		redirect('session/login');
 	}
 
@@ -51,7 +51,7 @@ class Session extends CI_Controller {
 				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'/*, 'csrf_token' exclude for now*/));
 				$data['session_token'] = md5(rand());
 				$_SESSION['auth_token'] = $data['auth_token'];
-				$_SESSION[$data['role']] = true;
+				$_SESSION['role'] = $data['role'];
 				$_SESSION['username'] = $data['username'];
 				$output = json_encode($data);
 			} catch (Exception $e) {

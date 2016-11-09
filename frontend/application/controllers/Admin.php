@@ -62,8 +62,10 @@ class Admin extends CI_Controller {
 				log_message('debug', '[REQUEST] create_request: ' . $packet);
 				$response = $this->request->send_request($packet);
 				log_message('debug', '[RESPONSE] create_response: ' . var_export($response, true));
-				//$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
-				//redirect('admin/users');
+				$payload = $this->request->verify_payload($response, 'retrieve_response', array());
+				log_message('debug', 'Created user');
+				$_SESSION['flash'] = $this->utils->success_alert_html('Created new user');
+				redirect('admin/users');
 			} catch(Exception $e) {
 				log_message('error', 'Exception when trying to create user: ' . $e->getMessage());
 				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to create new user');

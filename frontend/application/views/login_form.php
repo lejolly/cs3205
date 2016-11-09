@@ -65,6 +65,7 @@ function submitForm(_username, salt, _challenge) {
 	var _otp = $('#otp').val();
 	var password = $('#password').val() == undefined ? '' : $('#password').val();
 	hashpw(password, salt, function(hs, err) {
+		console.log('salt = ' + salt);
 		hs = btoa(hs);
 		console.log('[SECRET] hs = base_64(Hs(password, salt)) = ' + hs);
 		var hash = Sha256.hash(hs);

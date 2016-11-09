@@ -32,8 +32,8 @@ function checkForm() {
     }
 
     if(!error) {
-        $('#salt').val(gensalt(10));
-        hashpw($('pass').val(), $('#salt').val(), function(hs, err) {
+        $('#salt').val('$2a$10$NE00BxQCjuL3KThJ92HxQe');
+        hashpw($('#password').val(), $('#salt').val(), function(hs, err) {
             $('#hash').val(Sha256.hash(btoa(hs)));
             $('#password').val('');
             $('#password_repeat').val('');

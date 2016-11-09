@@ -55,6 +55,11 @@ class Request {
 		}
 
 		$data = array();
+
+		if(isset($payload['error']) && $payload['error'] != '') {
+			$data['error'] = $payload['error'];
+		}
+
 		foreach($data_fields as $data_field) {
 			if(!isset($payload['data'][$data_field])) {
 				throw new Exception('Expected <data[' . $data_field . ']> in response payload');
