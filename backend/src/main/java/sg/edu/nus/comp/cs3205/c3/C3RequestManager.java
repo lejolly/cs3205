@@ -74,6 +74,12 @@ public class C3RequestManager {
                 //TODO: check for auth
                 response = parseCreateRequest(createRequest);
             }
+        } else if (format == BaseJsonFormat.JSON_FORMAT.DELETE_REQUEST) {
+            DeleteRequest deleteRequest = DeleteRequest.fromBaseFormat(baseJsonFormat);
+            if (deleteRequest != null) {
+                //TODO: check for auth
+                response = parseDeleteRequest(deleteRequest);
+            }
         }
         return response;
     }
@@ -87,13 +93,16 @@ public class C3RequestManager {
                 List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
                         .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap).collect(Collectors.toList());
                 retrieveResponse.setRows(sanitizedUsers);
+                return retrieveResponse;
             } else if (retrieveRequest.getData().get("table_id").equals("items")) {
                 logger.info("Received request for items table");
                 List<Map<String, String>> items = C3ItemQueries.getAllItems().stream()
                         .map(Item::getItemMap).collect(Collectors.toList());
                 retrieveResponse.setRows(items);
+                return retrieveResponse;
             }
         }
+        retrieveResponse.setError("Invalid retrieve request. ");
         return retrieveResponse;
     }
 
@@ -194,6 +203,39 @@ public class C3RequestManager {
         updateResponse.setError("Invalid update request. Please check that user/item to update actually exists " +
                 "and that all fields have been properly filled up. ");
         return updateResponse;
+    }
+
+    private DeleteResponse parseDeleteRequest(DeleteRequest deleteRequest) {
+        DeleteResponse deleteResponse = new DeleteResponse();
+        if (deleteRequest.getData().containsKey("table_id")) {
+            if (deleteRequest.getData().get("table_id").equals("users") &&
+                    deleteRequest.getData().containsKey("username") &&
+                    C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
+                // TODO: check that user is admin
+                logger.info("Received request to delete user");
+                if (C3UserQueries.deleteUser(deleteRequest.getData().get("username"))) {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("username", deleteRequest.getData().get("username"));
+                    deleteResponse.setData(map);
+                    deleteResponse.setId("c3");
+                    return deleteResponse;
+                }
+            } else if (deleteRequest.getData().get("table_id").equals("items") &&
+                    deleteRequest.getData().containsKey("name") &&
+                    C3ItemQueries.doesItemExist(deleteRequest.getData().get("name"))) {
+                // TODO: check that user is admin
+                logger.info("Received request to delete item");
+                if (C3ItemQueries.deleteItem(deleteRequest.getData().get("name"))) {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("name", deleteRequest.getData().get("name"));
+                    deleteResponse.setData(map);
+                    deleteResponse.setId("c3");
+                    return deleteResponse;
+                }
+            }
+        }
+        deleteResponse.setError("Invalid delete request. Please check that user/item actually exists. ");
+        return deleteResponse;
     }
 
 }

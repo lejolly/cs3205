@@ -15,36 +15,32 @@ public class C3ItemQueries {
 
     private static final Logger logger = LoggerFactory.getLogger(C3ItemQueries.class);
 
-    public static String getItemName(int id) {
-        return getItemDetail(id, "name");
+    public static String getItemComment(String name) {
+        return getItemDetail(name, "comment");
     }
 
-    public static String getItemComment(int id) {
-        return getItemDetail(id, "comment");
-    }
-
-    public static int getItemQuantity(int id) {
+    public static int getItemQuantity(String name) {
         try {
-            return Integer.parseInt(getItemDetail(id, "quantity"));
+            return Integer.parseInt(getItemDetail(name, "quantity"));
         } catch (NumberFormatException e) {
             logger.warn("Invalid item quantity returned.");
             return -1;
         }
     }
 
-    private static String getItemDetail(int id, String column) {
+    private static String getItemDetail(String name, String column) {
         try {
-            logger.info("Getting " + column + " for item: " + id);
+            logger.info("Getting " + column + " for item: " + name);
             PreparedStatement preparedStatement =
                     C3DatabaseManager.dbConnection.prepareStatement("SELECT " + column + " FROM items " +
-                            "WHERE id = ? LIMIT 1");
-            preparedStatement.setInt(1, id);
+                            "WHERE name = ? LIMIT 1");
+            preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                logger.info(id + "'s " + column + ": " + resultSet.getString(1));
+                logger.info(name + "'s " + column + ": " + resultSet.getString(1));
                 return resultSet.getString(1);
             } else {
-                logger.warn("Unable to get " + column + " for: " + id);
+                logger.warn("Unable to get " + column + " for: " + name);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
@@ -52,21 +48,21 @@ public class C3ItemQueries {
         return null;
     }
 
-    public static Item getItem(int id) {
+    public static Item getItem(String name) {
         try {
-            logger.info("Getting item: " + id);
+            logger.info("Getting item: " + name);
             PreparedStatement preparedStatement =
-                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM items WHERE id = ? LIMIT 1");
-            preparedStatement.setInt(1, id);
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM items WHERE name = ? LIMIT 1");
+            preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String name = resultSet.getString(2);
+                int id = resultSet.getInt(1);
                 int quantity = resultSet.getInt(3);
                 String comment = resultSet.getString(4);
                 logger.info(id + ": " + name + " quantity: " + quantity + " comment: " + comment);
                 return new Item(id, name, quantity, comment);
             } else {
-                logger.warn("Unable to get item: " + id);
+                logger.warn("Unable to get item: " + name);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
@@ -138,14 +134,14 @@ public class C3ItemQueries {
         return false;
     }
 
-    public static boolean deleteItem(int id) {
+    public static boolean deleteItem(String name) {
         try {
-            logger.info("Deleting item: " + id);
+            logger.info("Deleting item: " + name);
             PreparedStatement preparedStatement = C3DatabaseManager.dbConnection.prepareStatement(
-                    "DELETE FROM items WHERE id = ?");
-            preparedStatement.setInt(1, id);
+                    "DELETE FROM items WHERE name = ?");
+            preparedStatement.setString(1, name);
             preparedStatement.execute();
-            logger.info("Deleted item: " + id);
+            logger.info("Deleted item: " + name);
             return true;
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
@@ -153,19 +149,19 @@ public class C3ItemQueries {
         return false;
     }
 
-    public static boolean doesItemExist(String item) {
+    public static boolean doesItemExist(String name) {
         try {
-            logger.info("Checking for the existence of item: " + item);
+            logger.info("Checking for the existence of item: " + name);
             PreparedStatement preparedStatement =
                     C3DatabaseManager.dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM items " +
                             "WHERE name = ? LIMIT 1)");
-            preparedStatement.setString(1, item);
+            preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                logger.info(item + " exists: " + resultSet.getBoolean(1));
+                logger.info(name + " exists: " + resultSet.getBoolean(1));
                 return resultSet.getBoolean(1);
             } else {
-                logger.warn("Unable to determine existence of item: " + item);
+                logger.warn("Unable to determine existence of item: " + name);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
