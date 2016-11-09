@@ -75,7 +75,7 @@ function checkForm() {
 	            </div>
 	            <div class="radio">
 	                <label>
-	                    <input type="radio" name="role" id="role_user_radio" value="user">
+	                    <input type="radio" name="role" id="role_user_radio" value="admin">
 	                    Admin User
 	                </label>
 	            </div>

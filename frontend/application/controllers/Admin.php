@@ -43,7 +43,6 @@ class Admin extends CI_Controller {
 		$hash = $this->input->post('hash');
 		$number = $this->input->post('number');
 		$role = $this->input->post('role');
-		$otp_seed = substr(md5(rand()), 0, 10);
 		if($full_name != null && $username != null && $salt != null && $hash != null && $number != null) {
 			log_message('debug', '[PARAMS] full_name='.$full_name);
 			log_message('debug', '[PARAMS] username='.$username);
@@ -51,12 +50,11 @@ class Admin extends CI_Controller {
 			log_message('debug', '[PARAMS] hash='.$hash);
 			log_message('debug', '[PARAMS] number='.$number);
 			log_message('debug', '[PARAMS] role='.$role);
-			log_message('debug', '[PARAMS] otp_seed='.$otp_seed);
 			$action = 'create_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
 			$data['csrf_token'] = md5(rand()); //TODO: Implement csrf
 			$data['table_id'] = 'users';
-			$data = array_merge($data, compact('full_name', 'username', 'salt', 'hash', 'number', 'role', 'otp_seed'));
+			$data = array_merge($data, compact('full_name', 'username', 'salt', 'hash', 'number', 'role'));
 			$id = get_class($this);
 
 			try {

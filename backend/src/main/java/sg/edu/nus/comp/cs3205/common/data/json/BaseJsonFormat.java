@@ -14,7 +14,7 @@ public class BaseJsonFormat {
     private static Logger logger = LoggerFactory.getLogger(BaseJsonFormat.class);
 
     public enum JSON_FORMAT {SALT_REQUEST, SALT_RESPONSE, LOGIN_REQUEST, LOGIN_RESPONSE, ERROR,
-        RETRIEVE_REQUEST, RETRIEVE_RESPONSE}
+        RETRIEVE_REQUEST, RETRIEVE_RESPONSE, CREATE_REQUEST, CREATE_RESPONSE}
 
     private String action;
     protected Map<String, String> data;
