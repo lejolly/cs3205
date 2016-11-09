@@ -14,7 +14,7 @@ public class C3SessionManager {
     private static Logger logger = LoggerFactory.getLogger(C3SessionManager.class);
 
     private Set<String> challenges;
-    // Map<username, auth_token)
+    // Map<auth_token, username>
     private Map<String, String> auth_tokens;
 
     public C3SessionManager() {
@@ -34,30 +34,34 @@ public class C3SessionManager {
         return isInChallenges;
     }
 
-    public synchronized void addAuth_token(String username, String auth_token) {
-        auth_tokens.put(username, auth_token);
+    public synchronized void addAuth_token(String auth_token, String username) {
+        auth_tokens.put(auth_token, username);
     }
 
     public synchronized boolean isUsernameInAuth_tokens(String username) {
-        return auth_tokens.containsKey(username);
+        return auth_tokens.containsValue(username);
     }
 
     public synchronized boolean isAuth_tokenInAuth_tokens(String auth_token) {
-        return auth_tokens.containsValue(auth_token);
+        return auth_tokens.containsKey(auth_token);
     }
 
     public synchronized void removeAuth_tokenFromAuth_tokens(String auth_token) {
-        Set<String> usernames = auth_tokens.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(auth_token))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-        if (usernames.size() == 1) {
-            auth_tokens.remove(usernames.iterator().next());
-        }
+        auth_tokens.remove(auth_token);
     }
 
     public synchronized void removeUsernameFromAuth_tokens(String username) {
-        auth_tokens.remove(username);
+        Set<String> auth_token = auth_tokens.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(username))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+        if (auth_token.size() == 1) {
+            auth_tokens.remove(auth_token.iterator().next());
+        }
+    }
+
+    public synchronized String getUsernameFromAuth_token(String auth_token) {
+        return auth_tokens.get(auth_token);
     }
 
 }

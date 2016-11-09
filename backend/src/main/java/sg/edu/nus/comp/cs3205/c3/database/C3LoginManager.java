@@ -88,7 +88,7 @@ public class C3LoginManager {
                             if (c3RequestManager.c3SessionManager.isUsernameInAuth_tokens(username)) {
                                 c3RequestManager.c3SessionManager.removeUsernameFromAuth_tokens(username);
                             }
-                            c3RequestManager.c3SessionManager.addAuth_token(username, auth_token);
+                            c3RequestManager.c3SessionManager.addAuth_token(auth_token, username);
                             Map<String, String> map = new HashMap<>();
                             map.put("auth_token", auth_token);
                             map.put("username", user);

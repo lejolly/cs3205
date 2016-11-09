@@ -65,26 +65,34 @@ public class C3RequestManager {
         } else if (format == BaseJsonFormat.JSON_FORMAT.RETRIEVE_REQUEST) {
             RetrieveRequest retrieveRequest = RetrieveRequest.fromBaseFormat(baseJsonFormat);
             if (retrieveRequest != null) {
-                //TODO: check for auth
-                response = parseRetrieveRequest(retrieveRequest);
+                if (retrieveRequest.getData().containsKey("auth_token") &&
+                        c3SessionManager.isAuth_tokenInAuth_tokens(retrieveRequest.getData().get("auth_token"))) {
+                    response = parseRetrieveRequest(retrieveRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.CREATE_REQUEST) {
             CreateRequest createRequest = CreateRequest.fromBaseFormat(baseJsonFormat);
             if (createRequest != null) {
-                //TODO: check for auth
-                response = parseCreateRequest(createRequest);
+                if (createRequest.getData().containsKey("auth_token") &&
+                        c3SessionManager.isAuth_tokenInAuth_tokens(createRequest.getData().get("auth_token"))) {
+                    response = parseCreateRequest(createRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.DELETE_REQUEST) {
             DeleteRequest deleteRequest = DeleteRequest.fromBaseFormat(baseJsonFormat);
             if (deleteRequest != null) {
-                //TODO: check for auth
-                response = parseDeleteRequest(deleteRequest);
+                if (deleteRequest.getData().containsKey("auth_token") &&
+                        c3SessionManager.isAuth_tokenInAuth_tokens(deleteRequest.getData().get("auth_token"))) {
+                    response = parseDeleteRequest(deleteRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.UPDATE_REQUEST) {
             UpdateRequest updateRequest = UpdateRequest.fromBaseFormat(baseJsonFormat);
             if (updateRequest != null) {
-                //TODO: check for auth
-                response = parseUpdateRequest(updateRequest);
+                if (updateRequest.getData().containsKey("auth_token") &&
+                        c3SessionManager.isAuth_tokenInAuth_tokens(updateRequest.getData().get("auth_token"))) {
+                    response = parseUpdateRequest(updateRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.LOGOUT_REQUEST) {
             LogoutRequest logoutRequest = LogoutRequest.fromBaseFormat(baseJsonFormat);
@@ -99,12 +107,16 @@ public class C3RequestManager {
         RetrieveResponse retrieveResponse = new RetrieveResponse();
         if (retrieveRequest.getData().containsKey("table_id")) {
             if (retrieveRequest.getData().get("table_id").equals("users")) {
-                // TODO: check that user has admin role
-                logger.info("Received request for users table");
-                List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
-                        .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap).collect(Collectors.toList());
-                retrieveResponse.setRows(sanitizedUsers);
-                return retrieveResponse;
+                String username = c3SessionManager.getUsernameFromAuth_token(
+                        retrieveRequest.getData().get("auth_token"));
+                if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+                    logger.info("Received request for users table");
+                    List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
+                            .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap)
+                            .collect(Collectors.toList());
+                    retrieveResponse.setRows(sanitizedUsers);
+                    return retrieveResponse;
+                }
             } else if (retrieveRequest.getData().get("table_id").equals("items")) {
                 logger.info("Received request for items table");
                 List<Map<String, String>> items = C3ItemQueries.getAllItems().stream()
@@ -113,7 +125,7 @@ public class C3RequestManager {
                 return retrieveResponse;
             }
         }
-        retrieveResponse.setError("Invalid retrieve request. ");
+        retrieveResponse.setError("Invalid retrieve request. Check that you have the correct permissions. ");
         return retrieveResponse;
     }
 
@@ -123,24 +135,26 @@ public class C3RequestManager {
             if (createRequest.getData().get("table_id").equals("users") &&
                     createRequest.getData().containsKey("username") &&
                     !C3UserQueries.doesUserExist(createRequest.getData().get("username"))) {
-                // TODO: check that user has admin role
-                logger.info("Received request to add new user");
-                User user = new User(0, createRequest.getData().get("username"),
-                        createRequest.getData().get("hash"),
-                        createRequest.getData().get("salt"),
-                        HashUtils.getNewOtpSeed(),
-                        createRequest.getData().get("role"),
-                        createRequest.getData().get("full_name"),
-                        Integer.parseInt(createRequest.getData().get("number")));
-                if (user.getRole().equals("user") || user.getRole().equals("admin")) {
-                    if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
-                        SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
-                        Map<String, String> map = new HashMap<>();
-                        map.put("username", sanitizedUser.getUsername());
-                        map.put("role", sanitizedUser.getRole());
-                        createResponse.setData(map);
-                        createResponse.setId("c3");
-                        return createResponse;
+                String username = c3SessionManager.getUsernameFromAuth_token(createRequest.getData().get("auth_token"));
+                if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+                    logger.info("Received request to add new user");
+                    User user = new User(0, createRequest.getData().get("username"),
+                            createRequest.getData().get("hash"),
+                            createRequest.getData().get("salt"),
+                            HashUtils.getNewOtpSeed(),
+                            createRequest.getData().get("role"),
+                            createRequest.getData().get("full_name"),
+                            Integer.parseInt(createRequest.getData().get("number")));
+                    if (user.getRole().equals("user") || user.getRole().equals("admin")) {
+                        if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
+                            SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
+                            Map<String, String> map = new HashMap<>();
+                            map.put("username", sanitizedUser.getUsername());
+                            map.put("role", sanitizedUser.getRole());
+                            createResponse.setData(map);
+                            createResponse.setId("c3");
+                            return createResponse;
+                        }
                     }
                 }
             } else if (createRequest.getData().get("table_id").equals("items") &&
@@ -171,22 +185,26 @@ public class C3RequestManager {
             if (updateRequest.getData().get("table_id").equals("users") &&
                     updateRequest.getData().containsKey("username") &&
                     C3UserQueries.doesUserExist(updateRequest.getData().get("username"))) {
-                // TODO: check that user has proper permissions
-                boolean success;
+                String authUserName = c3SessionManager.getUsernameFromAuth_token(
+                        updateRequest.getData().get("auth_token"));
                 String username = updateRequest.getData().get("username");
-                if (updateRequest.getData().containsKey("hash")) {
-                    logger.info("Received request to change user password");
-                    User user = new User(0, updateRequest.getData().get("username"),
-                            updateRequest.getData().get("hash"),
-                            updateRequest.getData().get("salt"),
-                            "", "", "", 0);
-                    success = C3UserQueries.changeUserPassword(user);
-                } else {
-                    logger.info("Received request to update user");
-                    User user = new User(0, updateRequest.getData().get("username"),
-                            "", "", "", "", updateRequest.getData().get("full_name"),
-                            Integer.parseInt(updateRequest.getData().get("number")));
-                    success = C3UserQueries.updateUser(user);
+                boolean success = false;
+                if (C3UserQueries.getUserRole(authUserName).equals("admin") ||
+                        authUserName.equals(username)) {
+                    if (updateRequest.getData().containsKey("hash")) {
+                        logger.info("Received request to change user password");
+                        User user = new User(0, updateRequest.getData().get("username"),
+                                updateRequest.getData().get("hash"),
+                                updateRequest.getData().get("salt"),
+                                "", "", "", 0);
+                        success = C3UserQueries.changeUserPassword(user);
+                    } else {
+                        logger.info("Received request to update user");
+                        User user = new User(0, updateRequest.getData().get("username"),
+                                "", "", "", "", updateRequest.getData().get("full_name"),
+                                Integer.parseInt(updateRequest.getData().get("number")));
+                        success = C3UserQueries.updateUser(user);
+                    }
                 }
                 if (success) {
                     Map<String, String> map = new HashMap<>();
@@ -212,36 +230,38 @@ public class C3RequestManager {
             }
         }
         updateResponse.setError("Invalid update request. Please check that user/item to update actually exists " +
-                "and that all fields have been properly filled up. ");
+                "and that all fields have been properly filled up. If not, please check that you have the correct" +
+                "permissions. ");
         return updateResponse;
     }
 
     private DeleteResponse parseDeleteRequest(DeleteRequest deleteRequest) {
         DeleteResponse deleteResponse = new DeleteResponse();
-        if (deleteRequest.getData().containsKey("table_id")) {
-            if (deleteRequest.getData().get("table_id").equals("users") &&
-                    deleteRequest.getData().containsKey("username") &&
-                    C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
-                // TODO: check that user is admin
-                logger.info("Received request to delete user");
-                if (C3UserQueries.deleteUser(deleteRequest.getData().get("username"))) {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("username", deleteRequest.getData().get("username"));
-                    deleteResponse.setData(map);
-                    deleteResponse.setId("c3");
-                    return deleteResponse;
-                }
-            } else if (deleteRequest.getData().get("table_id").equals("items") &&
-                    deleteRequest.getData().containsKey("name") &&
-                    C3ItemQueries.doesItemExist(deleteRequest.getData().get("name"))) {
-                // TODO: check that user is admin
-                logger.info("Received request to delete item");
-                if (C3ItemQueries.deleteItem(deleteRequest.getData().get("name"))) {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("name", deleteRequest.getData().get("name"));
-                    deleteResponse.setData(map);
-                    deleteResponse.setId("c3");
-                    return deleteResponse;
+        String username = c3SessionManager.getUsernameFromAuth_token(deleteRequest.getData().get("auth_token"));
+        if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+            if (deleteRequest.getData().containsKey("table_id")) {
+                if (deleteRequest.getData().get("table_id").equals("users") &&
+                        deleteRequest.getData().containsKey("username") &&
+                        C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
+                    logger.info("Received request to delete user");
+                    if (C3UserQueries.deleteUser(deleteRequest.getData().get("username"))) {
+                        Map<String, String> map = new HashMap<>();
+                        map.put("username", deleteRequest.getData().get("username"));
+                        deleteResponse.setData(map);
+                        deleteResponse.setId("c3");
+                        return deleteResponse;
+                    }
+                } else if (deleteRequest.getData().get("table_id").equals("items") &&
+                        deleteRequest.getData().containsKey("name") &&
+                        C3ItemQueries.doesItemExist(deleteRequest.getData().get("name"))) {
+                    logger.info("Received request to delete item");
+                    if (C3ItemQueries.deleteItem(deleteRequest.getData().get("name"))) {
+                        Map<String, String> map = new HashMap<>();
+                        map.put("name", deleteRequest.getData().get("name"));
+                        deleteResponse.setData(map);
+                        deleteResponse.setId("c3");
+                        return deleteResponse;
+                    }
                 }
             }
         }
