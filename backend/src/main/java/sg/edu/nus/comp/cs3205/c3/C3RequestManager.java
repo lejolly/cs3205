@@ -80,6 +80,12 @@ public class C3RequestManager {
                 //TODO: check for auth
                 response = parseDeleteRequest(deleteRequest);
             }
+        } else if (format == BaseJsonFormat.JSON_FORMAT.UPDATE_REQUEST) {
+            UpdateRequest updateRequest = UpdateRequest.fromBaseFormat(baseJsonFormat);
+            if (updateRequest != null) {
+                //TODO: check for auth
+                response = parseUpdateRequest(updateRequest);
+            }
         }
         return response;
     }
@@ -161,7 +167,7 @@ public class C3RequestManager {
                     updateRequest.getData().containsKey("username") &&
                     C3UserQueries.doesUserExist(updateRequest.getData().get("username"))) {
                 // TODO: check that user has proper permissions
-                boolean success = false;
+                boolean success;
                 String username = updateRequest.getData().get("username");
                 if (updateRequest.getData().containsKey("hash")) {
                     logger.info("Received request to change user password");
