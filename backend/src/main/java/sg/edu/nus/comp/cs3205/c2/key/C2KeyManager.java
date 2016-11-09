@@ -15,12 +15,14 @@ public class C2KeyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(C2KeyManager.class);
 
+    public static RSAPublicKey c1RsaPublicKey = null;
     public static RSAPublicKey c3RsaPublicKey = null;
     public static RSAPrivateKey c2RsaPrivateKey = null;
 
     public C2KeyManager() {
         logger.info("Initialising keys for C2.");
         try {
+            c1RsaPublicKey = (RSAPublicKey) KeyUtils.readPemFile("keys/c1_id_rsa.pub");
             c3RsaPublicKey = (RSAPublicKey) KeyUtils.readPemFile("keys/c3_id_rsa.pub");
             c2RsaPrivateKey = (RSAPrivateKey) KeyUtils.readPemFile("keys/c2_id_rsa");
         } catch (IOException e) {

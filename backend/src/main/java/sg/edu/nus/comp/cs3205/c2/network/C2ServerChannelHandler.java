@@ -1,9 +1,12 @@
 package sg.edu.nus.comp.cs3205.c2.network;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
 
 @ChannelHandler.Sharable
 public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> {
@@ -32,8 +35,11 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         c2NetworkForwarder.handleInputFromC1(request);
     }
 
-    public void forwardReplyToC1(String reply) {
+    public void forwardReplyToC1(BaseJsonFormat baseJsonFormat) throws JoseException {
+        String reply = baseJsonFormat.getJsonString();
         logger.info("Sending to C1: \"" + reply + "\"");
+        // uncomment to enable sending of signed messages to C1
+//        reply = JsonUtils.getSignedBaseJsonFormat(C2KeyManager.c2RsaPrivateKey, baseJsonFormat);
         channelHandlerContext.write(reply + "\r\n");
         channelHandlerContext.flush();
     }

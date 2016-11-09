@@ -11,14 +11,11 @@ import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.common.data.config.C2Config;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
-import java.security.Key;
 import java.util.Optional;
 
 public class C2NetworkManager {
 
     private static Logger logger = LoggerFactory.getLogger(C2NetworkManager.class);
-
-    public Key key = null;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;

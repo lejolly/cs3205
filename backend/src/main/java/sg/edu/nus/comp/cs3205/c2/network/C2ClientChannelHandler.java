@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
@@ -34,6 +35,8 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
                 }
             } catch (InvalidJwtException e) {
                 logger.error("InvalidJwtException: ", e);
+            } catch (JoseException e) {
+                logger.error("JoseException: ", e);
             }
         }
         logger.info("Invalid reply from C3 received");

@@ -17,7 +17,15 @@ public class StartC2 {
         LogUtils.configureLogger("c2-logback.xml");
         logger.info("Starting C2");
         c2KeyManager = new C2KeyManager();
-        c2NetworkManager = new C2NetworkManager();
+
+        // check for keys
+        if (C2KeyManager.c1RsaPublicKey == null ||
+                C2KeyManager.c2RsaPrivateKey == null ||
+                C2KeyManager.c3RsaPublicKey == null) {
+            logger.error("Keys not setup, exiting.");
+        } else {
+            c2NetworkManager = new C2NetworkManager();
+        }
     }
 
 }
