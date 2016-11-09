@@ -1,6 +1,5 @@
 package sg.edu.nus.comp.cs3205.c3;
 
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
@@ -79,7 +78,6 @@ public class C3RequestManager {
     }
 
     private RetrieveResponse parseRetrieveRequest(RetrieveRequest retrieveRequest) {
-        Gson gson = new Gson();
         RetrieveResponse retrieveResponse = new RetrieveResponse();
         if (retrieveRequest.getData().containsKey("table_id")) {
             if (retrieveRequest.getData().get("table_id").equals("users")) {
