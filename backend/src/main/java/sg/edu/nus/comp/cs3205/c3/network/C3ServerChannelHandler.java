@@ -5,34 +5,20 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3RetrieveManager;
+import sg.edu.nus.comp.cs3205.c3.C3RequestManager;
 import sg.edu.nus.comp.cs3205.c3.key.C3KeyManager;
-import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
-import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat.JSON_FORMAT;
-import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
-import sg.edu.nus.comp.cs3205.common.data.json.RetrieveRequest;
-import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
-
-import java.sql.Connection;
 
 @ChannelHandler.Sharable
 public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(C3ServerChannelHandler.class);
 
-    private C3SessionManager c3SessionManager;
-    private C3LoginManager c3LoginManager;
-    private Connection dbConnection;
+    private C3RequestManager c3RequestManager;
 
-    C3ServerChannelHandler(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager,
-                           C3DatabaseManager c3DatabaseManager) {
-        this.c3SessionManager = c3SessionManager;
-        this.c3LoginManager = c3LoginManager;
-        this.dbConnection = c3DatabaseManager.getDbConnection();
+    C3ServerChannelHandler(C3RequestManager c3RequestManager) {
+        this.c3RequestManager = c3RequestManager;
     }
 
     @Override
@@ -47,26 +33,7 @@ public class C3ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C3KeyManager.c2RsaPublicKey, request);
         if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
             logger.info("Received from C2: " + baseJsonFormat.getJsonString());
-            BaseJsonFormat response = null;
-            JSON_FORMAT format = JsonUtils.getJsonFormat(baseJsonFormat);
-            logger.info("Received " + format);
-            if (format == JSON_FORMAT.SALT_REQUEST) {
-                SaltRequest saltRequest = SaltRequest.fromBaseFormat(baseJsonFormat);
-                if (saltRequest != null) {
-                    response = c3LoginManager.getUserSalt(saltRequest);
-                }
-            } else if (format == JSON_FORMAT.LOGIN_REQUEST) {
-                LoginRequest loginRequest = LoginRequest.fromBaseFormat(baseJsonFormat);
-                if (loginRequest != null) {
-                    response = c3LoginManager.getLoginResponse(loginRequest);
-                }
-            } else if (format == JSON_FORMAT.RETRIEVE_REQUEST) {
-                RetrieveRequest retrieveRequest = RetrieveRequest.fromBaseFormat(baseJsonFormat);
-                if (retrieveRequest != null) {
-                    //TODO: check for auth
-                    response = C3RetrieveManager.parseRetrieveRequest(dbConnection, retrieveRequest);
-                }
-            }
+            BaseJsonFormat response = c3RequestManager.handleRequestFromC2(baseJsonFormat);
             if (response != null) {
                 logger.info("Sending response: " +  response.getJsonString());
                 sendMessageToC2(ctx, JsonUtils.getSignedBaseJsonFormat(C3KeyManager.c3RsaPrivateKey, response));

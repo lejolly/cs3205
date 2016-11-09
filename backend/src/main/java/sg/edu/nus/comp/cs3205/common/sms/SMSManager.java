@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs3205.common.sms;
 import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.config.SMSAPIKeysConfig;
 import sg.edu.nus.comp.cs3205.common.data.sms.SMSAccessToken;
 import sg.edu.nus.comp.cs3205.common.data.sms.SMSMessage;
@@ -16,7 +15,7 @@ import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.Optional;
 
-public class SMSManager extends AbstractManager {
+public class SMSManager {
 
     private static final Logger logger = LoggerFactory.getLogger(SMSManager.class);
 

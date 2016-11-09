@@ -4,38 +4,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.common.data.database.Item;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class C3ItemQueries {
 
     private static final Logger logger = LoggerFactory.getLogger(C3ItemQueries.class);
 
-    public static String getItemName(Connection dbConnection, int id) {
-        return getItemDetail(dbConnection, id, "name");
+    public static String getItemName(int id) {
+        return getItemDetail(id, "name");
     }
 
-    public static String getItemComment(Connection dbConnection, int id) {
-        return getItemDetail(dbConnection, id, "comment");
+    public static String getItemComment(int id) {
+        return getItemDetail(id, "comment");
     }
 
-    public static int getItemQuantity(Connection dbConnection, int id) {
+    public static int getItemQuantity(int id) {
         try {
-            return Integer.parseInt(getItemDetail(dbConnection, id, "quantity"));
+            return Integer.parseInt(getItemDetail(id, "quantity"));
         } catch (NumberFormatException e) {
             logger.warn("Invalid item quantity returned.");
             return -1;
         }
     }
 
-    private static String getItemDetail(Connection dbConnection, int id, String column) {
+    private static String getItemDetail(int id, String column) {
         try {
             logger.info("Getting " + column + " for item: " + id);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT " + column + " FROM items WHERE id = ? LIMIT 1");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT " + column + " FROM items " +
+                            "WHERE id = ? LIMIT 1");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -50,11 +52,11 @@ public class C3ItemQueries {
         return null;
     }
 
-    public static Item getItem(Connection dbConnection, int id) {
+    public static Item getItem(int id) {
         try {
             logger.info("Getting item: " + id);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT * FROM items WHERE id = ? LIMIT 1");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM items WHERE id = ? LIMIT 1");
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -72,10 +74,10 @@ public class C3ItemQueries {
         return null;
     }
 
-    public static List<Item> getAllItems(Connection dbConnection) {
+    public static List<Item> getAllItems() {
         try {
             logger.info("Getting all items");
-            Statement statement = dbConnection.createStatement();
+            Statement statement = C3DatabaseManager.dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * from items");
             List<Item> items = new ArrayList<>();
             while (resultSet.next()) {
@@ -97,11 +99,12 @@ public class C3ItemQueries {
         return null;
     }
 
-    public static boolean updateItem(Connection dbConnection, Item item) {
+    public static boolean updateItem(Item item) {
         try {
             logger.info("Updating item: " + item.getName());
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("UPDATE items SET name = ?, quantity = ?, comment = ? WHERE id = ?");
+                    C3DatabaseManager.dbConnection.prepareStatement("UPDATE items SET name = ?, quantity = ?, " +
+                            "comment = ? WHERE id = ?");
             preparedStatement.setString(1, item.getName());
             preparedStatement.setInt(2, item.getQuantity());
             preparedStatement.setString(3, item.getComment());
@@ -116,11 +119,11 @@ public class C3ItemQueries {
         return false;
     }
 
-    public static boolean addItem(Connection dbConnection, Item item) {
+    public static boolean addItem(Item item) {
         // ignores id
         try {
             logger.info("Adding item: " + item.getName());
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
+            PreparedStatement preparedStatement = C3DatabaseManager.dbConnection.prepareStatement("INSERT INTO " +
                     "items (name, quantity, comment) VALUES (?, ?, ?)");
             preparedStatement.setString(1, item.getName());
             preparedStatement.setInt(2, item.getQuantity());
@@ -135,10 +138,11 @@ public class C3ItemQueries {
         return false;
     }
 
-    public static boolean deleteItem(Connection dbConnection, int id) {
+    public static boolean deleteItem(int id) {
         try {
             logger.info("Deleting item: " + id);
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM items WHERE id = ?");
+            PreparedStatement preparedStatement = C3DatabaseManager.dbConnection.prepareStatement(
+                    "DELETE FROM items WHERE id = ?");
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
             logger.info("Deleted item: " + id);

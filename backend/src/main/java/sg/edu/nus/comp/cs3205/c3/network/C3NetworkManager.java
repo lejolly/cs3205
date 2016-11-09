@@ -8,21 +8,17 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.c3.auth.C3LoginManager;
-import sg.edu.nus.comp.cs3205.c3.database.C3DatabaseManager;
-import sg.edu.nus.comp.cs3205.c3.session.C3SessionManager;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
+import sg.edu.nus.comp.cs3205.c3.C3RequestManager;
 import sg.edu.nus.comp.cs3205.common.data.config.C3Config;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.util.Optional;
 
-public class C3NetworkManager extends AbstractManager {
+public class C3NetworkManager {
 
     private static final Logger logger = LoggerFactory.getLogger(C3NetworkManager.class);
 
-    public C3NetworkManager(C3SessionManager c3SessionManager, C3LoginManager c3LoginManager,
-                            C3DatabaseManager c3DatabaseManager) {
+    public C3NetworkManager(C3RequestManager c3RequestManager) {
         logger.info("Initializing network manager.");
         Optional<C3Config> c3Config = JsonUtils.readJsonFile("config/c3.json", C3Config.class);
         if (c3Config.isPresent()) {
@@ -33,8 +29,7 @@ public class C3NetworkManager extends AbstractManager {
                 b.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .handler(new LoggingHandler(LogLevel.INFO))
-                        .childHandler(new C3ServerChannelInitializer(
-                                c3SessionManager, c3LoginManager, c3DatabaseManager));
+                        .childHandler(new C3ServerChannelInitializer(c3RequestManager));
                 b.bind(c3Config.get().getC3ServerPort()).sync().channel().closeFuture().sync();
             } catch (InterruptedException e) {
                 logger.error("InterruptedException: ", e);

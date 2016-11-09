@@ -12,11 +12,11 @@ public class C3UserQueries {
 
     private static final Logger logger = LoggerFactory.getLogger(C3UserQueries.class);
 
-    public static boolean doesUserExist(Connection dbConnection, String user) {
+    public static boolean doesUserExist(String user) {
         try {
             logger.info("Checking for the existence of user: " + user);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM users WHERE username = ? LIMIT 1)");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT exists (SELECT 1 FROM users WHERE username = ? LIMIT 1)");
             preparedStatement.setString(1, user);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -31,35 +31,35 @@ public class C3UserQueries {
         return false;
     }
 
-    public static String getUserSalt(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "salt");
+    public static String getUserSalt(String user) {
+        return getUserDetail(user, "salt");
     }
 
-    public static String getUserHash(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "hash");
+    public static String getUserHash(String user) {
+        return getUserDetail(user, "hash");
     }
 
-    public static String getUserRole(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "role");
+    public static String getUserRole(String user) {
+        return getUserDetail(user, "role");
     }
 
-    public static String getUserOtpSeed(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "otp_seed");
+    public static String getUserOtpSeed(String user) {
+        return getUserDetail(user, "otp_seed");
     }
 
-    public static String getUserFullName(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "full_name");
+    public static String getUserFullName(String user) {
+        return getUserDetail(user, "full_name");
     }
 
-    public static String getUserNumber(Connection dbConnection, String user) {
-        return getUserDetail(dbConnection, user, "number");
+    public static String getUserNumber(String user) {
+        return getUserDetail(user, "number");
     }
 
-    private static String getUserDetail(Connection dbConnection, String user, String column) {
+    private static String getUserDetail(String user, String column) {
         try {
             logger.info("Getting " + column + " for: " + user);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT " + column + " FROM users WHERE username = ? LIMIT 1");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT " + column + " FROM users WHERE username = ? LIMIT 1");
             preparedStatement.setString(1, user);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -74,10 +74,10 @@ public class C3UserQueries {
         return null;
     }
 
-    public static List<User> getAllUsers(Connection dbConnection) {
+    public static List<User> getAllUsers() {
         try {
             logger.info("Getting all users");
-            Statement statement = dbConnection.createStatement();
+            Statement statement = C3DatabaseManager.dbConnection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * from users");
             List<User> users = new ArrayList<>();
             while (resultSet.next()) {
@@ -104,11 +104,11 @@ public class C3UserQueries {
         return null;
     }
 
-    public static User getUser(Connection dbConnection, String user) {
+    public static User getUser(String user) {
         try {
             logger.info("Getting user: " + user);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("SELECT * FROM users WHERE username = ? LIMIT 1");
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM users WHERE username = ? LIMIT 1");
             preparedStatement.setString(1, user);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -132,22 +132,23 @@ public class C3UserQueries {
         return null;
     }
 
-    public static boolean addUser(Connection dbConnection, User user) {
+    public static boolean addUser(User user) {
         // ignores user id and role
         try {
             logger.info("Adding user: " + user.getUsername());
-            PreparedStatement preparedStatement = dbConnection.prepareStatement("INSERT INTO " +
-                    "users (username, hash, salt, otp_seed, role, full_name, number) VALUES (?, ?, ?, ?, 'user', ?, ?)");
+            PreparedStatement preparedStatement = C3DatabaseManager.dbConnection.prepareStatement("INSERT INTO " +
+                    "users (username, hash, salt, otp_seed, role, full_name, number) VALUES (?, ?, ?, ?, ?, ?, ?)");
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getHash());
             preparedStatement.setString(3, user.getSalt());
             preparedStatement.setString(4, user.getOtp_seed());
-            preparedStatement.setString(5, user.getFull_name());
-            preparedStatement.setInt(6, user.getNumber());
+            preparedStatement.setString(5, user.getRole());
+            preparedStatement.setString(6, user.getFull_name());
+            preparedStatement.setInt(7, user.getNumber());
             preparedStatement.execute();
-            logger.info("Added normal user: " + user.getUsername() + " hash: " + user.getHash() + " salt: "
-                    + user.getSalt() + " otp_seed: " + user.getOtp_seed() + " full_name: " + user.getFull_name()
-                    + " number: " + user.getNumber());
+            logger.info("Added user: " + user.getUsername() + " hash: " + user.getHash() + " salt: "
+                    + user.getSalt() + " otp_seed: " + user.getOtp_seed() + " role: " + user.getRole()
+                    + " full_name: " + user.getFull_name() + " number: " + user.getNumber());
             return true;
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
@@ -155,11 +156,11 @@ public class C3UserQueries {
         return false;
     }
 
-    public static boolean deleteUser(Connection dbConnection, String user) {
+    public static boolean deleteUser(String user) {
         try {
             logger.info("Deleting user: " + user);
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("DELETE FROM users WHERE username = ?");
+                    C3DatabaseManager.dbConnection.prepareStatement("DELETE FROM users WHERE username = ?");
             preparedStatement.setString(1, user);
             preparedStatement.execute();
             logger.info("Deleted user: " + user);
@@ -171,11 +172,12 @@ public class C3UserQueries {
     }
 
     // does not include changing password
-    public static boolean updateUser(Connection dbConnection, User user) {
+    public static boolean updateUser(User user) {
         try {
             logger.info("Updating user: " + user.getUsername());
             PreparedStatement preparedStatement =
-                    dbConnection.prepareStatement("UPDATE users SET full_name = ?, number = ? WHERE id = ?");
+                    C3DatabaseManager.dbConnection.prepareStatement("UPDATE users SET full_name = ?, " +
+                            "number = ? WHERE id = ?");
             preparedStatement.setString(1, user.getFull_name());
             preparedStatement.setInt(2, user.getNumber());
             preparedStatement.setInt(3, user.getId());

@@ -8,14 +8,13 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.config.C2Config;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.security.Key;
 import java.util.Optional;
 
-public class C2NetworkManager extends AbstractManager {
+public class C2NetworkManager {
 
     private static Logger logger = LoggerFactory.getLogger(C2NetworkManager.class);
 

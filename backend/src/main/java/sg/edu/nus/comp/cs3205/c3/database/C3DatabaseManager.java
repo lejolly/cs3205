@@ -2,17 +2,16 @@ package sg.edu.nus.comp.cs3205.c3.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.data.config.DBCredentialsConfig;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.sql.*;
 import java.util.Optional;
 
-public class C3DatabaseManager extends AbstractManager {
+public class C3DatabaseManager {
 
     private static final Logger logger = LoggerFactory.getLogger(C3DatabaseManager.class);
-    private static Connection dbConnection = null;
+    public static Connection dbConnection = null;
 
     public C3DatabaseManager() {
         if (dbConnection == null) {

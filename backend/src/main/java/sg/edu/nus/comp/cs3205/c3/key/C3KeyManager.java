@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs3205.c3.key;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 import sg.edu.nus.comp.cs3205.common.utils.KeyUtils;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 
-public class C3KeyManager extends AbstractManager {
+public class C3KeyManager {
 
     private static final Logger logger = LoggerFactory.getLogger(C3KeyManager.class);
 

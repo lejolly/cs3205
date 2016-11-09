@@ -2,14 +2,13 @@ package sg.edu.nus.comp.cs3205.c3.session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sg.edu.nus.comp.cs3205.common.core.AbstractManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class C3SessionManager extends AbstractManager {
+public class C3SessionManager {
 
     private static Logger logger = LoggerFactory.getLogger(C3SessionManager.class);
 

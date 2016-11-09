@@ -46,6 +46,13 @@ public class HashUtils {
         return getSha256HashFromBytes(bytes);
     }
 
+    public static String getNewOtpSeed() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[8];
+        random.nextBytes(bytes);
+        return ENCODER.encodeToString(bytes);
+    }
+
     public static String getStringFromBytes(byte[] bytes) {
         BigInteger bigInt = new BigInteger(1, bytes);
         String hash = bigInt.toString(16);
