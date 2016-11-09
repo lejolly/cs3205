@@ -8,6 +8,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c2.csrf.C2CsrfManager;
 import sg.edu.nus.comp.cs3205.common.data.config.C2Config;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
@@ -21,9 +22,11 @@ public class C2NetworkManager {
     private EventLoopGroup workerGroup;
     private int c2ClientPort;
     private String c2ClientHost;
+    private C2CsrfManager c2CsrfManager;
 
-    public C2NetworkManager() {
+    public C2NetworkManager(C2CsrfManager c2CsrfManager) {
         logger.info("Initializing network manager.");
+        this.c2CsrfManager = c2CsrfManager;
         Optional<C2Config> c2Config = JsonUtils.readJsonFile("config/c2.json", C2Config.class);
         if (c2Config.isPresent()) {
             c2ClientPort = c2Config.get().getC2ClientPort();
@@ -46,7 +49,7 @@ public class C2NetworkManager {
     }
 
     C2NetworkForwarder getNetworkClient(C2ServerChannelHandler c2ServerChannelHandler) {
-        return new C2NetworkForwarder(workerGroup, c2ServerChannelHandler, c2ClientPort, c2ClientHost);
+        return new C2NetworkForwarder(workerGroup, c2ServerChannelHandler, c2ClientPort, c2ClientHost, c2CsrfManager);
     }
 
     public void stop() {

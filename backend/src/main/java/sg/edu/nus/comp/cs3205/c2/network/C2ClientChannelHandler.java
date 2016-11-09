@@ -11,6 +11,8 @@ import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
+import java.security.NoSuchAlgorithmException;
+
 @Sharable
 public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> {
 
@@ -37,6 +39,8 @@ public class C2ClientChannelHandler extends SimpleChannelInboundHandler<String> 
                 logger.error("InvalidJwtException: ", e);
             } catch (JoseException e) {
                 logger.error("JoseException: ", e);
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("NoSuchAlgorithmException: ", e);
             }
         }
         logger.info("Invalid reply from C3 received");

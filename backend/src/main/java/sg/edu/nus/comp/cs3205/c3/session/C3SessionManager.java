@@ -20,23 +20,23 @@ public class C3SessionManager {
         auth_tokens = new HashMap<>();
     }
 
-    public void addChallenge(String challenge) {
+    public synchronized void addChallenge(String challenge) {
         challenges.add(challenge);
     }
 
-    public boolean isInChallenges(String challenge) {
+    public synchronized boolean isInChallenges(String challenge) {
         return challenges.contains(challenge);
     }
 
-    public void addAuth_token(String username, String auth_token) {
+    public synchronized void addAuth_token(String username, String auth_token) {
         auth_tokens.put(username, auth_token);
     }
 
-    public boolean isUsernameInAuth_tokens(String username) {
+    public synchronized boolean isUsernameInAuth_tokens(String username) {
         return auth_tokens.containsKey(username);
     }
 
-    public void removeUsernameFromAuth_tokens(String username) {
+    public synchronized void removeUsernameFromAuth_tokens(String username) {
         auth_tokens.remove(username);
     }
 
