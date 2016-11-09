@@ -3,10 +3,7 @@ package sg.edu.nus.comp.cs3205.c3.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c3.C3RequestManager;
-import sg.edu.nus.comp.cs3205.common.data.json.LoginRequest;
-import sg.edu.nus.comp.cs3205.common.data.json.LoginResponse;
-import sg.edu.nus.comp.cs3205.common.data.json.SaltRequest;
-import sg.edu.nus.comp.cs3205.common.data.json.SaltResponse;
+import sg.edu.nus.comp.cs3205.common.data.json.*;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 import sg.edu.nus.comp.cs3205.common.utils.TotpUtils;
 import sg.edu.nus.comp.cs3205.common.utils.XorUtils;
@@ -108,6 +105,24 @@ public class C3LoginManager {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setError("Incorrect credentials");
         return loginResponse;
+    }
+
+    public LogoutResponse getLogoutResponse(LogoutRequest logoutRequest) {
+        if (logoutRequest.getData().containsKey("auth_token") &&
+                c3RequestManager.c3SessionManager.isAuth_tokenInAuth_tokens(
+                        logoutRequest.getData().get("auth_token"))) {
+            c3RequestManager.c3SessionManager.removeAuth_tokenFromAuth_tokens(
+                    logoutRequest.getData().get("auth_token"));
+            LogoutResponse logoutResponse = new LogoutResponse();
+            Map<String, String> map = new HashMap<>();
+            map.put("auth_token", logoutRequest.getData().get("auth_token"));
+            logoutResponse.setData(map);
+            return logoutResponse;
+        }
+        logger.warn("Invalid LogoutRequest received.");
+        LogoutResponse logoutResponse = new LogoutResponse();
+        logoutResponse.setError("Invalid logout request");
+        return logoutResponse;
     }
 
 }

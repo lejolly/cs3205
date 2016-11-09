@@ -86,6 +86,11 @@ public class C3RequestManager {
                 //TODO: check for auth
                 response = parseUpdateRequest(updateRequest);
             }
+        } else if (format == BaseJsonFormat.JSON_FORMAT.LOGOUT_REQUEST) {
+            LogoutRequest logoutRequest = LogoutRequest.fromBaseFormat(baseJsonFormat);
+            if (logoutRequest != null) {
+                response = c3LoginManager.getLogoutResponse(logoutRequest);
+            }
         }
         return response;
     }
