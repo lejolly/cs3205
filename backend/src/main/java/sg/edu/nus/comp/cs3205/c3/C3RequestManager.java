@@ -227,8 +227,9 @@ public class C3RequestManager {
 
     private DeleteResponse parseDeleteRequest(DeleteRequest deleteRequest) {
         DeleteResponse deleteResponse = new DeleteResponse();
-        String username = c3SessionManager.getUsernameFromAuth_token(deleteRequest.getData().get("auth_token"));
-        if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+        String authUsername = c3SessionManager.getUsernameFromAuth_token(deleteRequest.getData().get("auth_token"));
+        if (authUsername != null && C3UserQueries.getUserRole(authUsername).equals("admin") &&
+                !authUsername.equals(deleteRequest.getData().get("username"))) {
             if (deleteRequest.getData().get("table_id").equals("users") &&
                     C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
                 logger.info("Received request to delete user");
