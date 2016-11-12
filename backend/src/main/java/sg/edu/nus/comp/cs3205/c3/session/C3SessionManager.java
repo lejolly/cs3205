@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs3205.c3.session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,10 +17,24 @@ public class C3SessionManager {
     private Set<String> challenges;
     // Map<auth_token, username>
     private Map<String, String> auth_tokens;
+    // Map<sms_token, Create/DeleteRequest>
+    private Map<String, BaseJsonFormat> sms_tokens;
 
     public C3SessionManager() {
         challenges = new HashSet<>();
         auth_tokens = new HashMap<>();
+    }
+
+    public synchronized boolean isInSms_tokens(String sms_token) {
+        return sms_tokens.containsKey(sms_token);
+    }
+
+    public synchronized BaseJsonFormat getActionFromSms_token(String sms_token) {
+        return sms_tokens.get(sms_token);
+    }
+
+    public synchronized void removeSms_token(String sms_token) {
+        sms_tokens.remove(sms_token);
     }
 
     public synchronized void addChallenge(String challenge) {
