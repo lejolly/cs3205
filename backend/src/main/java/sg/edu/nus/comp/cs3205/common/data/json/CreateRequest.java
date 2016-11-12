@@ -9,7 +9,25 @@ public class CreateRequest extends BaseJsonFormat {
     }
 
     public static CreateRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
-        return fromBaseFormat(baseJsonFormat, new CreateRequest());
+        if (baseJsonFormat.getData().containsKey("table_id")) {
+            if (baseJsonFormat.getData().get("table_id").equals("users")) {
+                if (baseJsonFormat.getData().containsKey("username") &&
+                        baseJsonFormat.getData().containsKey("hash") &&
+                        baseJsonFormat.getData().containsKey("salt") &&
+                        baseJsonFormat.getData().containsKey("role") &&
+                        baseJsonFormat.getData().containsKey("full_name") &&
+                        baseJsonFormat.getData().containsKey("number")) {
+                    return fromBaseFormat(baseJsonFormat, new CreateRequest());
+                }
+            } else if (baseJsonFormat.getData().get("table_id").equals("items")) {
+                if (baseJsonFormat.getData().containsKey("name") &&
+                        baseJsonFormat.getData().containsKey("quantity") &&
+                        baseJsonFormat.getData().containsKey("comment")) {
+                    return fromBaseFormat(baseJsonFormat, new CreateRequest());
+                }
+            }
+        }
+        return null;
     }
 
 }

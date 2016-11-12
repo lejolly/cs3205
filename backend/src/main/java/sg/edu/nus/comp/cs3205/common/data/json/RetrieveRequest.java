@@ -9,6 +9,12 @@ public class RetrieveRequest extends BaseJsonFormat {
     }
 
     public static RetrieveRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
-        return fromBaseFormat(baseJsonFormat, new RetrieveRequest());
+        if (baseJsonFormat.getData().containsKey("table_id")) {
+            if (baseJsonFormat.getData().get("table_id").equals("users") ||
+                    baseJsonFormat.getData().get("table_id").equals("items")) {
+                return fromBaseFormat(baseJsonFormat, new RetrieveRequest());
+            }
+        }
+        return null;
     }
 }
