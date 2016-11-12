@@ -9,7 +9,10 @@ public class LogoutRequest extends BaseJsonFormat {
     }
 
     public static LogoutRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
-        return fromBaseFormat(baseJsonFormat, new LogoutRequest());
+        if (baseJsonFormat.getData().containsKey("auth_token")) {
+            return fromBaseFormat(baseJsonFormat, new LogoutRequest());
+        }
+        return null;
     }
 
 }

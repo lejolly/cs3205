@@ -9,7 +9,10 @@ public class SaltRequest extends BaseJsonFormat {
     }
 
     public static SaltRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
-        return fromBaseFormat(baseJsonFormat, new SaltRequest());
+        if (baseJsonFormat.getData().containsKey("username")) {
+            return fromBaseFormat(baseJsonFormat, new SaltRequest());
+        }
+        return null;
     }
 
 }

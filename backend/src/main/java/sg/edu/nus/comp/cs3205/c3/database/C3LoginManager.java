@@ -26,26 +26,12 @@ public class C3LoginManager {
         try {
             SaltResponse saltResponse = new SaltResponse();
             Map<String, String> map = new HashMap<>();
-            if (saltRequest.getData().containsKey("username")) {
-                if (C3UserQueries.doesUserExist(saltRequest.getData().get("username"))) {
-                    String user = saltRequest.getData().get("username");
-                    String salt = C3UserQueries.getUserSalt(user);
-                    if (salt != null) {
-                        map.put("username", user);
-                        map.put("salt", salt);
-                        String challenge = HashUtils.getShaNonce();
-                        c3RequestManager.c3SessionManager.addChallenge(challenge);
-                        map.put("challenge", challenge);
-                        saltResponse.setData(map);
-                        saltResponse.setId("c3");
-                        return saltResponse;
-                    }
-                } else {
-                    // just generate a deterministic salt for invalid usernames
-                    logger.warn("Invalid SaltRequest received.");
-                    String user = saltRequest.getData().get("username");
+            if (C3UserQueries.doesUserExist(saltRequest.getData().get("username"))) {
+                String user = saltRequest.getData().get("username");
+                String salt = C3UserQueries.getUserSalt(user);
+                if (salt != null) {
                     map.put("username", user);
-                    map.put("salt", "$2a$10$" + HashUtils.getSha256HashFromString(user).substring(0, 22));
+                    map.put("salt", salt);
                     String challenge = HashUtils.getShaNonce();
                     c3RequestManager.c3SessionManager.addChallenge(challenge);
                     map.put("challenge", challenge);
@@ -53,6 +39,18 @@ public class C3LoginManager {
                     saltResponse.setId("c3");
                     return saltResponse;
                 }
+            } else {
+                // just generate a deterministic salt for invalid usernames
+                logger.warn("Invalid SaltRequest received.");
+                String user = saltRequest.getData().get("username");
+                map.put("username", user);
+                map.put("salt", "$2a$10$" + HashUtils.getSha256HashFromString(user).substring(0, 22));
+                String challenge = HashUtils.getShaNonce();
+                c3RequestManager.c3SessionManager.addChallenge(challenge);
+                map.put("challenge", challenge);
+                saltResponse.setData(map);
+                saltResponse.setId("c3");
+                return saltResponse;
             }
         } catch (NoSuchAlgorithmException e) {
             logger.error("NoSuchAlgorithmException: ", e);
@@ -63,14 +61,9 @@ public class C3LoginManager {
     // http://openwall.info/wiki/people/solar/algorithms/challenge-response-authentication
     public LoginResponse getLoginResponse(LoginRequest loginRequest) throws NoSuchAlgorithmException {
         // check for challenge
-        if (loginRequest.getData().containsKey("challenge")
-                && c3RequestManager.c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {
+        if (c3RequestManager.c3SessionManager.isInChallenges(loginRequest.getData().get("challenge"))) {
             // check username and response
-            if (loginRequest.getData().containsKey("username")
-                    && C3UserQueries.doesUserExist(loginRequest.getData().get("username"))
-                    && loginRequest.getData().containsKey("response")
-                    && loginRequest.getData().get("response").length() == 80
-                    && loginRequest.getData().containsKey("otp")) {
+            if (C3UserQueries.doesUserExist(loginRequest.getData().get("username"))) {
                 String user = loginRequest.getData().get("username");
                 String otp = loginRequest.getData().get("otp");
                 String otpSeed = C3UserQueries.getUserOtpSeed(user);
@@ -108,9 +101,8 @@ public class C3LoginManager {
     }
 
     public LogoutResponse getLogoutResponse(LogoutRequest logoutRequest) {
-        if (logoutRequest.getData().containsKey("auth_token") &&
-                c3RequestManager.c3SessionManager.isAuth_tokenInAuth_tokens(
-                        logoutRequest.getData().get("auth_token"))) {
+        if (c3RequestManager.c3SessionManager.isAuth_tokenInAuth_tokens(
+                logoutRequest.getData().get("auth_token"))) {
             c3RequestManager.c3SessionManager.removeAuth_tokenFromAuth_tokens(
                     logoutRequest.getData().get("auth_token"));
             LogoutResponse logoutResponse = new LogoutResponse();

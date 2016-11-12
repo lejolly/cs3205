@@ -9,7 +9,14 @@ public class LoginRequest extends BaseJsonFormat {
     }
 
     public static LoginRequest fromBaseFormat(BaseJsonFormat baseJsonFormat) {
-        return fromBaseFormat(baseJsonFormat, new LoginRequest());
+        if (baseJsonFormat.getData().containsKey("challenge") &&
+                baseJsonFormat.getData().containsKey("username") &&
+                baseJsonFormat.getData().containsKey("response") &&
+                baseJsonFormat.getData().get("response").length() == 80 &&
+                baseJsonFormat.getData().containsKey("otp")) {
+            return fromBaseFormat(baseJsonFormat, new LoginRequest());
+        }
+        return null;
     }
 
 }
