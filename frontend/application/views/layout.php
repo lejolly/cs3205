@@ -38,10 +38,7 @@
           <a class="navbar-brand" href="#">CS3205 Secure Logistics System</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><?php echo anchor('session/login', 'Login'); ?></li>
-            <li><?php echo anchor('session/logout', 'Logout'); ?></li>
-          </ul>
+          <?php $this->load->view('menu/menu'); ?>
         </div><!--/.nav-collapse -->
       </div>
     </nav>

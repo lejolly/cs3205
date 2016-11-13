@@ -2,6 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Admin extends CI_Controller {
+	const TABLE_ID = 'users';
 
 	public function user_index() {
 		$this->auth->check_admin();
@@ -10,7 +11,7 @@ class Admin extends CI_Controller {
 		$data = array();
 		$data['auth_token'] = $this->auth->get_auth_token();
 		$data['csrf_token'] = md5(rand()); // TODO: implement with csrf
-		$data['table_id'] = 'users';
+		$data['table_id'] = self::TABLE_ID;
 		$data['record_id'] = '';
 		$id = get_class($this);
 
@@ -26,10 +27,8 @@ class Admin extends CI_Controller {
 			$this->parser->parse('layout', $page);
 		} catch (Exception $e) {
 			log_message('error', 'Exception when trying to retrieve index: ' . $e->getMessage());
-			$error = $this->request->get_error($response);
-			log_message('error', 'Error message from C2: '.$error);
 			$page['title'] = 'Error';
-			$page['contents'] = $this->load->view('error_block', compact($error), true);
+			$page['contents'] = $this->load->view('error_block', array('error' => 'none'), true);
 			$this->load->view('layout', $page);
 		}
 	}
@@ -72,8 +71,32 @@ class Admin extends CI_Controller {
 			}
 		}
 
-
 		$page['title'] = 'Add New User';
+		$page['contents'] = $this->load->view('users/form', null, true);
+		$this->load->view('layout', $page);
+	}
+
+	public function user_edit($user_id) {
+		$this->auth->check_admin();
+
+		$action = 'retrieve_request';
+		$data['auth_token'] = $this->auth->get_auth_token();
+		$data['cstf_token'] = $this->auth->get_csrf_token();
+		$data['table_id'] = self::TABLE_ID;
+		$data['record_id'] = $user_id;
+		$id = get_class($this);
+
+		try {
+			$packet = $this->request->get_packet($action, $data, $id);
+			$response = $this->request->send_request($packet);
+			$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
+		} catch(Exception $e) {
+			log_message('error', 'Exception when retrieving user');
+			$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to retrieve user details');
+			redirect('admin/users');
+		}
+
+		$page['title'] = 'Update User';
 		$page['contents'] = $this->load->view('users/form', null, true);
 		$this->load->view('layout', $page);
 	}

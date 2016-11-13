@@ -35,4 +35,8 @@ class Auth {
 	public function get_auth_token() {
 		return $_SESSION['auth_token'];
 	}
+
+	public function get_csrf_token() {
+		return md5(rand());
+	}
 }

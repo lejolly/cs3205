@@ -4,7 +4,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Request {
 
 	public function send_request($request) {
-		$port = '8081'; // Temporarily talking to C3 directly
+		log_message('debug', '[REQUEST] '.$request);
+
+		$port = '8081';
 		$address = '127.0.0.1';
 		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
@@ -24,6 +26,7 @@ class Request {
 			if($response == null) {
 				throw new Exception('NULL response');
 			} else {
+				log_message('debug', '[RESPONSE] '.$response);
 				return $response;
 			}
 		}

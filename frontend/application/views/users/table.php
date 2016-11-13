@@ -20,7 +20,7 @@
                 <td><?php echo isset($row['otp_seed']) ? $row['otp_seed'] : '<unknown>'; ?></td>
                 <td><?php echo isset($row['role']) ? $row['role'] : '<unknown>'; ?></td>
                 <td><?php echo isset($row['number']) ? $row['number'] : '<unknown>'; ?></td>
-                <td><?php echo anchor('', 'Edit'); ?> | <?php echo anchor('', 'Remove') ?></td>
+                <td><?php echo anchor('admin/users/edit/'.$row['id'], 'Edit'); ?> | <?php echo anchor('admin/users/delete/'.$row['id'], 'Delete') ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

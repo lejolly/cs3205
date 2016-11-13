@@ -1,26 +1,30 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <script type="text/javascript" src="<?php echo base_url(); ?>js/sha256.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>js/bCrypt.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>js/form.js"></script>
 <script>
-function addDangerAlert(message) {
-    $('#alerts').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Validation Error!</strong> ' + message + '</div>');
-}
 
 function checkForm() {
     var error = false;
-    $('#alerts').empty();
+    var inputs = {full_name: $('#full_name'), password: $('#password'), password_repeat: $('#password_repeat'), number: $('#number')};
+    clearFormValidation(inputs);
 
-    if($('#full_name').val() == '') {
+    if(inputs.full_name.val() == '') {
         error = true;
+        setErrorState(inputs.full_name);
         addDangerAlert('Please provide the user\'s Full Name');
     }
 
     if($('#password').val().length < 10) {
         error = true;
+        setErrorState(inputs.password);
         addDangerAlert('Password must be at least 10 characters long');
     }
 
     if($('#password').val() !== $('#password_repeat').val()) {
         error = true;
+        setErrorState(inputs.password);
+        setErrorState(inputs.password_repeat);
         addDangerAlert('Passwords do not match');
     }
 
@@ -28,6 +32,7 @@ function checkForm() {
 
     if(isNaN(number) || number < 80000000 || number > 90000000) {
         error = true;
+        setErrorState(inputs.number)
         addDangerAlert('Please enter a valid phone number');
     }
 
