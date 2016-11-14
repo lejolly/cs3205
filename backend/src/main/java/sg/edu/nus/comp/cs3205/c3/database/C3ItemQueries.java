@@ -70,6 +70,28 @@ public class C3ItemQueries {
         return null;
     }
 
+    public static Item getItemById(int id) {
+        try {
+            logger.info("Getting item: " + id);
+            PreparedStatement preparedStatement =
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM items WHERE id = ? LIMIT 1");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String name = resultSet.getString(2);
+                int quantity = resultSet.getInt(3);
+                String comment = resultSet.getString(4);
+                logger.info(id + ": " + name + " quantity: " + quantity + " comment: " + comment);
+                return new Item(id, name, quantity, comment);
+            } else {
+                logger.warn("Unable to get item: " + id);
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return null;
+    }
+
     public static List<Item> getAllItems() {
         try {
             logger.info("Getting all items");

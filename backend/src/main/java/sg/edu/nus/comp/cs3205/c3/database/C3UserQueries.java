@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs3205.c3.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.common.data.database.SanitizedUser;
 import sg.edu.nus.comp.cs3205.common.data.database.User;
 
 import java.sql.*;
@@ -99,6 +100,33 @@ public class C3UserQueries {
             } else {
                 logger.warn("No users found");
                 return new ArrayList<>();
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException: ", e);
+        }
+        return null;
+    }
+
+    public static SanitizedUser getSanitizedUserById(int id) {
+        try {
+            logger.info("Getting user: " + id);
+            PreparedStatement preparedStatement =
+                    C3DatabaseManager.dbConnection.prepareStatement("SELECT * FROM users WHERE id = ? LIMIT 1");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String username = resultSet.getString(2);
+                String hash = resultSet.getString(3);
+                String salt = resultSet.getString(4);
+                String otp_seed = resultSet.getString(5);
+                String role = resultSet.getString(6);
+                String full_name = resultSet.getString(7);
+                int number = resultSet.getInt(8);
+                logger.info(id + ": " + username + " hash: " + hash + " salt: " + salt + " otp_seed: "
+                        + otp_seed + " role: " + role + " full_name: " + full_name + " number: " + number);
+                return new SanitizedUser(new User(id, username, hash, salt, otp_seed, role, full_name, number));
+            } else {
+                logger.warn("Unable to get user: " + id);
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);

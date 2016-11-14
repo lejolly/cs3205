@@ -19,6 +19,7 @@ import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,20 +109,42 @@ public class C3RequestManager {
         if (retrieveRequest.getData().get("table_id").equals("users")) {
             String username = c3SessionManager.getUsernameFromAuth_token(
                     retrieveRequest.getData().get("auth_token"));
-            if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
-                logger.info("Received request for users table");
-                List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
-                        .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap)
-                        .collect(Collectors.toList());
-                retrieveResponse.setRows(sanitizedUsers);
-                return retrieveResponse;
+            if (retrieveRequest.getData().containsKey("record_id")) {
+                int id = Integer.parseInt(retrieveRequest.getData().get("record_id"));
+                SanitizedUser sanitizedUser = C3UserQueries.getSanitizedUserById(id);
+                if (username != null && (username.equals(sanitizedUser.getUsername()) ||
+                        C3UserQueries.getUserRole(username).equals("admin"))) {
+                    logger.info("Received request for user: " + id);
+                    List<Map<String, String>> sanitizedUsers = new ArrayList<>();
+                    sanitizedUsers.add(SanitizedUser.getSanitizedUserMap(sanitizedUser));
+                    retrieveResponse.setRows(sanitizedUsers);
+                    return retrieveResponse;
+                }
+            } else {
+                if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+                    logger.info("Received request for users table");
+                    List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
+                            .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap)
+                            .collect(Collectors.toList());
+                    retrieveResponse.setRows(sanitizedUsers);
+                    return retrieveResponse;
+                }
             }
         } else if (retrieveRequest.getData().get("table_id").equals("items")) {
-            logger.info("Received request for items table");
-            List<Map<String, String>> items = C3ItemQueries.getAllItems().stream()
-                    .map(Item::getItemMap).collect(Collectors.toList());
-            retrieveResponse.setRows(items);
-            return retrieveResponse;
+            if (retrieveRequest.getData().containsKey("record_id")) {
+                int id = Integer.parseInt(retrieveRequest.getData().get("record_id"));
+                logger.info("Received request for item: " + id);
+                List<Map<String, String>> items = new ArrayList<>();
+                items.add(Item.getItemMap(C3ItemQueries.getItemById(id)));
+                retrieveResponse.setRows(items);
+                return retrieveResponse;
+            } else {
+                logger.info("Received request for items table");
+                List<Map<String, String>> items = C3ItemQueries.getAllItems().stream()
+                        .map(Item::getItemMap).collect(Collectors.toList());
+                retrieveResponse.setRows(items);
+                return retrieveResponse;
+            }
         }
         retrieveResponse.setError("Invalid retrieve request. Check that you have the correct permissions. ");
         return retrieveResponse;
