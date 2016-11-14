@@ -88,6 +88,7 @@ public class C3ItemQueries {
                 return items;
             } else {
                 logger.warn("No items found");
+                return new ArrayList<>();
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);

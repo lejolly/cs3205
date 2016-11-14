@@ -98,6 +98,7 @@ public class C3UserQueries {
                 return users;
             } else {
                 logger.warn("No users found");
+                return new ArrayList<>();
             }
         } catch (SQLException e) {
             logger.error("SQLException: ", e);
