@@ -12,7 +12,6 @@ class Items extends CI_Controller {
 		$data['auth_token'] = $this->auth->get_auth_token();
 		$data['csrf_token'] = $this->auth->get_csrf_token();
 		$data['table_id'] = self::TABLE_ID;
-		$data['record_id'] = '';
 		$id = get_class($this);
 
 		try {
@@ -59,6 +58,31 @@ class Items extends CI_Controller {
 
 		$page['title'] = 'Add New Item';
 		$page['contents'] = $this->load->view('items/form', null, true);
+		$this->load->view('layout', $page);
+	}
+
+	public function edit($item_id) {
+		$this->auth->check_auth();
+
+		$action = 'retrieve_request';
+		$data['auth_token'] = $this->auth->get_auth_token();
+		$data['cstf_token'] = $this->auth->get_csrf_token();
+		$data['table_id'] = self::TABLE_ID;
+		$data['record_id'] = $user_id;
+		$id = get_class($this);
+
+		try {
+			$packet = $this->request->get_packet($action, $data, $id);
+			$response = $this->request->send_request($packet);
+			$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
+		} catch(Exception $e) {
+			log_message('error', 'Exception when retrieving user');
+			$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to retrieve user details');
+			redirect('admin/users');
+		}
+
+		$page['title'] = 'Update User';
+		$page['contents'] = $this->load->view('users/form', null, true);
 		$this->load->view('layout', $page);
 	}
 }

@@ -49,7 +49,6 @@ class Session extends CI_Controller {
 				log_message('debug', '[RESPONSE] login_response: ' . var_export($response, true));
 // TODO: signature verification?
 				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'/*, 'csrf_token' exclude for now*/));
-				$data['session_token'] = md5(rand());
 				$_SESSION['auth_token'] = $data['auth_token'];
 				$_SESSION['role'] = $data['role'];
 				$_SESSION['username'] = $data['username'];
@@ -67,8 +66,6 @@ class Session extends CI_Controller {
 	}
 
 	public function get_salt($username = null) {
-		log_message('debug', '[PARAMS] username: ' . $username);
-
 		$action = 'salt_request';
 		$data = array();
 		$data['username'] = $username == null ? '' : $username;
@@ -76,9 +73,7 @@ class Session extends CI_Controller {
 
 		try {
 			$packet = $this->request->get_packet($action, $data, $id);
-			log_message('debug', '[REQUEST] salt_request: ' . $packet);
 			$response = $this->request->send_request($packet);
-			log_message('debug', '[RESPONSE] salt_response: ' . var_export($response, true));
 // TODO: signature verification?
 			$data = $this->request->verify_payload($response, 'salt_response', array('username', 'salt', 'challenge'));
 			$output = json_encode($data);

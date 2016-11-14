@@ -59,8 +59,8 @@ class Request {
 
 		$data = array();
 
-		if(isset($payload['error']) && $payload['error'] != '') {
-			$data['error'] = $payload['error'];
+		if(isset($payload['error']) && !empty($payload['error'])) {
+			throw new Exception('Error field is populated: ' . $payload['error']);
 		}
 
 		foreach($data_fields as $data_field) {
