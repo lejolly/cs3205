@@ -152,41 +152,49 @@ public class C3RequestManager {
 
     private CreateResponse parseCreateRequest(CreateRequest createRequest) {
         CreateResponse createResponse = new CreateResponse();
-        if (createRequest.getData().get("table_id").equals("users") &&
-                !C3UserQueries.doesUserExist(createRequest.getData().get("username"))) {
-            String username = c3SessionManager.getUsernameFromAuth_token(createRequest.getData().get("auth_token"));
-            if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
-                logger.info("Received request to add new user");
-                User user = new User(0, createRequest.getData().get("username"),
-                        createRequest.getData().get("hash"),
-                        createRequest.getData().get("salt"),
-                        HashUtils.getNewOtpSeed(),
-                        createRequest.getData().get("role"),
-                        createRequest.getData().get("full_name"),
-                        Integer.parseInt(createRequest.getData().get("number")));
-                if (user.getRole().equals("user") || user.getRole().equals("admin")) {
-                    if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
-                        SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
-                        Map<String, String> map = new HashMap<>();
-                        map.put("username", sanitizedUser.getUsername());
-                        map.put("role", sanitizedUser.getRole());
-                        createResponse.setData(map);
-                        createResponse.setId("c3");
-                        return createResponse;
+        if (createRequest.getData().get("table_id").equals("users")) {
+            if (!C3UserQueries.doesUserExist(createRequest.getData().get("username"))) {
+                String username = c3SessionManager.getUsernameFromAuth_token(createRequest.getData().get("auth_token"));
+                if (username != null && C3UserQueries.getUserRole(username).equals("admin")) {
+                    logger.info("Received request to add new user");
+                    User user = new User(0, createRequest.getData().get("username"),
+                            createRequest.getData().get("hash"),
+                            createRequest.getData().get("salt"),
+                            HashUtils.getNewOtpSeed(),
+                            createRequest.getData().get("role"),
+                            createRequest.getData().get("full_name"),
+                            Integer.parseInt(createRequest.getData().get("number")));
+                    if (user.getRole().equals("user") || user.getRole().equals("admin")) {
+                        if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
+                            SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
+                            Map<String, String> map = new HashMap<>();
+                            map.put("username", sanitizedUser.getUsername());
+                            map.put("role", sanitizedUser.getRole());
+                            createResponse.setData(map);
+                            createResponse.setId("c3");
+                            return createResponse;
+                        }
                     }
                 }
+            } else {
+                createResponse.setError("Username already exists!");
+                return createResponse;
             }
-        } else if (createRequest.getData().get("table_id").equals("items") &&
-                !C3ItemQueries.doesItemExist(createRequest.getData().get("name"))) {
-            logger.info("Received request to add new item");
-            Item item = new Item(0, createRequest.getData().get("name"),
-                    Integer.parseInt(createRequest.getData().get("quantity")),
-                    createRequest.getData().get("comment"));
-            if (C3ItemQueries.addItem(item) && C3ItemQueries.doesItemExist(item.getName())) {
-                Map<String, String> map = new HashMap<>();
-                map.put("name", item.getName());
-                createResponse.setData(map);
-                createResponse.setId("c3");
+        } else if (createRequest.getData().get("table_id").equals("items")) {
+            if (!C3ItemQueries.doesItemExist(createRequest.getData().get("name"))) {
+                logger.info("Received request to add new item");
+                Item item = new Item(0, createRequest.getData().get("name"),
+                        Integer.parseInt(createRequest.getData().get("quantity")),
+                        createRequest.getData().get("comment"));
+                if (C3ItemQueries.addItem(item) && C3ItemQueries.doesItemExist(item.getName())) {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("name", item.getName());
+                    createResponse.setData(map);
+                    createResponse.setId("c3");
+                    return createResponse;
+                }
+            } else {
+                createResponse.setError("Item name already exists!");
                 return createResponse;
             }
         }
