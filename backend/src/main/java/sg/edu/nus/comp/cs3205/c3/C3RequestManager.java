@@ -19,10 +19,7 @@ import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // the main brains behind this thing
@@ -128,6 +125,9 @@ public class C3RequestManager {
                     List<Map<String, String>> sanitizedUsers = C3UserQueries.getAllUsers().stream()
                             .map(SanitizedUser::new).map(SanitizedUser::getSanitizedUserMap)
                             .collect(Collectors.toList());
+                    Collections.sort(sanitizedUsers, (a, b) ->
+                            Integer.parseInt(a.get("id")) < Integer.parseInt(b.get("id")) ? -1 :
+                                    Integer.parseInt(a.get("id")) == Integer.parseInt(b.get("id")) ? 0 : 1);
                     retrieveResponse.setRows(sanitizedUsers);
                     return retrieveResponse;
                 }
@@ -144,6 +144,9 @@ public class C3RequestManager {
                 logger.info("Received request for items table");
                 List<Map<String, String>> items = C3ItemQueries.getAllItems().stream()
                         .map(Item::getItemMap).collect(Collectors.toList());
+                Collections.sort(items, (a, b) ->
+                        Integer.parseInt(a.get("id")) < Integer.parseInt(b.get("id")) ? -1 :
+                                Integer.parseInt(a.get("id")) == Integer.parseInt(b.get("id")) ? 0 : 1);
                 retrieveResponse.setRows(items);
                 return retrieveResponse;
             }
