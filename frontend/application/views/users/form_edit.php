@@ -56,6 +56,7 @@ function checkForm() {
 	        </div>
             <div class="form-group">
                 <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Update User</button>
+                <input type="hidden" name="username" value="<?php echo $username; ?>">
             </div>
         </form>
     </div>

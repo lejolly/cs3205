@@ -78,16 +78,17 @@ class Admin extends CI_Controller {
 		$full_name = $this->input->post('full_name');
 		$number = $this->input->post('number');
 		$role = $this->input->post('role');
+		$username = $this->input->post('username');
 		if($full_name != null && $number != null && $role != null) {
 			log_message('debug', '[PARAMS] full_name = ' . $full_name);
 			log_message('debug', '[PARAMS] number = ' . $number);
 			log_message('debug', '[PARAMS] role = ' . $role);
+			log_message('debug', '[PARAMS] username = ' . $username);
 			$action = 'update_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
 			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
-			$data['record_id'] = $user_id;
-			$data = array_merge($data, compact('full_name', 'number', 'role'));
+			$data = array_merge($data, compact('full_name', 'number', 'role', 'username'));
 			$id = get_class($this);
 
 			try {
