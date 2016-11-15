@@ -97,6 +97,8 @@ public class C3RequestManager {
             if (baseJsonFormat != null && baseJsonFormat.getData().containsKey("auth_token")
                     && c3SessionManager.isAuth_tokenInAuth_tokens(baseJsonFormat.getData().get("auth_token"))) {
                 return true;
+            } else {
+                logger.warn("Invalid request or auth_token.");
             }
         } catch (Exception e) {
             logger.error("Exception: ", e);
