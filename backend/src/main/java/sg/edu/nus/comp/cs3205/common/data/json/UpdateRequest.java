@@ -21,7 +21,8 @@ public class UpdateRequest extends BaseJsonFormat {
                     }
                 }
             } else if (baseJsonFormat.getData().get("table_id").equals("items")) {
-                if (baseJsonFormat.getData().containsKey("name") &&
+                if (baseJsonFormat.getData().containsKey("id") &&
+                        baseJsonFormat.getData().containsKey("name") &&
                         baseJsonFormat.getData().containsKey("quantity") &&
                         baseJsonFormat.getData().containsKey("comment")) {
                     return fromBaseFormat(baseJsonFormat, new UpdateRequest());

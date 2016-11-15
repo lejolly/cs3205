@@ -239,7 +239,8 @@ public class C3RequestManager {
         } else if (updateRequest.getData().get("table_id").equals("items") &&
                 C3ItemQueries.doesItemExist(updateRequest.getData().get("name"))) {
             logger.info("Received request to update item");
-            Item item = new Item(0, updateRequest.getData().get("name"),
+            Item item = new Item(Integer.parseInt(updateRequest.getData().get("id")),
+                    updateRequest.getData().get("name"),
                     Integer.parseInt(updateRequest.getData().get("quantity")),
                     updateRequest.getData().get("comment"));
             if (C3ItemQueries.updateItem(item)) {
