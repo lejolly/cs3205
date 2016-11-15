@@ -33,6 +33,10 @@ public class C3SessionManager {
         return sms_tokens.get(sms_token);
     }
 
+    public synchronized void addSms_token(String sms_token, BaseJsonFormat baseJsonFormat) {
+        sms_tokens.put(sms_token, baseJsonFormat);
+    }
+
     public synchronized void removeSms_token(String sms_token) {
         sms_tokens.remove(sms_token);
     }

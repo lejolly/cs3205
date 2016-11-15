@@ -85,6 +85,11 @@ public class C3RequestManager {
             if (logoutRequest != null) {
                 response = c3LoginManager.getLogoutResponse(logoutRequest);
             }
+        } else if (format == BaseJsonFormat.JSON_FORMAT.SMS_CHALLENGE) {
+            SmsChallenge smsChallenge = SmsChallenge.fromBaseFormat(baseJsonFormat);
+            if (checkNotNullAndIsLoggedIn(smsChallenge)) {
+                response = parseSmsChallenge(smsChallenge);
+            }
         }
         return response;
     }
@@ -101,6 +106,13 @@ public class C3RequestManager {
             logger.error("Exception: ", e);
         }
         return false;
+    }
+
+    private SmsResult parseSmsChallenge(SmsChallenge smsChallenge) {
+        SmsResult smsResult = new SmsResult();
+        
+        smsResult.setError("Invalid sms challenge.");
+        return smsResult;
     }
 
     private RetrieveResponse parseRetrieveRequest(RetrieveRequest retrieveRequest) {
@@ -155,7 +167,7 @@ public class C3RequestManager {
         return retrieveResponse;
     }
 
-    private CreateResponse parseCreateRequest(CreateRequest createRequest) {
+    private CreateResponse parseCreateRequest(CreateRequest createRequest) throws NoSuchAlgorithmException {
         CreateResponse createResponse = new CreateResponse();
         if (createRequest.getData().get("table_id").equals("users")) {
             if (!C3UserQueries.doesUserExist(createRequest.getData().get("username"))) {
@@ -171,6 +183,10 @@ public class C3RequestManager {
                             Integer.parseInt(createRequest.getData().get("number")));
                     if (user.getRole().equals("user") || user.getRole().equals("admin")) {
                         if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
+                            // uncomment to enable sms sending
+//                            String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
+//                            smsManager.sendSMS(C3UserQueries.getUserNumber(username), "Challenge: " + challenge);
+//                            c3SessionManager.addSms_token(challenge, createRequest);
                             SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
                             Map<String, String> map = new HashMap<>();
                             map.put("username", sanitizedUser.getUsername());
@@ -262,7 +278,7 @@ public class C3RequestManager {
         return updateResponse;
     }
 
-    private DeleteResponse parseDeleteRequest(DeleteRequest deleteRequest) {
+    private DeleteResponse parseDeleteRequest(DeleteRequest deleteRequest) throws NoSuchAlgorithmException {
         DeleteResponse deleteResponse = new DeleteResponse();
         String authUsername = c3SessionManager.getUsernameFromAuth_token(deleteRequest.getData().get("auth_token"));
         if (authUsername != null && C3UserQueries.getUserRole(authUsername).equals("admin") &&
@@ -271,6 +287,10 @@ public class C3RequestManager {
                     C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
                 logger.info("Received request to delete user");
                 if (C3UserQueries.deleteUser(deleteRequest.getData().get("username"))) {
+                    // uncomment to enable sms sending
+//                    String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
+//                    smsManager.sendSMS(C3UserQueries.getUserNumber(authUsername), "Challenge: " + challenge);
+//                    c3SessionManager.addSms_token(challenge, deleteRequest);
                     Map<String, String> map = new HashMap<>();
                     map.put("username", deleteRequest.getData().get("username"));
                     deleteResponse.setData(map);
