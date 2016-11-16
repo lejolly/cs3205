@@ -135,7 +135,7 @@ class Admin extends CI_Controller {
 			$data['table_id'] = self::TABLE_ID;
 			$data['record_id'] = $user_id;
 			$data['username'] = $_SESSION['username'];
-			
+
 			$id = get_class($this);
 
 			try {
@@ -147,7 +147,7 @@ class Admin extends CI_Controller {
 			} catch(Exception $e) {
 				log_message('error', 'Exception when deleting item');
 				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to delete item');
-				redirect('items');
+				redirect('admin/users');
 			}
 		} else {
 			try {
@@ -173,7 +173,7 @@ class Admin extends CI_Controller {
 			} catch(Exception $e) {
 				log_message('error', 'Exception when retrieving user');
 				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to retrieve user details');
-				redirect('items');
+				redirect('admin/users');
 			}
 		}
 	}
