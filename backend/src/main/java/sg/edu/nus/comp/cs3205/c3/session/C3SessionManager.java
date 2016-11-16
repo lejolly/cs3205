@@ -23,6 +23,7 @@ public class C3SessionManager {
     public C3SessionManager() {
         challenges = new HashSet<>();
         auth_tokens = new HashMap<>();
+        sms_tokens = new HashMap<>();
     }
 
     public synchronized boolean isInSms_tokens(String sms_token) {
