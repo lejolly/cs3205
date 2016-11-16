@@ -17,6 +17,7 @@ import sg.edu.nus.comp.cs3205.common.data.json.*;
 import sg.edu.nus.comp.cs3205.common.sms.SMSManager;
 import sg.edu.nus.comp.cs3205.common.utils.HashUtils;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
+import sg.edu.nus.comp.cs3205.common.utils.TotpUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -39,7 +40,7 @@ public class C3RequestManager {
                 C3DatabaseManager.dbConnection == null) {
             logger.error("Keys or database connection not setup, exiting.");
         } else {
-//            smsManager = new SMSManager();
+            smsManager = new SMSManager();
             c3SessionManager = new C3SessionManager();
             c3LoginManager = new C3LoginManager(this);
             c3NetworkManager = new C3NetworkManager(this);
@@ -237,19 +238,16 @@ public class C3RequestManager {
                             createRequest.getData().get("full_name"),
                             Integer.parseInt(createRequest.getData().get("number")));
                     if (user.getRole().equals("user") || user.getRole().equals("admin")) {
-                        if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
-                            // uncomment to enable sms sending
-//                            String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
-//                            smsManager.sendSMS(C3UserQueries.getUserNumber(username), "Challenge: " + challenge);
-//                            c3SessionManager.addSms_token(challenge, createRequest);
-                            SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
-                            Map<String, String> map = new HashMap<>();
-                            map.put("username", sanitizedUser.getUsername());
-                            map.put("role", sanitizedUser.getRole());
-                            createResponse.setData(map);
-                            createResponse.setId("c3");
-                            return createResponse;
-                        }
+                        c3SessionManager.removeUsernameFromSms_tokens(user.getUsername());
+                        String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
+                        smsManager.sendSMS(C3UserQueries.getUserNumber(username), "Challenge: " + challenge);
+                        c3SessionManager.addSms_token(challenge, createRequest);
+                        Map<String, String> map = new HashMap<>();
+                        map.put("username", user.getUsername());
+                        map.put("role", user.getRole());
+                        createResponse.setData(map);
+                        createResponse.setId("c3");
+                        return createResponse;
                     }
                 }
             } else {
@@ -341,17 +339,15 @@ public class C3RequestManager {
             if (deleteRequest.getData().get("table_id").equals("users") &&
                     C3UserQueries.doesUserExist(deleteRequest.getData().get("username"))) {
                 logger.info("Received request to delete user");
-                if (C3UserQueries.deleteUser(deleteRequest.getData().get("username"))) {
-                    // uncomment to enable sms sending
-//                    String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
-//                    smsManager.sendSMS(C3UserQueries.getUserNumber(authUsername), "Challenge: " + challenge);
-//                    c3SessionManager.addSms_token(challenge, deleteRequest);
-                    Map<String, String> map = new HashMap<>();
-                    map.put("username", deleteRequest.getData().get("username"));
-                    deleteResponse.setData(map);
-                    deleteResponse.setId("c3");
-                    return deleteResponse;
-                }
+                c3SessionManager.removeUsernameFromSms_tokens(deleteRequest.getData().get("username"));
+                String challenge = TotpUtils.getOTPS(HashUtils.getShaNonce()).get(0);
+                smsManager.sendSMS(C3UserQueries.getUserNumber(authUsername), "Challenge: " + challenge);
+                c3SessionManager.addSms_token(challenge, deleteRequest);
+                Map<String, String> map = new HashMap<>();
+                map.put("username", deleteRequest.getData().get("username"));
+                deleteResponse.setData(map);
+                deleteResponse.setId("c3");
+                return deleteResponse;
             } else if (deleteRequest.getData().get("table_id").equals("items") &&
                     C3ItemQueries.doesItemExist(deleteRequest.getData().get("name"))) {
                 logger.info("Received request to delete item");
