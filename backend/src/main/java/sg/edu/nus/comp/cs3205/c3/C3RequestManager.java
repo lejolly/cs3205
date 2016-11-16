@@ -324,19 +324,23 @@ public class C3RequestManager {
                     updateRequest.getData().get("auth_token"));
             String username = updateRequest.getData().get("username");
             boolean success = false;
-            if (C3UserQueries.getUserRole(authUserName).equals("admin") ||
-                    authUserName.equals(username)) {
-                if (updateRequest.getData().containsKey("hash")) {
-                    logger.info("Received request to change user password");
-                    User user = new User(0, updateRequest.getData().get("username"),
-                            updateRequest.getData().get("hash"),
-                            updateRequest.getData().get("salt"),
-                            "", "", "", 0);
-                    success = C3UserQueries.changeUserPassword(user);
-                } else {
-                    logger.info("Received request to update user");
-                    User user = new User(0, updateRequest.getData().get("username"),
+            if (authUserName.equals(username) && updateRequest.getData().containsKey("hash")) {
+                logger.info("Received request to change user password");
+                User user = new User(0, updateRequest.getData().get("username"),
+                        updateRequest.getData().get("hash"),
+                        updateRequest.getData().get("salt"),
+                        "", "", "", 0);
+                success = C3UserQueries.changeUserPassword(user);
+            } else {
+                logger.info("Received request to update user");
+                if (C3UserQueries.getUserRole(authUserName).equals("admin")) {
+                    User user = new User(0, username,
                             "", "", "", "", updateRequest.getData().get("full_name"),
+                            Integer.parseInt(updateRequest.getData().get("number")));
+                    success = C3UserQueries.updateUser(user);
+                } else if (authUserName.equals(username)) {
+                    User user = new User(0, username,
+                            "", "", "", "", C3UserQueries.getUserFullName(username),
                             Integer.parseInt(updateRequest.getData().get("number")));
                     success = C3UserQueries.updateUser(user);
                 }
