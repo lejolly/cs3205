@@ -42,12 +42,16 @@ public class C3SessionManager {
     }
 
     public synchronized void removeUsernameFromSms_tokens(String username) {
-        Set<String> sms_token = sms_tokens.entrySet().stream()
-                .filter(entry -> entry.getValue().getData().get("username").equals(username))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-        for (String key : sms_token) {
-            sms_tokens.remove(key);
+        if (sms_tokens.size() > 0) {
+            Set<String> sms_token = sms_tokens.entrySet().stream()
+                    .filter(entry -> entry.getValue().getData().get("username").equals(username))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            if (sms_token.size() > 0) {
+                for (String key : sms_token) {
+                    sms_tokens.remove(key);
+                }
+            }
         }
     }
 
@@ -80,12 +84,16 @@ public class C3SessionManager {
     }
 
     public synchronized void removeUsernameFromAuth_tokens(String username) {
-        Set<String> auth_token = auth_tokens.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(username))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
-        if (auth_token.size() == 1) {
-            auth_tokens.remove(auth_token.iterator().next());
+        if (auth_tokens.size() > 0) {
+            Set<String> auth_token = auth_tokens.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(username))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            if (auth_token.size() > 0) {
+                for (String key : auth_token) {
+                    auth_tokens.remove(key);
+                }
+            }
         }
     }
 
