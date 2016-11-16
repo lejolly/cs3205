@@ -64,23 +64,39 @@ public class C3RequestManager {
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.RETRIEVE_REQUEST) {
             RetrieveRequest retrieveRequest = RetrieveRequest.fromBaseFormat(baseJsonFormat);
-            if (checkNotNullAndIsLoggedIn(retrieveRequest)) {
-                response = parseRetrieveRequest(retrieveRequest);
+            if (retrieveRequest != null) {
+                if (checkIfLoggedIn(retrieveRequest)) {
+                    response = parseRetrieveRequest(retrieveRequest);
+                } else {
+                    response = notLoggedInResponse(retrieveRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.CREATE_REQUEST) {
             CreateRequest createRequest = CreateRequest.fromBaseFormat(baseJsonFormat);
-            if (checkNotNullAndIsLoggedIn(createRequest)) {
-                response = parseCreateRequest(createRequest);
+            if (createRequest != null) {
+                if (checkIfLoggedIn(createRequest)) {
+                    response = parseCreateRequest(createRequest);
+                } else {
+                    response = notLoggedInResponse(createRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.DELETE_REQUEST) {
             DeleteRequest deleteRequest = DeleteRequest.fromBaseFormat(baseJsonFormat);
-            if (checkNotNullAndIsLoggedIn(deleteRequest)) {
-                response = parseDeleteRequest(deleteRequest);
+            if (deleteRequest != null) {
+                if (checkIfLoggedIn(deleteRequest)) {
+                    response = parseDeleteRequest(deleteRequest);
+                } else {
+                    response = notLoggedInResponse(deleteRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.UPDATE_REQUEST) {
             UpdateRequest updateRequest = UpdateRequest.fromBaseFormat(baseJsonFormat);
-            if (checkNotNullAndIsLoggedIn(updateRequest)) {
-                response = parseUpdateRequest(updateRequest);
+            if (updateRequest != null) {
+                if (checkIfLoggedIn(updateRequest)) {
+                    response = parseUpdateRequest(updateRequest);
+                } else {
+                    response = notLoggedInResponse(updateRequest);
+                }
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.LOGOUT_REQUEST) {
             LogoutRequest logoutRequest = LogoutRequest.fromBaseFormat(baseJsonFormat);
@@ -89,14 +105,31 @@ public class C3RequestManager {
             }
         } else if (format == BaseJsonFormat.JSON_FORMAT.SMS_CHALLENGE) {
             SmsChallenge smsChallenge = SmsChallenge.fromBaseFormat(baseJsonFormat);
-            if (checkNotNullAndIsLoggedIn(smsChallenge)) {
-                response = parseSmsChallenge(smsChallenge);
+            if (smsChallenge != null) {
+                if (checkIfLoggedIn(smsChallenge)) {
+                    response = parseSmsChallenge(smsChallenge);
+                } else {
+                    response = notLoggedInResponse(smsChallenge);
+                }
             }
         }
         return response;
     }
 
-    private boolean checkNotNullAndIsLoggedIn(BaseJsonFormat baseJsonFormat) {
+    private BaseJsonFormat notLoggedInResponse(BaseJsonFormat baseJsonFormat) {
+        if (baseJsonFormat.getData().containsKey("auth_token") &&
+                InputUtils.noWhitespace(baseJsonFormat.getData().get("auth_token"))) {
+            NotLoggedInResponse notLoggedInResponse = new NotLoggedInResponse();
+            Map<String, String> map = new HashMap<>();
+            map.put("auth_token", baseJsonFormat.getData().get("auth_token"));
+            notLoggedInResponse.setData(map);
+            notLoggedInResponse.setId("c3");
+            return notLoggedInResponse;
+        }
+        return null;
+    }
+
+    private boolean checkIfLoggedIn(BaseJsonFormat baseJsonFormat) {
         try {
             if (baseJsonFormat != null && baseJsonFormat.getData().containsKey("auth_token")
                     && InputUtils.noWhitespace(baseJsonFormat.getData().get("auth_token"))
