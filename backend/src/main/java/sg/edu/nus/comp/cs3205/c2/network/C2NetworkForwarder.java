@@ -45,10 +45,8 @@ public class C2NetworkForwarder {
     }
 
     public void handleInputFromC1(String line) throws Exception {
-        // uncomment to enable checking of signed messages from C1
-//        BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C2KeyManager.c1RsaPublicKey, line);
+        BaseJsonFormat baseJsonFormat = JsonUtils.consumeSignedBaseJsonFormat(C2KeyManager.c1RsaPublicKey, line);
         try {
-            BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(line);
             if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
                 if (!c2CsrfManager.checkCsrf(baseJsonFormat)) {
                     logger.info("Invalid csrf received");

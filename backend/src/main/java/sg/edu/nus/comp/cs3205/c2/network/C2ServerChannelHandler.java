@@ -6,7 +6,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
+import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 @ChannelHandler.Sharable
 public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> {
@@ -38,8 +40,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
     public void forwardReplyToC1(BaseJsonFormat baseJsonFormat) throws JoseException {
         String reply = baseJsonFormat.getJsonString();
         logger.info("Sending to C1: \"" + reply + "\"");
-        // uncomment to enable sending of signed messages to C1
-//        reply = JsonUtils.getSignedBaseJsonFormat(C2KeyManager.c2RsaPrivateKey, baseJsonFormat);
+        reply = JsonUtils.getSignedBaseJsonFormat(C2KeyManager.c2RsaPrivateKey, baseJsonFormat);
         channelHandlerContext.write(reply + "\r\n");
         channelHandlerContext.flush();
     }
