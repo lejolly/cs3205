@@ -80,6 +80,7 @@ class Admin extends CI_Controller {
 				} else {
 					$_SESSION['flash'] = $this->utils->danger_alert_html(Strings::ADMIN_USER_ADD_ERROR_SMS);
 				}
+				redirect('admin/users');
 			} catch (Exception $e) {
 				log_message('error', 'Exception when sending SMS challenge: ' . $e->getMessage());
 				$_SESSION['flash'] = $this->utils->danger_alert_html(Strings::ADMIN_USER_ADD_ERROR);
@@ -161,8 +162,8 @@ class Admin extends CI_Controller {
 
 				$packet = $this->request->get_packet($action, $data, $id);
 				$response = $this->request->send_request($packet);
-				$payload = $this->request->verify_payload($response, 'sms_result', array());
-				if(strcmp($payload, 'true') == 0) {
+				$payload = $this->request->verify_payload($response, 'sms_result', array('result'));
+				if(strcmp($payload['result'], 'true') == 0) {
 					$_SESSION['flash'] = $this->utils->success_alert_html('User deleted');
 				} else {
 					$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to delete user, incorrect SMS Code');
