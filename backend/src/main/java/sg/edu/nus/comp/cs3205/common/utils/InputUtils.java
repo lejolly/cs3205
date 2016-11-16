@@ -2,8 +2,9 @@ package sg.edu.nus.comp.cs3205.common.utils;
 
 public class InputUtils {
 
-    private static final String noWhitespace = "^[a-zA-Z0-9_.-]+$";
-    private static final String hasWhitespace = "^[a-zA-Z0-9_. -]+$";
+    private static final String noWhitespace = "^[a-zA-Z0-9_.\\-]+$";
+    private static final String hasWhitespace = "^[a-zA-Z0-9_. \\-()\\[\\]{}'*+,:;<=>?@&!#$%\"]+$";
+    private static final String forComments = "^[a-zA-Z0-9_. \\-\"()!#$%&'*+,:;<=>?@\\[\\]^`{}|~\\t\\n\\r\\\\/]+$";
     private static final String numbersOnly = "^[0-9]+$";
     private static final String forHashSaltOtpSeedResponse = "^[a-zA-Z0-9$=/+]+$";
 
@@ -17,6 +18,10 @@ public class InputUtils {
 
     public static boolean numbersOnly(String s) {
         return s.matches(numbersOnly);
+    }
+
+    public static boolean forComments(String s) {
+        return s.matches(forComments);
     }
 
     public static boolean forHashSaltOtpSeedResponse(String s) {

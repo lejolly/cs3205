@@ -34,7 +34,7 @@ public class CreateRequest extends BaseJsonFormat {
                         baseJsonFormat.getData().containsKey("quantity") &&
                         InputUtils.numbersOnly(baseJsonFormat.getData().get("quantity")) &&
                         baseJsonFormat.getData().containsKey("comment") &&
-                        InputUtils.withWhitespace(baseJsonFormat.getData().get("comment"))) {
+                        InputUtils.forComments(baseJsonFormat.getData().get("comment"))) {
                     return fromBaseFormat(baseJsonFormat, new CreateRequest());
                 }
             }
