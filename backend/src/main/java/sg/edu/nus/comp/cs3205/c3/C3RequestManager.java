@@ -121,7 +121,7 @@ public class C3RequestManager {
             if (baseJsonFormat.getData().get("username").equals(username) &&
                     baseJsonFormat.getData().get("table_id").equals("users")) {
                 if (baseJsonFormat.getAction().equals("create_request") &&
-                        action.equals("add")) {
+                        action.equals("create")) {
                     logger.info("Received request to add new user");
                     User user = new User(0, username,
                             baseJsonFormat.getData().get("hash"),
@@ -135,7 +135,7 @@ public class C3RequestManager {
                             SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
                             Map<String, String> map = new HashMap<>();
                             map.put("username", sanitizedUser.getUsername());
-                            map.put("action", "add");
+                            map.put("action", "create");
                             map.put("result", "true");
                             smsResult.setData(map);
                             smsResult.setId("c3");
