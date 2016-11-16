@@ -41,6 +41,16 @@ public class C3SessionManager {
         sms_tokens.remove(sms_token);
     }
 
+    public synchronized void removeUsernameFromSms_tokens(String username) {
+        Set<String> sms_token = sms_tokens.entrySet().stream()
+                .filter(entry -> entry.getValue().getData().get("username").equals(username))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+        for (String key : sms_token) {
+            sms_tokens.remove(key);
+        }
+    }
+
     public synchronized void addChallenge(String challenge) {
         challenges.add(challenge);
     }

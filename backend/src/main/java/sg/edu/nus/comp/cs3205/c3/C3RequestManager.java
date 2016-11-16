@@ -110,7 +110,62 @@ public class C3RequestManager {
 
     private SmsResult parseSmsChallenge(SmsChallenge smsChallenge) {
         SmsResult smsResult = new SmsResult();
-        
+        String challenge = smsChallenge.getData().get("challenge");
+        String username = smsChallenge.getData().get("username");
+        String action = smsChallenge.getData().get("action");
+        String authUsername = c3SessionManager.getUsernameFromAuth_token(smsChallenge.getData().get("auth_token"));
+        if (c3SessionManager.isInSms_tokens(challenge) && authUsername != null &&
+                C3UserQueries.getUserRole(authUsername).equals("admin")) {
+            BaseJsonFormat baseJsonFormat = c3SessionManager.getActionFromSms_token(challenge);
+            if (baseJsonFormat.getData().get("username").equals(username) &&
+                    baseJsonFormat.getData().get("table_id").equals("users")) {
+                if (baseJsonFormat.getAction().equals("create_request") &&
+                        action.equals("add")) {
+                    logger.info("Received request to add new user");
+                    User user = new User(0, username,
+                            baseJsonFormat.getData().get("hash"),
+                            baseJsonFormat.getData().get("salt"),
+                            HashUtils.getNewOtpSeed(),
+                            baseJsonFormat.getData().get("role"),
+                            baseJsonFormat.getData().get("full_name"),
+                            Integer.parseInt(baseJsonFormat.getData().get("number")));
+                    if (user.getRole().equals("user") || user.getRole().equals("admin")) {
+                        if (C3UserQueries.addUser(user) && C3UserQueries.doesUserExist(user.getUsername())) {
+                            SanitizedUser sanitizedUser = new SanitizedUser(C3UserQueries.getUser(user.getUsername()));
+                            Map<String, String> map = new HashMap<>();
+                            map.put("username", sanitizedUser.getUsername());
+                            map.put("action", "add");
+                            map.put("result", "true");
+                            smsResult.setData(map);
+                            smsResult.setId("c3");
+                            c3SessionManager.removeSms_token(challenge);
+                            return smsResult;
+                        }
+                    }
+                } else if (baseJsonFormat.getAction().equals("delete_request") &&
+                        action.equals("delete")) {
+                    if (C3UserQueries.doesUserExist(username)) {
+                        logger.info("Received request to delete user");
+                        if (C3UserQueries.deleteUser(username)) {
+                            Map<String, String> map = new HashMap<>();
+                            map.put("username", username);
+                            map.put("action", "delete");
+                            map.put("result", "true");
+                            smsResult.setData(map);
+                            smsResult.setId("c3");
+                            c3SessionManager.removeSms_token(challenge);
+                            return smsResult;
+                        }
+                    }
+                }
+            }
+        }
+        c3SessionManager.removeUsernameFromSms_tokens(username);
+        Map<String, String> map = new HashMap<>();
+        map.put("username", username);
+        map.put("action", action);
+        map.put("result", "false");
+        smsResult.setData(map);
         smsResult.setError("Invalid sms challenge.");
         return smsResult;
     }
