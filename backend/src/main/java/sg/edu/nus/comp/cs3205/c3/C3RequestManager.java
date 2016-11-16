@@ -255,7 +255,8 @@ public class C3RequestManager {
                 return createResponse;
             }
         } else if (createRequest.getData().get("table_id").equals("items")) {
-            if (!C3ItemQueries.doesItemExist(createRequest.getData().get("name"))) {
+            if (!C3ItemQueries.doesItemExist(createRequest.getData().get("name")) &&
+                    Integer.parseInt(createRequest.getData().get("quantity")) >= 0) {
                 logger.info("Received request to add new item");
                 Item item = new Item(0, createRequest.getData().get("name"),
                         Integer.parseInt(createRequest.getData().get("quantity")),
@@ -311,7 +312,8 @@ public class C3RequestManager {
                 return updateResponse;
             }
         } else if (updateRequest.getData().get("table_id").equals("items") &&
-                C3ItemQueries.doesItemExist(updateRequest.getData().get("name"))) {
+                C3ItemQueries.doesItemExist(updateRequest.getData().get("name")) &&
+                Integer.parseInt(updateRequest.getData().get("quantity")) >= 0) {
             logger.info("Received request to update item");
             Item item = new Item(Integer.parseInt(updateRequest.getData().get("id")),
                     updateRequest.getData().get("name"),
