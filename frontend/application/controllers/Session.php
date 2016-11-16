@@ -21,11 +21,11 @@ class Session extends CI_Controller {
 		$response = $this->input->post('response');
 		$csrf_token = $this->input->post('csrf_token');
 		$otp = $this->input->post('otp');
-		log_message('debug', '[PARAMS] username=' . $username);
-		log_message('debug', '[PARAMS] challenge=' . $challenge);
-		log_message('debug', '[PARAMS] response=' . $response);
-		log_message('debug', '[PARAMS] csrf_token=' . $csrf_token);
-		log_message('debug', '[PARAMS] otp=' . $otp);
+		log_message('debug', '[PARAMS] username = ' . $username);
+		log_message('debug', '[PARAMS] challenge = ' . $challenge);
+		log_message('debug', '[PARAMS] response = ' . $response);
+		log_message('debug', '[PARAMS] csrf_token = ' . $csrf_token);
+		log_message('debug', '[PARAMS] otp = ' . $otp);
 
 		if($username == null || $challenge == null || $response == null || $csrf_token == null || $otp == null) {
 			log_message('debug', '[PARAMS] One or more credentials missing');
@@ -44,31 +44,27 @@ class Session extends CI_Controller {
 
 			try {
 				$packet = $this->request->get_packet($action, $data, $id);
-				log_message('debug', '[REQUEST] login_request: ' . $packet);
 				$response = $this->request->send_request($packet);
-				log_message('debug', '[RESPONSE] login_response: ' . var_export($response, true));
-// TODO: signature verification?
-				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'/*, 'csrf_token' exclude for now*/));
+				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'));
 				$_SESSION['auth_token'] = $data['auth_token'];
 				$_SESSION['role'] = $data['role'];
 				$_SESSION['username'] = $data['username'];
 				$output = json_encode($data);
 			} catch (Exception $e) {
 				log_message('error', 'Exception when trying to login: ' . $e->getMessage());
-				$error = $this->request->get_error($response);
-				$output = Request::error_output_json($error == null ? 'Unable to login, perhaps the server is down?' : $error);
+				$output = Request::error_output_json('Unable to login, perhaps the server is down?');
 			}
 
+			log_message('debug', '[OUTPUT] ' . $output);
 			$this->output->set_content_type('application/json');
         	$this->output->set_output($output);
-        	log_message('debug', '[OUTPUT] ' . $output);
 		}
 	}
 
-	public function get_salt($username = null) {
+	public function get_salt($username = '') {
 		$action = 'salt_request';
 		$data = array();
-		$data['username'] = $username == null ? '' : $username;
+		$data['username'] = $username;
 		$id = get_class($this);
 
 		try {
@@ -77,13 +73,13 @@ class Session extends CI_Controller {
 // TODO: signature verification?
 			$data = $this->request->verify_payload($response, 'salt_response', array('username', 'salt', 'challenge'));
 			$output = json_encode($data);
-			log_message('debug', '[OUTPUT] ' . $output);
 		} catch(Exception $e) {
 			log_message('error', 'Exception when getting user salt: ' . $e->getMessage());
 			$output = Request::error_output_json('Unable to retrieve user salt, perhaps the server is down?');
-			log_message('debug', '[OUTPUT] ' . $output);
+			
 		}
 
+		log_message('debug', '[OUTPUT] ' . $output);
 		$this->output->set_content_type('application/json');
         $this->output->set_output($output);
 	}

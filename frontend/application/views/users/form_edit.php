@@ -17,9 +17,9 @@ function checkForm() {
 
     var number = parseInt($('#number').val());
 
-    if(isNaN(number) || number < 80000000 || number > 90000000) {
+    if(isNaN(number) || number < 80000000 || number > 99999999) {
         error = true;
-        setErrorState(inputs.number)
+        setErrorState(inputs.number);
         addDangerAlert('Please enter a valid phone number');
     }
 
@@ -39,21 +39,6 @@ function checkForm() {
                 <label for="number">Phone Number</label>
                 <input type="phone" class="form-control" name="number" id="number" placeholder="Phone Number" value="<?php echo $number; ?>">
             </div>
-            <div class="form-group">
-                <label>User Role</label>
-	            <div class="radio">
-	                <label>
-	                    <input type="radio" name="role" id="role_user_radio" value="user" <?php if(strcmp($role, 'user') == 0) {echo 'checked';} ?>>
-	                    Normal User
-	                </label>
-	            </div>
-	            <div class="radio">
-	                <label>
-	                    <input type="radio" name="role" id="role_user_radio" value="admin" <?php if(strcmp($role, 'admin') == 0) {echo 'checked';} ?>>
-	                    Admin User
-	                </label>
-	            </div>
-	        </div>
             <div class="form-group">
                 <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Update User</button>
                 <input type="hidden" name="username" value="<?php echo $username; ?>">

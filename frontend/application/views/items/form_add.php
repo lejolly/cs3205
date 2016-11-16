@@ -1,11 +1,28 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <script type="text/javascript" src="<?php echo base_url(); ?>js/form.js"></script>
 <script>
-
 function checkForm() {
     var error = false;
-    var inputs = {name: $('#name')};
+    var inputs = {name: $('#name'), quantity: $('#quantity')};
     clearFormValidation(inputs);
+
+    if(inputs.name.val() == '') {
+        error = true;
+        setErrorState(inputs.name);
+        addDangerAlert('Please enter the item name');
+    }
+
+    var quantity = parseInt($('#quantity').val());
+
+    if(isNaN(quantity) || quantity < 0) {
+        error = true;
+        setErrorState(inputs.quantity);
+        addDangerAlert('Please provide a valid non-negative quantity');
+    }
+
+    if(!error) {
+        $('#form').submit();
+    }
 }
 </script>
 <div class="row">
@@ -17,18 +34,14 @@ function checkForm() {
             </div>
             <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <select class="form-control">
-                <?php for($i = 1; $i <= 100; $i++): ?>
-                	<option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                <?php endfor; ?>
-                </select>
+                <input type="number" class="form-control" name="quantity" id="quantity" placeholder="Quantity of Item" value="1">
             </div>
             <div class="form-group">
                 <label for="comment">Comment</label>
-                <textarea class="form-control" rows="4" placeholder="Comments for Item"></textarea>
+                <textarea class="form-control" rows="4" placeholder="Comments for Item" name="comment"></textarea>
             </div>
             <div class="form-group">
-                <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Add New Item</button>
+                <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Add Item</button>
             </div>
         </form>
     </div>

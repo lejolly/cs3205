@@ -67,7 +67,7 @@ class Admin extends CI_Controller {
 			}
 		}
 
-		$page['title'] = 'Add New User';
+		$page['title'] = 'Add User';
 		$page['contents'] = $this->load->view('users/form_add', null, true);
 		$this->load->view('layout', $page);
 	}
@@ -77,18 +77,16 @@ class Admin extends CI_Controller {
 
 		$full_name = $this->input->post('full_name');
 		$number = $this->input->post('number');
-		$role = $this->input->post('role');
 		$username = $this->input->post('username');
-		if($full_name != null && $number != null && $role != null) {
+		if($full_name != null && $number != null) {
 			log_message('debug', '[PARAMS] full_name = ' . $full_name);
 			log_message('debug', '[PARAMS] number = ' . $number);
-			log_message('debug', '[PARAMS] role = ' . $role);
 			log_message('debug', '[PARAMS] username = ' . $username);
 			$action = 'update_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
 			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
-			$data = array_merge($data, compact('full_name', 'number', 'role', 'username'));
+			$data = array_merge($data, compact('full_name', 'number', 'username'));
 			$id = get_class($this);
 
 			try {
@@ -123,6 +121,59 @@ class Admin extends CI_Controller {
 				log_message('error', 'Exception when retrieving user: ' . $e->getMessage());
 				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to retrieve user details');
 				redirect('admin/users');
+			}
+		}
+	}
+
+	public function user_delete($user_id) {
+		$challenge = $this->input->post('challenge');
+
+		if($challenge != null) {
+			$action = 'sms_challenge';
+			$data['auth_token'] = $this->auth->get_auth_token();
+			$data['cstf_token'] = $this->auth->get_csrf_token();
+			$data['table_id'] = self::TABLE_ID;
+			$data['record_id'] = $user_id;
+			$data['username'] = $_SESSION['username'];
+			
+			$id = get_class($this);
+
+			try {
+				$packet = $this->request->get_packet($action, $data, $id);
+				$response = $this->request->send_request($packet);
+				$payload = $this->request->verify_payload($response, 'delete_response', array());
+				$_SESSION['flash'] = $this->utils->success_alert_html('Item deleted');
+				redirect('items');
+			} catch(Exception $e) {
+				log_message('error', 'Exception when deleting item');
+				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to delete item');
+				redirect('items');
+			}
+		} else {
+			try {
+				$action = 'retrieve_request';
+				$data['auth_token'] = $this->auth->get_auth_token();
+				$data['cstf_token'] = $this->auth->get_csrf_token();
+				$data['table_id'] = self::TABLE_ID;
+				$data['record_id'] = $user_id;
+				$id = get_class($this);
+
+				$packet = $this->request->get_packet($action, $data, $id);
+				$response = $this->request->send_request($packet);
+				$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
+
+				$action = 'delete_request';
+				$data['username'] = $payload['rows'][0]['username'];
+				$packet = $this->request->get_packet($action, $data, $id);
+				$this->request->send_request($packet);
+
+				$page['title'] = 'Confirm Delete User';
+				$page['contents'] = $this->load->view('users/form_delete', $payload['rows'][0], true);
+				$this->load->view('layout', $page);
+			} catch(Exception $e) {
+				log_message('error', 'Exception when retrieving user');
+				$_SESSION['flash'] = $this->utils->danger_alert_html('Unable to retrieve user details');
+				redirect('items');
 			}
 		}
 	}

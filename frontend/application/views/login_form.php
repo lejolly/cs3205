@@ -80,7 +80,7 @@ function submitForm(_username, salt, _challenge) {
 			} else {
 				sessionStorage.setItem('auth_token', response.auth_token);
 				sessionStorage.setItem('session_token', response.session_token);
-				window.location = '/index.php/authorized/index';
+				window.location = '/index.php/items/';
 			}
 		})
 	});

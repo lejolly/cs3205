@@ -28,7 +28,7 @@ class Auth {
 		$this->check_auth();
 		if(!$this->is_admin()) {
 			$_SESSION['flash'] = $this->CI->utils->danger_alert_html('You must be an administrator to view this page');
-			redirect('authorized/index');
+			redirect('items');
 		}
 	}
 

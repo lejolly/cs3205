@@ -30,7 +30,7 @@ function checkForm() {
 
     var number = parseInt($('#number').val());
 
-    if(isNaN(number) || number < 80000000 || number > 90000000) {
+    if(isNaN(number) || number < 80000000 || number > 99999999) {
         error = true;
         setErrorState(inputs.number)
         addDangerAlert('Please enter a valid phone number');
@@ -86,7 +86,7 @@ function checkForm() {
 	            </div>
 	        </div>
             <div class="form-group">
-                <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Add New User</button>
+                <button type="button" class="btn btn-primary btn-block" onClick="javascript:checkForm();">Add User</button>
                 <input type="hidden" name="hash" id="hash" value="">
                 <input type="hidden" name="salt" id="salt" value="">
             </div>

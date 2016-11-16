@@ -14,7 +14,7 @@ class Request {
 		    throw new Exception("Unable to create socket" . socket_strerror(socket_last_error()));
 		}
 
-		$result = socket_connect($socket, $address, $port);
+		@$result = socket_connect($socket, $address, $port);
 		if ($result === false) {
 		    throw new Exception("Unable to connect to server: " . socket_strerror(socket_last_error()));
 		}
