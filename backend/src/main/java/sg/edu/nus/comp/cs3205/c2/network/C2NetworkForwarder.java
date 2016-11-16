@@ -12,9 +12,12 @@ import org.slf4j.LoggerFactory;
 import sg.edu.nus.comp.cs3205.c2.csrf.C2CsrfManager;
 import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
+import sg.edu.nus.comp.cs3205.common.data.json.LogoutRequest;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class C2NetworkForwarder {
 
@@ -46,19 +49,18 @@ public class C2NetworkForwarder {
         try {
             BaseJsonFormat baseJsonFormat = JsonUtils.fromJsonString(line);
             if (baseJsonFormat != null && JsonUtils.hasJsonFormat(baseJsonFormat)) {
-                // uncomment to enable csrf checking for messages from c1
-//                if (!c2CsrfManager.checkCsrf(baseJsonFormat)) {
-//                    logger.info("Invalid csrf received");
-//                    if (baseJsonFormat.getData().containsKey("auth_token")) {
-//                        baseJsonFormat = new LogoutRequest();
-//                        Map<String, String> map = new HashMap<>();
-//                        map.put("auth_token", baseJsonFormat.getData().get("auth_token"));
-//                        baseJsonFormat.setData(map);
-//                        baseJsonFormat.setId("c2");
-//                    } else {
-//                        throw new Exception();
-//                    }
-//                }
+                if (!c2CsrfManager.checkCsrf(baseJsonFormat)) {
+                    logger.info("Invalid csrf received");
+                    if (baseJsonFormat.getData().containsKey("auth_token")) {
+                        baseJsonFormat = new LogoutRequest();
+                        Map<String, String> map = new HashMap<>();
+                        map.put("auth_token", baseJsonFormat.getData().get("auth_token"));
+                        baseJsonFormat.setData(map);
+                        baseJsonFormat.setId("c2");
+                    } else {
+                        throw new Exception();
+                    }
+                }
                 logger.info("Sending to C3: \"" + baseJsonFormat.getJsonString() + "\"");
                 ChannelFuture lastWriteFuture = sendMessageToC3(JsonUtils.getSignedBaseJsonFormat(
                         C2KeyManager.c2RsaPrivateKey, baseJsonFormat));
@@ -75,8 +77,7 @@ public class C2NetworkForwarder {
     }
 
     public void handleMessageFromC3(BaseJsonFormat baseJsonFormat) throws JoseException, NoSuchAlgorithmException {
-        // uncomment to enable csrf for messages to C1
-//        baseJsonFormat = c2CsrfManager.addCsrf(baseJsonFormat);
+        baseJsonFormat = c2CsrfManager.addCsrf(baseJsonFormat);
         c2ServerChannelHandler.forwardReplyToC1(baseJsonFormat);
     }
 
