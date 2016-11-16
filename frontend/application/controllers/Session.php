@@ -6,7 +6,7 @@ class Session extends CI_Controller {
 	public function login() {
 		$page = array();
 		$page['title'] = "Login";
-		$page['contents'] = $this->load->view('login_form', array(), true);
+		$page['contents'] = $this->load->view('login/form', array(), true);
 		$this->load->view('layout', $page);
 	}
 

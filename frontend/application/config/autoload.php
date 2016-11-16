@@ -58,7 +58,7 @@ $autoload['packages'] = array();
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('parser', 'auth', 'utils', 'jwt', 'request');
+$autoload['libraries'] = array('parser', 'auth', 'utils', 'jwt', 'request', 'strings');
 
 /*
 | -------------------------------------------------------------------

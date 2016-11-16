@@ -97,7 +97,7 @@ class Request {
 	private function socket_getline($socket) {
 		socket_set_nonblock($socket);
 		$start = time();
-		$timeout = 1;
+		$timeout = 2;
 	    $response = '';
 	    log_message('debug', 'Socket read start: ' . $start);
 

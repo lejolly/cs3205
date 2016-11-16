@@ -57,5 +57,6 @@ $route['login'] = 'session/login';
 $route['logout'] = 'session/logout';
 $route['admin/users'] = 'admin/user_index';
 $route['admin/users/add'] = 'admin/user_add';
+$route['admin/users/add_confirm'] = 'admin/user_add_confirm';
 $route['admin/users/edit/(:num)'] = 'admin/user_edit/$1';
 $route['admin/users/delete/(:num)'] = 'admin/user_delete/$1';
