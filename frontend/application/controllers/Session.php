@@ -62,15 +62,12 @@ class Session extends CI_Controller {
 	}
 
 	public function get_salt($username = '') {
-		$action = 'salt_request';
-		$data = array();
-		$data['username'] = $username;
-		$id = get_class($this);
-
 		try {
+			$action = 'salt_request';
+			$data['username'] = $username;
+			$id = get_class($this);
 			$packet = $this->request->get_packet($action, $data, $id);
 			$response = $this->request->send_request($packet);
-// TODO: signature verification?
 			$data = $this->request->verify_payload($response, 'salt_response', array('username', 'salt', 'challenge'));
 			$output = json_encode($data);
 		} catch(Exception $e) {
