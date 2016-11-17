@@ -45,8 +45,6 @@ class Request {
 
 	public function verify_payload($jws, $action, $data_fields, $toplevel_fields = array()) {
 		$payload = json_decode(Jwt::verify_signature($jws)['message'], true);
-		log_message('debug', '[RESPONSE] jws: ' . $jws);
-		log_message('debug', '[RESPONSE] raw: ' . var_export($payload, true));
 
 		if(!isset($payload['action'])) {
 			throw new Exception('Missing field <action> in response payload');

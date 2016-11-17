@@ -26,7 +26,7 @@ class Jwt {
 
 	public static function verify_signature($packet) {
 		log_message('debug', '[RESPONSE] raw: ' . $packet);
-		$parts = explode('.', trim($packet));
+		$parts = explode('.', $packet);
 		$pub_key = Jwt::get_pub_key();
 		
 		if(count($parts) != 3) {
@@ -42,7 +42,14 @@ class Jwt {
 		log_message('debug', '[SIGNATURE LEN] '.strlen(base64_decode($parts[2])));
 		if(!openssl_verify($parts[0].'.'.$parts[1], base64_decode($parts[2]), $pub_key, OPENSSL_ALGO_SHA512)) goto fail;
 
-		return json_decode(base64_decode($parts[1]), true);
+		$payload = json_decode(base64_decode($parts[1]), true);
+
+		if($payload == null) {
+			log_message('error', 'Unable to decode JSON: ' .json_last_error_msg());
+			throw new Exception('Unable to decode JSON: ' . json_last_error());
+		} else {
+			return $payload;
+		}
 
 		fail: {
 			log_message('debug', '[OPENSSL_ERROR] ' . openssl_error_string());

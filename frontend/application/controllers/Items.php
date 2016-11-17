@@ -94,13 +94,13 @@ class Items extends CI_Controller {
 				$this->load->view('layout', $page);
 			}
 		} else {
-			$action = 'retrieve_request';
-			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['table_id'] = self::TABLE_ID;
-			$data['record_id'] = $item_id;
-			$id = get_class($this);
-
 			try {
+				$action = 'retrieve_request';
+				$data['auth_token'] = $this->auth->get_auth_token();
+				$data['table_id'] = self::TABLE_ID;
+				$data['record_id'] = $item_id;
+				$id = get_class($this);
+				
 				$packet = $this->request->get_packet($action, $data, $id);
 				$response = $this->request->send_request($packet);
 				$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
