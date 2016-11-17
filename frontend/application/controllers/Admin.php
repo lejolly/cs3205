@@ -180,14 +180,15 @@ class Admin extends CI_Controller {
 				$response = $this->request->send_request($packet);
 				$payload = $this->request->verify_payload($response, 'retrieve_response', array(), array('rows'));
 
+				$page['title'] = 'Confirm Delete User';
+				$page['contents'] = $this->load->view('users/form_delete', $payload['rows'][0], true);
+
 				$action = 'delete_request';
 				$data['username'] = $payload['rows'][0]['username'];
 				$packet = $this->request->get_packet($action, $data, $id);
 				$response = $this->request->send_request($packet);
 				$payload = $this->request->verify_payload($response, 'delete_response', array());
 
-				$page['title'] = 'Confirm Delete User';
-				$page['contents'] = $this->load->view('users/form_delete', $payload['rows'][0], true);
 				$this->load->view('layout', $page);
 			} catch(Exception $e) {
 				log_message('error', 'Exception when retrieving user');
