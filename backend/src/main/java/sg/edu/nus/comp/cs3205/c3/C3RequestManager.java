@@ -345,11 +345,6 @@ public class C3RequestManager {
                             "", "", "", "", updateRequest.getData().get("full_name"),
                             Integer.parseInt(updateRequest.getData().get("number")));
                     success = C3UserQueries.updateUser(user);
-                } else if (authUserName.equals(username)) {
-                    User user = new User(0, username,
-                            "", "", "", "", C3UserQueries.getUserFullName(username),
-                            Integer.parseInt(updateRequest.getData().get("number")));
-                    success = C3UserQueries.updateUser(user);
                 }
             }
             if (success) {
