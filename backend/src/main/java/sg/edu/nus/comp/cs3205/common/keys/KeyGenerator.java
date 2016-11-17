@@ -7,9 +7,7 @@ import sg.edu.nus.comp.cs3205.common.utils.KeyUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
 public class KeyGenerator {
@@ -31,6 +29,10 @@ public class KeyGenerator {
             logger.error("IOException: ", e);
         } catch (InvalidKeySpecException e) {
             logger.error("InvalidKeySpecException: ", e);
+        } catch (SignatureException e) {
+            logger.error("SignatureException: ", e);
+        } catch (InvalidKeyException e) {
+            logger.error("InvalidKeyException: ", e);
         }
     }
 

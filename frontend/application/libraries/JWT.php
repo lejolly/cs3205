@@ -76,6 +76,7 @@ class Jwt {
 		// $pubKey = openssl_pkey_get_public($contents);
 		// $key = openssl_pkey_get_details($pubKey)['key'];
 		$key = openssl_get_publickey($contents);
+		log_message('debug', '[PUBLIC KEY] ' . openssl_pkey_get_details($key)['key']);
 		// log_message('debug', '[PUBLIC KEY] ' . $key);
 		// log_message('debug', '[PUBLIC KEY] ' . var_export($key, true));
 
