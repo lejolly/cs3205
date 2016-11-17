@@ -53,7 +53,7 @@ class Session extends CI_Controller {
 				$output = json_encode($data);
 			} catch (Exception $e) {
 				log_message('error', 'Exception when trying to login: ' . $e->getMessage());
-				$output = Request::error_output_json('Unable to login, perhaps the server is down?');
+				$output = Request::error_output_json('Unable to login, ' . $e->getMessage());
 			}
 
 			log_message('debug', '[OUTPUT] ' . $output);
