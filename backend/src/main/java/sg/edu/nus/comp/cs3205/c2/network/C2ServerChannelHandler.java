@@ -33,7 +33,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String request) throws Exception {
-        logger.info(ctx.channel() + " received from C1: \"" + request + "\"");
+        logger.info("Received from C1: \"" + request + "\"");
         c2NetworkForwarder.handleInputFromC1(request);
     }
 
@@ -41,6 +41,7 @@ public class C2ServerChannelHandler extends SimpleChannelInboundHandler<String> 
         String reply = baseJsonFormat.getJsonString();
         logger.info("Sending to C1: \"" + reply + "\"");
         reply = JsonUtils.getSignedBaseJsonFormat(C2KeyManager.c2RsaPrivateKey, baseJsonFormat);
+        logger.info("Sending to C1: \"" + reply + "\"");
         channelHandlerContext.write(reply + "\r\n");
         channelHandlerContext.flush();
     }
