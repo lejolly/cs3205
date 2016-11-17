@@ -20,7 +20,7 @@ public class C2CsrfManager {
     // coming from C1
     public synchronized boolean checkCsrf(BaseJsonFormat baseJsonFormat) {
         if (JsonUtils.getJsonFormat(baseJsonFormat) == BaseJsonFormat.JSON_FORMAT.SALT_REQUEST) {
-               return true;
+            return true;
         }
         if (baseJsonFormat.getData().containsKey("csrf_token") &&
                 csrfMap.containsValue(baseJsonFormat.getData().get("csrf_token"))) {

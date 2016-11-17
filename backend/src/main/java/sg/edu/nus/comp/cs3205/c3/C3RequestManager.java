@@ -113,6 +113,13 @@ public class C3RequestManager {
                 }
             }
         }
+        // add auth_token to valid logged in responses
+        if (response != null && baseJsonFormat.getData().containsKey("auth_token") &&
+                checkIfLoggedIn(baseJsonFormat)) {
+            Map<String, String> map = new HashMap<>(response.getData());
+            map.put("auth_token", baseJsonFormat.getData().get("auth_token"));
+            response.setData(map);
+        }
         return response;
     }
 
