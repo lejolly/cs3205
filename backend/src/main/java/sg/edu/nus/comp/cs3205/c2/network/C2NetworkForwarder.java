@@ -13,6 +13,7 @@ import sg.edu.nus.comp.cs3205.c2.csrf.C2CsrfManager;
 import sg.edu.nus.comp.cs3205.c2.key.C2KeyManager;
 import sg.edu.nus.comp.cs3205.common.data.json.BaseJsonFormat;
 import sg.edu.nus.comp.cs3205.common.data.json.LogoutRequest;
+import sg.edu.nus.comp.cs3205.common.data.json.NotLoggedInResponse;
 import sg.edu.nus.comp.cs3205.common.utils.JsonUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -58,6 +59,10 @@ public class C2NetworkForwarder {
                         map.put("auth_token", auth_token);
                         baseJsonFormat.setData(map);
                         baseJsonFormat.setId("c2");
+                        NotLoggedInResponse notLoggedInResponse = new NotLoggedInResponse();
+                        notLoggedInResponse.setData(map);
+                        notLoggedInResponse.setId("c2");
+                        c2ServerChannelHandler.forwardReplyToC1(notLoggedInResponse);
                     } else {
                         throw new Exception();
                     }

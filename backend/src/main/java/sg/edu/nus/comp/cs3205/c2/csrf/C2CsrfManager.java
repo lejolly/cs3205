@@ -41,7 +41,8 @@ public class C2CsrfManager {
 
     // going to C1
     public synchronized BaseJsonFormat addCsrf(BaseJsonFormat baseJsonFormat) throws NoSuchAlgorithmException {
-        if (JsonUtils.getJsonFormat(baseJsonFormat) != BaseJsonFormat.JSON_FORMAT.LOGOUT_RESPONSE) {
+        if (JsonUtils.getJsonFormat(baseJsonFormat) != BaseJsonFormat.JSON_FORMAT.LOGOUT_RESPONSE &&
+                JsonUtils.getJsonFormat(baseJsonFormat) != BaseJsonFormat.JSON_FORMAT.NOT_LOGGED_IN_RESPONSE) {
             String csrf = HashUtils.getShaNonce();
             if (JsonUtils.getJsonFormat(baseJsonFormat) == BaseJsonFormat.JSON_FORMAT.SALT_RESPONSE) {
                 csrfMap.put(baseJsonFormat.getData().get("challenge"), csrf);
