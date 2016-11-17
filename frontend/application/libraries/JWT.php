@@ -4,8 +4,8 @@ include 'phpseclib/Crypt/RSA.php';
 include 'phpseclib/Math/BigInteger.php';
 
 class Jwt {
-	const C1_KEYFILE = '../backend/keys/c1_id_rsa';
-	const C2_KEYFILE = '../backend/keys/c2_id_rsa';
+	const C1_PRIVATE_KEYFILE = '../backend/keys/c1_id_rsa';
+	const C2_PUBLIC_KEYFILE = '../backend/keys/c2_id_rsa.pub';
 
 	public static function get_jws($packet) {
 		$headers = ['alg' => 'RS512'];
@@ -37,21 +37,22 @@ class Jwt {
 			log_message('debug', '[PAYLOAD] ' . base64_decode($parts[1]));
 		}
 
-		//if(!openssl_verify($parts[0].'.'.$parts[1], base64_decode($parts[2]), $pub_key, OPENSSL_ALGO_SHA512)) goto fail;
+		if(!openssl_verify($parts[0].'.'.$parts[1], base64_decode($parts[2]), $pub_key, OPENSSL_ALGO_SHA512)) goto fail;
 
 		return json_decode(base64_decode($parts[1]), true);
 
 		fail: {
+			log_message('debug', '[OPENSSL_ERROR] ' . openssl_error_string());
 			throw new Exception('Signed JWT failed to validate');
 		}
 	}
 
 	private static function get_priv_key() {
-		if(!is_readable(Jwt::C1_KEYFILE)) {
+		if(!is_readable(Jwt::C1_PRIVATE_KEYFILE)) {
 			throw new Exception('Invalid or missing C1 Private KEYFILE: ' . getcwd());
 		}
 
-		$contents = file_get_contents(Jwt::C1_KEYFILE);
+		$contents = file_get_contents(Jwt::C1_PRIVATE_KEYFILE);
 		$key = openssl_get_privatekey($contents, '');
 
 		if(!$key) {
@@ -67,14 +68,16 @@ class Jwt {
 	}
 
 	private static function get_pub_key() {
-		if(!is_readable(Jwt::C2_KEYFILE)) {
+		if(!is_readable(Jwt::C2_PUBLIC_KEYFILE)) {
 			throw new Exception('Invalid or missing C2 Public KEYFILE: ' . getcwd());
 		}
 
-		$contents = file_get_contents(Jwt::C2_KEYFILE);
-		$privKey = openssl_pkey_get_private($contents);
-		$key = openssl_pkey_get_details($privKey)['key'];
-		log_message('debug', '[PUBLIC KEY] ' . var_export($key, true));
+		$contents = file_get_contents(Jwt::C2_PUBLIC_KEYFILE);
+		// $pubKey = openssl_pkey_get_public($contents);
+		// $key = openssl_pkey_get_details($pubKey)['key'];
+		$key = openssl_get_publickey($contents);
+		// log_message('debug', '[PUBLIC KEY] ' . $key);
+		// log_message('debug', '[PUBLIC KEY] ' . var_export($key, true));
 
 		return $key;
 	}

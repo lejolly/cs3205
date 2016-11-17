@@ -24,8 +24,8 @@ public class KeyUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(KeyUtils.class);
 
-    private static final String RSA_PUBLIC_KEY_TYPE = "RSA PUBLIC KEY";
-    private static final String RSA_PRIVATE_KEY_TYPE = "RSA PRIVATE KEY";
+    private static final String PUBLIC_KEY_TYPE = "PUBLIC KEY";
+    private static final String PRIVATE_KEY_TYPE = "PRIVATE KEY";
 
     public static void checkAndAddBouncyCastleProvider() {
         if (Security.getProvider("BC") == null) {
@@ -50,8 +50,8 @@ public class KeyUtils {
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
         RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-        writePemFile(rsaPrivateKey, RSA_PRIVATE_KEY_TYPE, "keys/" + keyPairName + "_id_rsa");
-        writePemFile(rsaPublicKey, RSA_PUBLIC_KEY_TYPE, "keys/" + keyPairName + "_id_rsa.pub");
+        writePemFile(rsaPrivateKey, PRIVATE_KEY_TYPE, "keys/" + keyPairName + "_id_rsa");
+        writePemFile(rsaPublicKey, PUBLIC_KEY_TYPE, "keys/" + keyPairName + "_id_rsa.pub");
     }
 
     public static void writePemFile(Key key, String description, String filename)
@@ -74,11 +74,11 @@ public class KeyUtils {
         KeyFactory factory = KeyFactory.getInstance("RSA", "BC");
         PEMParser pemParser = new PEMParser(new FileReader(filename));
         PemObject pemObject = (PemObject) pemParser.readPemObject();
-        if (pemObject.getType().equals(RSA_PRIVATE_KEY_TYPE)) {
+        if (pemObject.getType().equals(PRIVATE_KEY_TYPE)) {
             byte[] content = pemObject.getContent();
             PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(content);
             return factory.generatePrivate(privKeySpec);
-        } else if (pemObject.getType().equals(RSA_PUBLIC_KEY_TYPE)) {
+        } else if (pemObject.getType().equals(PUBLIC_KEY_TYPE)) {
             byte[] content = pemObject.getContent();
             X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(content);
             return factory.generatePublic(pubKeySpec);
