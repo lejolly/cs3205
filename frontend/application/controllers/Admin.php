@@ -183,7 +183,8 @@ class Admin extends CI_Controller {
 				$action = 'delete_request';
 				$data['username'] = $payload['rows'][0]['username'];
 				$packet = $this->request->get_packet($action, $data, $id);
-				$this->request->send_request($packet);
+				$response = $this->request->send_request($packet);
+				$payload = $this->request->verify_payload($response, 'delete_response', array());
 
 				$page['title'] = 'Confirm Delete User';
 				$page['contents'] = $this->load->view('users/form_delete', $payload['rows'][0], true);
