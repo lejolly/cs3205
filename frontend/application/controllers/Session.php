@@ -45,10 +45,11 @@ class Session extends CI_Controller {
 			try {
 				$packet = $this->request->get_packet($action, $data, $id);
 				$response = $this->request->send_request($packet);
-				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role'));
+				$data = $this->request->verify_payload($response, 'login_response', array('auth_token', 'username', 'role', 'csrf_token'));
 				$_SESSION['auth_token'] = $data['auth_token'];
 				$_SESSION['role'] = $data['role'];
 				$_SESSION['username'] = $data['username'];
+				$_SESSION['csrf_token'] = $data['csrf_token'];
 				$output = json_encode($data);
 			} catch (Exception $e) {
 				log_message('error', 'Exception when trying to login: ' . $e->getMessage());
@@ -68,7 +69,7 @@ class Session extends CI_Controller {
 			$id = get_class($this);
 			$packet = $this->request->get_packet($action, $data, $id);
 			$response = $this->request->send_request($packet);
-			$data = $this->request->verify_payload($response, 'salt_response', array('username', 'salt', 'challenge'));
+			$data = $this->request->verify_payload($response, 'salt_response', array('username', 'salt', 'challenge', 'csrf_token'));
 			$output = json_encode($data);
 		} catch(Exception $e) {
 			log_message('error', 'Exception when getting user salt: ' . $e->getMessage());

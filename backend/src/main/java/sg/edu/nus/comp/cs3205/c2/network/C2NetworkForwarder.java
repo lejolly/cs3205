@@ -52,9 +52,10 @@ public class C2NetworkForwarder {
                 if (!c2CsrfManager.checkCsrf(baseJsonFormat)) {
                     logger.info("Invalid csrf received");
                     if (baseJsonFormat.getData().containsKey("auth_token")) {
+                        String auth_token = baseJsonFormat.getData().get("auth_token");
                         baseJsonFormat = new LogoutRequest();
                         Map<String, String> map = new HashMap<>();
-                        map.put("auth_token", baseJsonFormat.getData().get("auth_token"));
+                        map.put("auth_token", auth_token);
                         baseJsonFormat.setData(map);
                         baseJsonFormat.setId("c2");
                     } else {

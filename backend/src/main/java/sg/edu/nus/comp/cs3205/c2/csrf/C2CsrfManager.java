@@ -41,15 +41,17 @@ public class C2CsrfManager {
 
     // going to C1
     public synchronized BaseJsonFormat addCsrf(BaseJsonFormat baseJsonFormat) throws NoSuchAlgorithmException {
-        String csrf = HashUtils.getShaNonce();
-        if (JsonUtils.getJsonFormat(baseJsonFormat) == BaseJsonFormat.JSON_FORMAT.SALT_RESPONSE) {
-            csrfMap.put(baseJsonFormat.getData().get("challenge"), csrf);
-        } else {
-            csrfMap.put(baseJsonFormat.getData().get("auth_token"), csrf);
+        if (JsonUtils.getJsonFormat(baseJsonFormat) != BaseJsonFormat.JSON_FORMAT.LOGOUT_RESPONSE) {
+            String csrf = HashUtils.getShaNonce();
+            if (JsonUtils.getJsonFormat(baseJsonFormat) == BaseJsonFormat.JSON_FORMAT.SALT_RESPONSE) {
+                csrfMap.put(baseJsonFormat.getData().get("challenge"), csrf);
+            } else {
+                csrfMap.put(baseJsonFormat.getData().get("auth_token"), csrf);
+            }
+            Map<String, String> map = new HashMap<>(baseJsonFormat.getData());
+            map.put("csrf_token", csrf);
+            baseJsonFormat.setData(map);
         }
-        Map<String, String> map = new HashMap<>(baseJsonFormat.getData());
-        map.put("csrf_token", csrf);
-        baseJsonFormat.setData(map);
         return baseJsonFormat;
     }
 

@@ -37,23 +37,23 @@ class Auth {
 	}
 
 	public function get_csrf_token() {
-		if(!isset($_SESSION['csrf_token'])) {
-			$CI = &get_instance();
+		// if(!isset($_SESSION['csrf_token'])) {
+		// 	$CI = &get_instance();
 
-			try {
-				$action = 'csrf_request';
-				$data = array();
-				$id = get_class($this);
+		// 	try {
+		// 		$action = 'csrf_request';
+		// 		$data = array();
+		// 		$id = get_class($this);
 
-				$packet = $CI->request->get_packet($action, $data, $id);
-				$response = $CI->request->send_request($packet);
-				$data = $CI->request->verify_payload($response, 'csrf_response', array('csrf_token'));
-				$_SESSION['csrf_token'] = $data['csrf_token'];
-			} catch (Exception $e) {
-				log_message('error', 'Unable to retrieve CSRF token');
-				return null;
-			}
-		}
+		// 		$packet = $CI->request->get_packet($action, $data, $id);
+		// 		$response = $CI->request->send_request($packet);
+		// 		$data = $CI->request->verify_payload($response, 'csrf_response', array('csrf_token'));
+		// 		$_SESSION['csrf_token'] = $data['csrf_token'];
+		// 	} catch (Exception $e) {
+		// 		log_message('error', 'Unable to retrieve CSRF token');
+		// 		return null;
+		// 	}
+		// }
 		return $_SESSION['csrf_token'];
 	}
 }

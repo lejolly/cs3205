@@ -51,8 +51,8 @@ function getSalt() {
 		if(response.hasOwnProperty('error')) {
 			showDangerAlert(response.error);
 		} else {
-			if(response.hasOwnProperty('salt') && response.hasOwnProperty('challenge')) {
-				submitForm(username, response.salt, response.challenge);
+			if(response.hasOwnProperty('salt') && response.hasOwnProperty('challenge') && response.hasOwnProperty('csrf_token')) {
+				submitForm(username, response.salt, response.challenge, response.csrf_token);
 			}
 		}
 	}).fail(function(jxhr, status, error) {
@@ -60,8 +60,7 @@ function getSalt() {
 	});
 }
 
-function submitForm(_username, salt, _challenge) {
-	var _csrf_token = "abc";
+function submitForm(_username, salt, _challenge, _csrf_token) {
 	var _otp = $('#otp').val();
 	var password = $('#password').val() == undefined ? '' : $('#password').val();
 	hashpw(password, salt, function(hs, err) {
@@ -79,7 +78,7 @@ function submitForm(_username, salt, _challenge) {
 				showDangerAlert(response.error);
 			} else {
 				sessionStorage.setItem('auth_token', response.auth_token);
-				sessionStorage.setItem('session_token', response.session_token);
+				sessionStorage.setItem('csrf_token', response.csrf_token);
 				window.location = '/index.php/items/';
 			}
 		})
@@ -106,5 +105,5 @@ function stringXOR(s1, s2) {
 	<label for="otp" class="sr-only">OTP</label>
 	<input type="text" id="otp" name="otp" class="form-control" placeholder="OTP" required>
 	<button class="btn btn-lg btn-primary btn-block" onClick="javascript:getSalt();" type="button">Sign in</button>
-	<input type="hidden" name="csrf" value="<?php echo $this->auth->get_csrf_token(); ?>">
+	<!--<input type="hidden" name="csrf" value="<?php echo $this->auth->get_csrf_token(); ?>">-->
 </form>
