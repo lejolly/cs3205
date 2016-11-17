@@ -11,7 +11,6 @@ class Admin extends CI_Controller {
 			$action = 'retrieve_request';
 			$data = array();
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$id = get_class($this);
 
@@ -45,7 +44,6 @@ class Admin extends CI_Controller {
 			try {
 				$action = 'create_request';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['table_id'] = 'users';
 				$data = array_merge($data, compact('full_name', 'username', 'salt', 'hash', 'number', 'role'));
 				$id = get_class($this);
@@ -66,7 +64,6 @@ class Admin extends CI_Controller {
 			try {
 				$action = 'sms_challenge';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['username'] = $username;
 				$data['challenge'] = $challenge;
 				$data['action'] = 'create';
@@ -105,7 +102,6 @@ class Admin extends CI_Controller {
 			log_message('debug', '[PARAMS] username = ' . $username);
 			$action = 'update_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$data = array_merge($data, compact('full_name', 'number', 'username'));
 			$id = get_class($this);
@@ -126,7 +122,6 @@ class Admin extends CI_Controller {
 		} else {
 			$action = 'retrieve_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['cstf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$data['record_id'] = $user_id;
 			$id = get_class($this);
@@ -154,7 +149,6 @@ class Admin extends CI_Controller {
 			try {
 				$action = 'sms_challenge';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['username'] = $username;
 				$data['challenge'] = $challenge;
 				$data['action'] = 'delete';
@@ -178,7 +172,6 @@ class Admin extends CI_Controller {
 			try {
 				$action = 'retrieve_request';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['table_id'] = self::TABLE_ID;
 				$data['record_id'] = $user_id;
 				$id = get_class($this);

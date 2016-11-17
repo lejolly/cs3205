@@ -77,8 +77,6 @@ function submitForm(_username, salt, _challenge, _csrf_token) {
 			if(response.hasOwnProperty('error') && response.error != '') {
 				showDangerAlert(response.error);
 			} else {
-				sessionStorage.setItem('auth_token', response.auth_token);
-				sessionStorage.setItem('csrf_token', response.csrf_token);
 				window.location = '/index.php/items/';
 			}
 		})
@@ -105,5 +103,4 @@ function stringXOR(s1, s2) {
 	<label for="otp" class="sr-only">OTP</label>
 	<input type="text" id="otp" name="otp" class="form-control" placeholder="OTP" required>
 	<button class="btn btn-lg btn-primary btn-block" onClick="javascript:getSalt();" type="button">Sign in</button>
-	<!--<input type="hidden" name="csrf" value="<?php echo $this->auth->get_csrf_token(); ?>">-->
 </form>

@@ -10,7 +10,6 @@ class Items extends CI_Controller {
 		$action = 'retrieve_request';
 		$data = array();
 		$data['auth_token'] = $this->auth->get_auth_token();
-		$data['csrf_token'] = $this->auth->get_csrf_token();
 		$data['table_id'] = self::TABLE_ID;
 		$id = get_class($this);
 
@@ -42,7 +41,6 @@ class Items extends CI_Controller {
 
 			$action = 'create_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$data = array_merge($data, compact('name', 'quantity', 'comment'));
 			$id = get_class($this);
@@ -77,7 +75,6 @@ class Items extends CI_Controller {
 
 			$action = 'update_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['csrf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$data['id'] = $item_id;
 			$data = array_merge($data, compact('name', 'quantity', 'comment'));
@@ -99,7 +96,6 @@ class Items extends CI_Controller {
 		} else {
 			$action = 'retrieve_request';
 			$data['auth_token'] = $this->auth->get_auth_token();
-			$data['cstf_token'] = $this->auth->get_csrf_token();
 			$data['table_id'] = self::TABLE_ID;
 			$data['record_id'] = $item_id;
 			$id = get_class($this);
@@ -129,7 +125,6 @@ class Items extends CI_Controller {
 			try {
 				$action = 'delete_request';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['table_id'] = self::TABLE_ID;
 				$data['name'] = $name;
 				$id = get_class($this);
@@ -147,7 +142,6 @@ class Items extends CI_Controller {
 			try {
 				$action = 'retrieve_request';
 				$data['auth_token'] = $this->auth->get_auth_token();
-				$data['csrf_token'] = $this->auth->get_csrf_token();
 				$data['table_id'] = self::TABLE_ID;
 				$data['record_id'] = $item_id;
 				$id = get_class($this);

@@ -2,7 +2,6 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Request {
-
 	public function send_request($request) {
 		log_message('debug', '[REQUEST] '.$request);
 
@@ -36,6 +35,7 @@ class Request {
 		$packet = array();
 		$packet['action'] = $action;
 		$packet['data'] = $data;
+		if(isset($_SESSION['csrf_token'])) $packet['data']['csrf_token'] = $_SESSION['csrf_token'];
 		$packet['error'] = '';
 		$packet['id'] = $id;
 		$packet['input'] = '';
@@ -45,8 +45,12 @@ class Request {
 
 	public function verify_payload($json_payload, $action, $data_fields, $toplevel_fields = array()) {
 		$payload = json_decode($json_payload, true);
+		$data_fields[] = 'csrf_token';
+
 		if(!isset($payload['action'])) {
 			throw new Exception('Missing field <action> in response payload');
+		} else if(strcmp($payload['action'], 'not_logged_in_response') == 0) {
+			redirect('logout');
 		}
 
 		if(strcmp($payload['action'], $action) != 0) {
@@ -76,6 +80,8 @@ class Request {
 			}
 			$data[$toplevel_field] = $payload[$toplevel_field];
 		}
+
+		$_SESSION['csrf_token'] = $data['csrf_token'];
 		return $data;
 	}
 
