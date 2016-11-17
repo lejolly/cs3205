@@ -19,7 +19,9 @@ class Jwt {
 		if(!openssl_sign("$headers_enc.$payload_enc", $signature, $priv_key, OPENSSL_ALGO_SHA512)) {
 			throw new Exception('Error when creating signed JWT');
 		}
+		log_message('debug', '[SIGNATURE LEN] ' . strlen($signature));
 		$signature_enc = base64_encode($signature);
+		log_message('debug', '[SIGNATURE_ENC LEN] ' . strlen($signature_enc));
 
 		$jws = "$headers_enc.$payload_enc.$signature_enc";
 		return $jws;
@@ -27,7 +29,7 @@ class Jwt {
 
 	public static function verify_signature($packet) {
 		log_message('debug', '[RESPONSE] raw: ' . $packet);
-		$parts = explode('.', $packet);
+		$parts = explode('.', trim($packet));
 		$pub_key = Jwt::get_pub_key();
 		
 		if(count($parts) != 3) {
@@ -35,8 +37,12 @@ class Jwt {
 		} else {
 			log_message('debug', '[HEADERS] ' . base64_decode($parts[0]));
 			log_message('debug', '[PAYLOAD] ' . base64_decode($parts[1]));
+			$parts[2] = strtr($parts[2], '-_', '+/');
 		}
-
+		$extra = true;
+		log_message('debug', '[SIGNATURE] ' . $parts[2]);
+		log_message('debug', '[SIGNATURE_ENC LEN] '.strlen($parts[2]));
+		log_message('debug', '[SIGNATURE LEN] '.strlen(base64_decode($parts[2])));
 		if(!openssl_verify($parts[0].'.'.$parts[1], base64_decode($parts[2]), $pub_key, OPENSSL_ALGO_SHA512)) goto fail;
 
 		return json_decode(base64_decode($parts[1]), true);
