@@ -1,8 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-include 'phpseclib/Crypt/RSA.php';
-include 'phpseclib/Math/BigInteger.php';
-
 class Jwt {
 	const C1_PRIVATE_KEYFILE = '../backend/keys/c1_id_rsa';
 	const C2_PUBLIC_KEYFILE = '../backend/keys/c2_id_rsa.pub';

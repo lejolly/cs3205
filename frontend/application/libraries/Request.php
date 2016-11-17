@@ -82,7 +82,10 @@ class Request {
 			$data[$toplevel_field] = $payload[$toplevel_field];
 		}
 
-		$_SESSION['csrf_token'] = $data['csrf_token'];
+		if(isset($payload['data']['csrf_token'])) {
+			$_SESSION['csrf_token'] = $payload['data']['csrf_token'];
+		}
+
 		return $data;
 	}
 
